@@ -1,0 +1,33 @@
+{
+  "name": "sails-generate-ember-rest",
+  "version": "0.1.0",
+  "description": "sails generate ember-rest",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "ember-rest",
+    "generator",
+    "sails",
+    "generate",
+    "plugin"
+  ],
+  "author": "Michael Conaway",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "~3.2.0",
+  	"merge-defaults": ">=0.1.0",
+    "pluralize": "^1.1.0"
+  },
+  "devDependencies": {
+    "sails-generate": "*",
+    "reportback": "*",
+    "fs-extra": "*"
+  },
+  "sailsGenerator": {
+    "type": "ember-rest",
+    "behavior": "overrides `sails generate ember-rest`",
+    "sailsVersion": "~0.12.0"
+  }
+}
