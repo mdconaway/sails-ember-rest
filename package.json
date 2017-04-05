@@ -7,12 +7,25 @@
     "test": "mocha"
   },
   "keywords": [
+    "ember",
+    "rest",
     "ember-rest",
     "generator",
+    "controller",
+    "virtual",
     "sails",
     "generate",
-    "plugin"
+    "plugin",
+    "addon"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdconaway/sails-ember-rest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mdconaway/sails-ember-rest/issues"
+  },
+  "homepage": "https://github.com/mdconaway/sails-ember-rest#readme",
   "author": "Michael Conaway",
   "license": "MIT",
   "dependencies": {
