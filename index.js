@@ -83,7 +83,6 @@ module.exports = {
                 scope.filename = scope.args[1].trim().replace(/(^| )(\w)/g, function(x) {
                     return x.toUpperCase();
                 }) + 'Controller';
-                scope.force = scope.args[2] === '--force';
             }
             else
             {
@@ -93,7 +92,6 @@ module.exports = {
         else
         {
             scope.filename = scope.args[0];
-            scope.force = scope.args[1] === '--force';
         }
 
         cb();
