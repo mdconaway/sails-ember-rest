@@ -6,7 +6,7 @@
 The latest stable version in npm is always a safe bet.
 
 ```sh
-$ npm install sails-generate-ember-rest
+$ npm install sails-ember-rest
 ```
 
 [![NPM](https://nodei.co/npm/sails-generate-ember-rest.png?downloads=true&stars=true)](https://nodei.co/npm/sails-generate-ember-rest/)
