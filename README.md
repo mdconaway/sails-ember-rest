@@ -53,6 +53,16 @@ The policy generator creates a set of helper policies that can allow a sails app
 # Getting started
 
 * Install the library and generators into your (new) Sails project `npm install sails-ember-rest`
+* Add this generator to your .sailsrc file:
+```javascript
+{
+  "generators": {
+    "modules": {
+        "ember-rest": "sails-ember-rest"
+    }
+  }
+}
+```
 * Run the generator: 
 * `sails generate ember-rest controller <name>`
 * `sails generate ember-rest policies`
