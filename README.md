@@ -1,6 +1,17 @@
 Sails-Ember-Rest
 ======================
 
+# VERSIONS
+
+The following versions of this library are designed for the listed versions of sails.js:
+
+* Version 0.x.x - Sails.js ^0.11.x
+* Version 1.x.x - Sails.js ^1.x.x
+
+- The Version 1.x.x series of this library is under active testing and development. If you find a bug, please open an issue or make a pull request!
+
+# Summary
+
 Ember Data REST-Adapter compatible controllers, policies, services and generators for Sails v0.12+
 
 THIS PACKAGE DERIVES THE MAJORITY OF ITS ORIGINAL IDEAS AND CODE FROM THE FOLLOWING LIBRARY: [Sails-Generate-Ember-Blueprints](https://github.com/mphasize/sails-generate-ember-blueprints)
@@ -30,6 +41,19 @@ From this require statement the following classes/objects will be available:
 **policies**
 
 (TO BE DOCUMENTED, WORK COMPLETED)
+
+**util**
+
+(TO BE DOCUMENTED, WORK COMPLETED)
+
+If you are using es6, you can import these elements and inspect them using the following code:
+
+```javascript
+import { controller, service, policies, util } from 'sails-ember-rest';
+```
+
+* controller and policies subelements are class constructors
+* service and util are singleton objects
 
 sails-ember-rest will also install 2 sails generators to make scaffolding out your application easier:
 
@@ -75,18 +99,22 @@ Now you should be up and running and your Ember Data app should be able to talk 
 ### Configuration
 
 * Configure sails to use **pluralized** blueprint routes.
+* Add a default limit to the blueprint config (Sails ^1.0)
+* You can use parseBlueprintOptions instead of defaultLimit in Sails ^1.0
 
 In `myproject/config/blueprints.js` set `pluralize: true`
 
 ```javascript
 module.exports.blueprints = {
     // ...
-    pluralize: true
+    pluralize: true,
+    defaultLimit: 100
 };
 ```
 
 * Add a configuration option `associations: { list: "link", detail: "record" }`
  to `myproject/config/models.js`. This will determine the default behaviour.
+* Also add fetch on create/update/delete to this config (Sails ^1.0)
 
 ```javascript
 module.exports.models = {
@@ -94,7 +122,11 @@ module.exports.models = {
     associations: {
         list: "link",
         detail: "record"
-    }
+    },
+    fetchRecordsOnUpdate: true,
+    fetchRecordsOnDestroy: true,
+    fetchRecordsOnCreate: true,
+    fetchRecordsOnCreateEach: true
 };
  ```
 
@@ -114,7 +146,9 @@ module.exports.models = {
 
 ```javascript
 attributes: {
-    name : "string",
+    name : {
+        type: "string"
+    },
     posts: {
         collection: "post",
         via: "user",
@@ -155,6 +189,8 @@ export default DS.RESTAdapter.extend({
     host: 'http://localhost:1337' // Sails server
 });
 ```
+
+* Please note that in Sails 1.0, record updates should be made through PATCH requests, not PUT requests. You can modify the http verb used by the Ember RESTAdapter used during updates to avoid getting deprecation warnings in the Sails 1.0 console.
 
 
 ### Create with current user

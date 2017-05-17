@@ -50,9 +50,6 @@ var Ember = {
                 return record.id;
             });
         });
-        _.each(json, function(array, key){
-
-        });
 
         // add *links* for relationships to sideloaded records
         Object.keys(json).forEach(function(key){
@@ -62,7 +59,7 @@ var Ember = {
             {
                 if(!_.isNumber(array[0]) && !_.isString(array[0])) // this is probably an array of records
                 {
-                    var model = sails.models[pluralize(_.camelCase(key).toLowerCase(), 1)];
+                    var model = sails.models[pluralize(_.kebabCase(key).toLowerCase(), 1)];
                     Ember.linkAssociations(model, array);
                 }
             }
@@ -83,7 +80,8 @@ var Ember = {
         var emberModelIdentity = model.globalId;
         var modelPlural = pluralize( emberModelIdentity );
         var linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
-        var documentIdentifier = _.kebabCase(modelPlural);
+        var documentIdentifier = _.camelCase(modelPlural);
+        var toJSON = model.customToJSON ? model.customToJSON : function(){return this;};
         var json = {};
 
         json[documentIdentifier] = [];
@@ -97,7 +95,7 @@ var Ember = {
                 // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
                 if(assoc.include === "record")
                 {
-                    var assocModelIdentifier = pluralize(_.kebabCase( sails.models[assoc.collection || assoc.model].globalId));
+                    var assocModelIdentifier = pluralize(_.camelCase( sails.models[assoc.collection || assoc.model].globalId));
                     // initialize jsoning object
                     if(!json.hasOwnProperty(assoc.alias))
                     {
@@ -110,9 +108,9 @@ var Ember = {
         records.forEach(function(record){
             // get rid of the record's prototype ( otherwise the .toJSON called in res.send would re-insert embedded records)
             var links = {};
-            record = Object.assign({}, record.toJSON());
+            record = Object.assign({}, toJSON.call(record));
             associations.forEach(function(assoc){
-                var assocModelIdentifier = pluralize(_.kebabCase(sails.models[assoc.collection || assoc.model].globalId));
+                var assocModelIdentifier = pluralize(_.camelCase(sails.models[assoc.collection || assoc.model].globalId));
                 var assocModel;
                 if(assoc.type === "collection")
                 {

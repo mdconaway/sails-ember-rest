@@ -24,7 +24,7 @@ module.exports = {
             detail: "record"
         };
         var associations = Model.associations;
-        var attributes = Model._attributes;
+        var attributes = Model.attributes;
         associations.forEach(function(assoc){
             assoc.include = _.extend({}, presentationDefaults, attributes[assoc.alias].includeIn)[style]; // extend association object with presentation configuration
             if(attributes[assoc.alias].through)
@@ -159,7 +159,7 @@ module.exports = {
 
     /**
      * Subscribe deep (associations)
-     *
+     * This likely needs to be refactored to fully support sails 1.0. 
      * @param   {[type]} associations   [description]
      * @param   {[type]} record         [description]
      * @return {[type]}                 [description]
@@ -247,13 +247,13 @@ module.exports = {
         req.options.criteria.blacklist = req.options.criteria.blacklist || [ 'limit', 'skip', 'sort', 'populate' ];
         // Validate blacklist to provide a more helpful error msg.
         var blacklist = req.options.criteria && req.options.criteria.blacklist;
-        if(blacklist && !_.isArray(blacklist))
+        if(blacklist && !Array.isArray(blacklist))
         {
             throw new Error( 'Invalid `req.options.criteria.blacklist`. Should be an array of strings (parameter names.)' );
         }
 
         // Look for explicitly specified `where` parameter.
-        var where = req.params.all().where;
+        var where = req.allParams().where;
 
         // If `where` parameter is a string, try to interpret it as JSON
         if (_.isString(where))
@@ -268,7 +268,7 @@ module.exports = {
 
             // Prune params which aren't fit to be used as `where` criteria
             // to build a proper where query
-            where = req.params.all();
+            where = req.allParams();
 
             // Omit built-in runtime config (like query modifiers)
             where = _.omit(where, blacklist || ['limit', 'skip', 'sort']);
