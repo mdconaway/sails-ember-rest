@@ -1,5 +1,5 @@
 //This crude map generator is only needed until waterline provides a means to count relationships
-function generateManyMap(models){
+module.exports = function generateManyMap(models){
     const aliasMap = {};
     Object.keys(models).forEach((k) => {
         let model = models[k];
