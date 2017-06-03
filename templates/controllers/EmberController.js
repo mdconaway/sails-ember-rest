@@ -6,7 +6,7 @@
  */
 const create = require('./../actions/create');
 const destroy = require('./../actions/destroy');
-const find = require('./../actions/destroy');
+const find = require('./../actions/find');
 const findone = require('./../actions/findone');
 const hydrate = require('./../actions/hydrate');
 const populate = require('./../actions/populate');
