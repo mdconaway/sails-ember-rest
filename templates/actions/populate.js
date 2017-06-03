@@ -48,7 +48,7 @@ module.exports = function(interrupts) {
         const skip = actionUtil.parseSkip(req);
         const limit = actionUtil.parseLimit(req);
         const sort = actionUtil.parseSort(req);
-        if(childPk){
+        if (childPk) {
             where[RelatedModel.primaryKey] = [childPk];
         }
         const populateOptions = {
@@ -58,58 +58,61 @@ module.exports = function(interrupts) {
         if (limit) populateOptions.limit = limit;
         if (sort) populateOptions.sort = sort;
 
-        async.parallel({
-            count: Ember.countRelationship(Model, association, parentPk),
-            records: (done) => {
-                Model.findOne(parentPk).populate(relation, populateOptions).exec((err, matchingRecord) => {
-                    if(err)
-                    {
-                        return done(err);
-                    }
-                    if(!matchingRecord)
-                    {
-                        return done(new Error('No record found with the specified id.'));
-                    }
-                    if(!matchingRecord[relation])
-                    {
-                        return done(new Error(util.format('Specified record (%s) is missing relation `%s`', parentPk, relation)));
-                    }
-                    done(null, { parent: matchingRecord, children: matchingRecord[relation] });
-                });
-            }
-        }, (err, results) => {
-            if(err)
+        async.parallel(
             {
-                return res.serverError(err);
-            }
-            const children = results.records.children;
-            interrupts.populate.call(
-                this,
-                req,
-                res,
-                () => {
-                    // Subcribe to instance, if relevant
-                    // TODO: only subscribe to populated attribute- not the entire model
-                    if (sails.hooks.pubsub && req.isSocket) {
-                        Model.subscribe(req, results.records.parent);
-                        actionUtil.subscribeDeep(req, results.records.parent);
-                    }
-                    // find the model identity and the Collection for this relation
-                    
-                    const documentIdentifier = pluralize(_.kebabCase(RelatedModel.globalId));
-                    const related = Ember.linkAssociations(RelatedModel, children);
-                    const json = {};
+                count: Ember.countRelationship(Model, association, parentPk),
+                records: done => {
+                    Model.findOne(parentPk).populate(relation, populateOptions).exec((err, matchingRecord) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        if (!matchingRecord) {
+                            return done(new Error('No record found with the specified id.'));
+                        }
+                        if (!matchingRecord[relation]) {
+                            return done(
+                                new Error(
+                                    util.format('Specified record (%s) is missing relation `%s`', parentPk, relation)
+                                )
+                            );
+                        }
+                        done(null, { parent: matchingRecord, children: matchingRecord[relation] });
+                    });
+                }
+            },
+            (err, results) => {
+                if (err) {
+                    return res.serverError(err);
+                }
+                const children = results.records.children;
+                interrupts.populate.call(
+                    this,
+                    req,
+                    res,
+                    () => {
+                        // Subcribe to instance, if relevant
+                        // TODO: only subscribe to populated attribute- not the entire model
+                        if (sails.hooks.pubsub && req.isSocket) {
+                            Model.subscribe(req, results.records.parent);
+                            actionUtil.subscribeDeep(req, results.records.parent);
+                        }
+                        // find the model identity and the Collection for this relation
 
-                    json[documentIdentifier] = related;
-                    //BOOM! counted relationships!
-                    json.meta = {
-                        total: results.count
-                    };
-                    res.ok(json, actionUtil.parseLocals(req));
-                },
-                Model,
-                children
-            );
-        });
+                        const documentIdentifier = pluralize(_.kebabCase(RelatedModel.globalId));
+                        const related = Ember.linkAssociations(RelatedModel, children);
+                        const json = {};
+
+                        json[documentIdentifier] = related;
+                        //BOOM! counted relationships!
+                        json.meta = {
+                            total: results.count
+                        };
+                        res.ok(json, actionUtil.parseLocals(req));
+                    },
+                    Model,
+                    children
+                );
+            }
+        );
     };
 };

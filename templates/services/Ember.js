@@ -18,17 +18,15 @@ module.exports = {
      * @param {ObjectID} pk The pk value of the parent record to count a relationship FROM
      * @return {Function} The returned structure is an `async` ready function
      */
-    countRelationship(model, association, pk){
-        if(!mapGen)
-        {
+    countRelationship(model, association, pk) {
+        if (!mapGen) {
             aliasMap = generateManyMap(sails.models);
             mapGen = true;
         }
-        if(aliasMap[model.identity] && aliasMap[model.identity][association.alias])
-        {
+        if (aliasMap[model.identity] && aliasMap[model.identity][association.alias]) {
             return aliasMap[model.identity][association.alias](pk);
         }
-        return function(done){
+        return function(done) {
             done(null, 0);
         };
     },
@@ -107,9 +105,11 @@ module.exports = {
         let modelPlural = pluralize(emberModelIdentity);
         let linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
         let documentIdentifier = _.camelCase(modelPlural);
-        const toJSON = model.customToJSON ? model.customToJSON : function(){
-            return this;
-        };
+        const toJSON = model.customToJSON
+            ? model.customToJSON
+            : function() {
+                  return this;
+              };
         let json = {};
 
         json[documentIdentifier] = [];

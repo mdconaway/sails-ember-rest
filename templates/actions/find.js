@@ -38,7 +38,7 @@ module.exports = function(interrupts) {
             (err, results) => {
                 if (err) return res.serverError(err);
                 const matchingRecords = results.records;
-                const ids = matchingRecords.map((record) => {
+                const ids = matchingRecords.map(record => {
                     return record[Model.primaryKey];
                 });
                 interrupts.find.call(
