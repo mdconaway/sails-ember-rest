@@ -14,7 +14,9 @@ module.exports = function(interrupts) {
     return function(req, res) {
         // Look up the model
         const Model = actionUtil.parseModel(req);
-        const toJSON = Model.customToJSON ? Model.customToJSON : () => this;
+        const toJSON = Model.customToJSON ? Model.customToJSON : function(){
+            return this;
+        };
         // Locate and validate the required `id` parameter.
         const pk = actionUtil.requirePk(req);
         // Create `values` object (monolithic combination of all parameters)
