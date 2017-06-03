@@ -107,7 +107,9 @@ module.exports = {
         let modelPlural = pluralize(emberModelIdentity);
         let linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
         let documentIdentifier = _.camelCase(modelPlural);
-        let toJSON = model.customToJSON ? model.customToJSON : () => this;
+        const toJSON = model.customToJSON ? model.customToJSON : function(){
+            return this;
+        };
         let json = {};
 
         json[documentIdentifier] = [];

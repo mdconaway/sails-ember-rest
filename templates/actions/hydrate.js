@@ -19,7 +19,9 @@ module.exports = function(interrupts) {
         const modelPlural = pluralize(emberModelIdentity);
         const documentIdentifier = _.kebabCase(modelPlural);
         const response = {};
-        const toJSON = Model.customToJSON ? Model.customToJSON : () => this;
+        const toJSON = Model.customToJSON ? Model.customToJSON : function(){
+            return this;
+        };
         // Look up the association configuration and determine how to populate the query
         // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
