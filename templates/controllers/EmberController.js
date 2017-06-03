@@ -10,6 +10,7 @@ const find = require('./../actions/destroy');
 const findone = require('./../actions/findone');
 const hydrate = require('./../actions/hydrate');
 const populate = require('./../actions/populate');
+const update = require('./../actions/update');
 
 function baseController(interrupts) {
     return {
