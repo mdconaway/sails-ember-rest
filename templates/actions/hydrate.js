@@ -1,0 +1,71 @@
+/**
+ * hydrate
+ * 
+ * returns a function with access to an interruption context
+ * 
+ * @description :: Server-side logic for a generic crud controller hydrate action that can be used to represent all models
+ * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+ */
+const actionUtil = require('./../util/actionUtil');
+const pluralize = require('pluralize');
+const _ = require('lodash');
+
+module.exports = function(interrupts) {
+    return function(req, res) {
+        const Model = actionUtil.parseModel(req);
+        const pk = actionUtil.requirePk(req);
+        const query = Model.findOne(pk);
+        const emberModelIdentity = Model.globalId;
+        const modelPlural = pluralize(emberModelIdentity);
+        const documentIdentifier = _.kebabCase(modelPlural);
+        const response = {};
+        const toJSON = Model.customToJSON ? Model.customToJSON : () => this;
+        // Look up the association configuration and determine how to populate the query
+        // @todo support request driven selection of includes/populate
+        const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
+
+        actionUtil
+            .populateRecords(query, associations, true)
+            .where(actionUtil.parseCriteria(req))
+            .exec((err, matchingRecord) => {
+                if (err) return res.serverError(err);
+                if (!matchingRecord) return res.notFound('No record found with the specified `id`.');
+                interrupts.hydrate.call(
+                    this,
+                    req,
+                    res,
+                    () => {
+                        if (req._sails.hooks.pubsub && req.isSocket) {
+                            Model.subscribe(req, matchingRecord);
+                            actionUtil.subscribeDeep(req, matchingRecord);
+                        }
+                        const record = Object.assign({}, toJSON.call(matchingRecord));
+                        associations.forEach(assoc => {
+                            let assocModel;
+                            if (assoc.type === 'collection') {
+                                assocModel = req._sails.models[assoc.collection];
+                                let via = _.kebabCase(emberModelIdentity);
+                                // check if inverse is using a different name
+                                if (via !== pluralize(assoc.via, 1)) {
+                                    via = pluralize(assoc.via, 1);
+                                }
+                                if (record[assoc.alias] && record[assoc.alias].length > 0) {
+                                    // sideload association records with links for 3rd level associations
+                                    record[assoc.alias] = Ember.linkAssociations(assocModel, record[assoc.alias]);
+                                }
+                            }
+                            if (assoc.type === 'model' && record[assoc.alias]) {
+                                assocModel = req._sails.models[assoc.model];
+                                let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
+                                record[assoc.alias] = linkedRecords[0]; // reduce embedded record to id
+                            }
+                        });
+                        response[documentIdentifier] = [record];
+                        res.ok(response, actionUtil.parseLocals(req));
+                    },
+                    Model,
+                    matchingRecord
+                );
+            });
+    };
+};

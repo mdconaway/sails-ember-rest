@@ -2,12 +2,11 @@
  * Module dependencies
  */
 
-var fs = require('fs');
-var util = require('util');
-var _ = require('lodash');
+const fs = require('fs');
+const util = require('util');
+const _ = require('lodash');
+const acceptedCommands = ['controller', 'policies'];
 _.defaults = require('merge-defaults');
-var acceptedCommands = ['controller', 'policies'];
-
 /**
  * INVALID_SCOPE_VARIABLE()
  *
@@ -22,17 +21,17 @@ var acceptedCommands = ['controller', 'policies'];
  * @api private
  */
 
-function INVALID_SCOPE_VARIABLE (varname, details, message) {
-  var DEFAULT_MESSAGE =
-  'Issue encountered in generator "ember-rest":\n'+
-  'Missing required scope variable: `%s`"\n' +
-  'If you are the author of `sails-ember-rest`, please resolve this '+
-  'issue and publish a new patch release.';
+function INVALID_SCOPE_VARIABLE(varname, details, message) {
+    let DEFAULT_MESSAGE =
+        'Issue encountered in generator "ember-rest":\n' +
+        'Missing required scope variable: `%s`"\n' +
+        'If you are the author of `sails-ember-rest`, please resolve this ' +
+        'issue and publish a new patch release.';
 
-  message = (message || DEFAULT_MESSAGE) + (details ? '\n'+details : '');
-  message = util.inspect(message, varname);
+    message = (message || DEFAULT_MESSAGE) + (details ? '\n' + details : '');
+    message = util.inspect(message, varname);
 
-  return new Error(message);
+    return new Error(message);
 }
 /**
  * sails-generate-ember-rest
@@ -56,41 +55,29 @@ module.exports = {
      * @param  {Function} cb    [callback]
      */
 
-    before: function (scope, cb) {
-        if (!scope.args[0]) 
-        {
+    before(scope, cb) {
+        if (!scope.args[0]) {
             return cb(new Error('Please provide a type for ember-rest to generate.'));
-        }
-        else if (acceptedCommands.indexOf(scope.args[0]) === -1)
-        {
-            return cb(new Error('Please enter a valid command. Supported commands: ' + acceptedCommands.join()))
+        } else if (acceptedCommands.indexOf(scope.args[0]) === -1) {
+            return cb(new Error('Please enter a valid command. Supported commands: ' + acceptedCommands.join()));
         }
         scope.generatorName = scope.args[0];
-        
-        if (!scope.rootPath) 
-        {
-            return cb(INVALID_SCOPE_VARIABLE('rootPath') );
+
+        if (!scope.rootPath) {
+            return cb(INVALID_SCOPE_VARIABLE('rootPath'));
         }
 
         _.defaults(scope, {
             createdAt: new Date()
         });
 
-        if(scope.args[0] === 'controller')
-        {
-            if(typeof scope.args[1] === 'string' && scope.args[1].trim().length > 0)
-            {
-                scope.filename = scope.args[1].trim().replace(/(^| )(\w)/g, function(x) {
-                    return x.toUpperCase();
-                }) + 'Controller';
-            }
-            else
-            {
+        if (scope.args[0] === 'controller') {
+            if (typeof scope.args[1] === 'string' && scope.args[1].trim().length > 0) {
+                scope.filename = scope.args[1].trim().replace(/(^| )(\w)/g, x => x.toUpperCase()) + 'Controller';
+            } else {
                 return cb(new Error('Please enter a valid name for your new controller'));
             }
-        }
-        else
-        {
+        } else {
             scope.filename = scope.args[0];
         }
 
@@ -103,55 +90,67 @@ module.exports = {
      */
     targets: {
         './': {
-            exec: function ( scope, cb ) {
-                if(!fs.existsSync(scope.rootPath + '/api')) 
-                {
+            exec: function(scope, cb) {
+                if (!fs.existsSync(scope.rootPath + '/api')) {
                     fs.mkdirSync(scope.rootPath + '/api');
                 }
                 // check for previous installation
-                if(!scope.force && fs.existsSync( scope.rootPath + '/api/services/Ember.js' )) 
-                {
+                if (!scope.force && fs.existsSync(scope.rootPath + '/api/services/Ember.js')) {
                     console.info('Ember service detected, not overwriting. To overwrite use --force.');
-                }
-                else
-                {
-                    if(!fs.existsSync(scope.rootPath + '/api/services')) 
-                    {
+                } else {
+                    if (!fs.existsSync(scope.rootPath + '/api/services')) {
                         fs.mkdirSync(scope.rootPath + '/api/services');
                     }
-                    fs.writeFileSync(scope.rootPath + '/api/services/Ember.js', 'var SailsEmber = require(\'sails-ember-rest\');\nmodule.exports = SailsEmber.service;\n');
+                    fs.writeFileSync(
+                        scope.rootPath + '/api/services/Ember.js',
+                        "var SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
+                    );
                 }
-                if(scope.generatorName === 'controller')
-                {
-                    if(!scope.force && fs.existsSync( scope.rootPath + '/api/controllers/' + scope.filename + '.js' )) 
-                    {
-                        return cb( new Error( 'Ember controller detected at specified path, not overwriting. To overwrite use --force.' ) );
-                    }
-                    else
-                    {
-                        if(!fs.existsSync(scope.rootPath + '/api/controllers')) 
-                        {
+                if (scope.generatorName === 'controller') {
+                    if (!scope.force && fs.existsSync(scope.rootPath + '/api/controllers/' + scope.filename + '.js')) {
+                        return cb(
+                            new Error(
+                                'Ember controller detected at specified path, not overwriting. To overwrite use --force.'
+                            )
+                        );
+                    } else {
+                        if (!fs.existsSync(scope.rootPath + '/api/controllers')) {
                             fs.mkdirSync(scope.rootPath + '/api/controllers');
                         }
-                        fs.writeFileSync(scope.rootPath + '/api/controllers/' + scope.filename + '.js', 'var SailsEmber = require(\'sails-ember-rest\');\nmodule.exports = new SailsEmber.controller();\n');
-                        console.info('Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js');
+                        fs.writeFileSync(
+                            scope.rootPath + '/api/controllers/' + scope.filename + '.js',
+                            "var SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.controller();\n"
+                        );
+                        console.info(
+                            'Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js'
+                        );
                     }
-                }
-                else
-                {
-                    if(!fs.existsSync(scope.rootPath + '/api/policies')) 
-                    {
+                } else {
+                    if (!fs.existsSync(scope.rootPath + '/api/policies')) {
                         fs.mkdirSync(scope.rootPath + '/api/policies');
                     }
-                    ['Create', 'Destroy', 'Find', 'FindOne', 'Hydrate', 'Populate', 'SetHeader', 'Update'].forEach(function(file){
-                        if(!scope.force && fs.existsSync(scope.rootPath + '/api/policies/ember' + file + '.js'))
-                        {
+                    [
+                        'Create',
+                        'Destroy',
+                        'Find',
+                        'FindOne',
+                        'Hydrate',
+                        'Populate',
+                        'SetHeader',
+                        'Update'
+                    ].forEach(function(file) {
+                        if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/ember' + file + '.js')) {
                             console.info('Policy ember' + file + ' detected, skipping. To overwrite use --force.');
-                        }
-                        else
-                        {
-                            fs.writeFileSync(scope.rootPath + '/api/policies/ember' + file + '.js', 'var SailsEmber = require(\'sails-ember-rest\');\nmodule.exports = new SailsEmber.policies.ember' + file + '();\n');
-                            console.info('Created policy: ' + scope.rootPath + '/api/controllers/policies/ember' + file + '.js');
+                        } else {
+                            fs.writeFileSync(
+                                scope.rootPath + '/api/policies/ember' + file + '.js',
+                                "var SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
+                                    file +
+                                    '();\n'
+                            );
+                            console.info(
+                                'Created policy: ' + scope.rootPath + '/api/controllers/policies/ember' + file + '.js'
+                            );
                         }
                     });
                 }
@@ -159,7 +158,6 @@ module.exports = {
             }
         }
     },
-
 
     /**
      * The absolute path to the `templates` for this generator

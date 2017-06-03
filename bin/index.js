@@ -2,8 +2,8 @@
  * Module dependencies
  */
 
-var sailsgen = require( 'sails-generate' ),
-  path = require( 'path' );
+const sailsgen = require('sails-generate');
+const path = require('path');
 
 //
 // This script exists so we can run our generator
@@ -11,21 +11,21 @@ var sailsgen = require( 'sails-generate' ),
 // during development.
 //
 
-var args = Array.prototype.slice.call(process.argv, 2);
-var scope = {
-  generatorType: 'ember-rest',
-  rootPath: process.cwd(),
-  modules: {
-    'ember-rest': path.resolve( __dirname, '../' )
-  },
-  args: args
+const args = Array.prototype.slice.call(process.argv, 2);
+const scope = {
+    generatorType: 'ember-rest',
+    rootPath: process.cwd(),
+    modules: {
+        'ember-rest': path.resolve(__dirname, '../')
+    },
+    args
 };
 
-sailsgen( scope, function ( err ) {
-  if ( err ) {
-    throw err;
-  }
+sailsgen(scope, err => {
+    if (err) {
+        throw err;
+    }
 
-  // It worked.
-  console.log( 'Done.' );
-} );
+    // It worked.
+    console.log('Done.');
+});
