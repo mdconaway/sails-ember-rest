@@ -5,8 +5,33 @@
  */
 const _ = require('lodash');
 const pluralize = require('pluralize');
+const generateManyMap = require('./../util/manyMapGenerator');
+let aliasMap = {};
+let mapGen = false;
 
 module.exports = {
+    /**
+     * Generate a COUNT query to analyze a relationship for the populate action
+     *
+     * @param {Model} model The parent model class to count a relationship FROM
+     * @param {Associations} association Definition of the association
+     * @param {ObjectID} pk The pk value of the parent record to count a relationship FROM
+     * @return {Function} The returned structure is an `async` ready function
+     */
+    countRelationship(model, association, pk){
+        if(!mapGen)
+        {
+            aliasMap = generateManyMap(sails.models);
+            mapGen = true;
+        }
+        if(aliasMap[model.identity] && aliasMap[model.identity][association.alias])
+        {
+            return aliasMap[model.identity][association.alias](pk);
+        }
+        return function(done){
+            done(null, 0);
+        };
+    },
     /**
      * Prepare records and populated associations to be consumed by Ember's DS.RESTAdapter in link mode
      *
