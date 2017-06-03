@@ -38,7 +38,9 @@ module.exports = function(interrupts) {
             (err, results) => {
                 if (err) return res.serverError(err);
                 const matchingRecords = results.records;
-                const ids = matchingRecords.map(record => record[Model.primaryKey]);
+                const ids = matchingRecords.map((record) => {
+                    return record[Model.primaryKey];
+                });
                 interrupts.find.call(
                     this,
                     req,
@@ -61,7 +63,7 @@ module.exports = function(interrupts) {
                             }
                             const emberizedJSON = Ember.buildResponse(
                                 Model,
-                                results.records,
+                                matchingRecords,
                                 associations,
                                 true,
                                 associated
