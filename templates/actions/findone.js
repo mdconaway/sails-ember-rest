@@ -16,32 +16,37 @@ module.exports = function(interrupts) {
         // Look up the association configuration and determine how to populate the query
         // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
-
-        actionUtil
-            .populateRecords(query, associations)
-            .where(actionUtil.parseCriteria(req))
-            .exec((err, matchingRecord) => {
-                if (err) return res.serverError(err);
-                if (!matchingRecord) return res.notFound('No record found with the specified `id`.');
-                interrupts.findone.call(
-                    this,
-                    req,
-                    res,
-                    () => {
-                        actionUtil.populateIndexes(Model, matchingRecord.id, associations, (err, associated) => {
-                            if (sails.hooks.pubsub && req.isSocket) {
-                                Model.subscribe(req, matchingRecord);
-                                actionUtil.subscribeDeep(req, matchingRecord);
-                            }
-                            res.ok(
-                                Ember.buildResponse(Model, matchingRecord, associations, true, associated),
-                                actionUtil.parseLocals(req)
-                            );
-                        });
-                    },
-                    Model,
-                    matchingRecord
-                );
-            });
+        async.parallel({
+            matchingRecord: (done) => {
+                actionUtil
+                    .populateRecords(query, associations)
+                    .where(actionUtil.parseCriteria(req))
+                    .exec(done);
+            },
+            associated: (done) => {
+                actionUtil.populateIndexes(Model, pk, associations, done);
+            }
+        }, (err, results) => {
+            if (err) return res.serverError(err);
+            const { matchingRecord, associated } = results;
+            if (!matchingRecord) return res.notFound('No record found with the specified ' + Model.primaryKey + '.');
+            if (sails.hooks.pubsub && req.isSocket) {
+                Model.subscribe(req, matchingRecord);
+                actionUtil.subscribeDeep(req, matchingRecord);
+            }
+            interrupts.findone.call(
+                this,
+                req,
+                res,
+                () => {
+                    res.ok(
+                        Ember.buildResponse(Model, matchingRecord, associations, associated),
+                        actionUtil.parseLocals(req)
+                    );
+                },
+                Model,
+                matchingRecord
+            );
+        });
     };
 };

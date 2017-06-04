@@ -48,11 +48,6 @@ module.exports = function(interrupts) {
                             let assocModel;
                             if (assoc.type === 'collection') {
                                 assocModel = req._sails.models[assoc.collection];
-                                let via = _.kebabCase(emberModelIdentity);
-                                // check if inverse is using a different name
-                                if (via !== pluralize(assoc.via, 1)) {
-                                    via = pluralize(assoc.via, 1);
-                                }
                                 if (record[assoc.alias] && record[assoc.alias].length > 0) {
                                     // sideload association records with links for 3rd level associations
                                     record[assoc.alias] = Ember.linkAssociations(assocModel, record[assoc.alias]);
@@ -61,7 +56,7 @@ module.exports = function(interrupts) {
                             if (assoc.type === 'model' && record[assoc.alias]) {
                                 assocModel = req._sails.models[assoc.model];
                                 let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
-                                record[assoc.alias] = linkedRecords[0]; // reduce embedded record to id
+                                record[assoc.alias] = linkedRecords[0]; 
                             }
                         });
                         response[documentIdentifier] = [record];

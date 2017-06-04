@@ -82,42 +82,20 @@ module.exports = {
      * @param  {Function} done         [description]
      */
     populateIndexes(parentModel, ids, associations, done) {
-        async.reduce(
-            associations,
-            {},
-            (associatedRecords, association, next) => {
-                if (association.include === 'index') {
-                    let assocModel = null;
+        const hash = {};
+        associations.forEach((association) => {
+            if (association.include === 'index') {
+                if (association.collection && !association.through) {
                     let assocCriteria = {};
-
-                    if (association.through) {
-                        assocModel = sails.models[association.through];
-                        assocCriteria[parentModel.identity] = ids;
-                        assocModel.find(assocCriteria).exec((err, recs) => {
-                            associatedRecords[association.alias] = recs;
-                            next(err, associatedRecords);
-                        });
-                    } else if (association.collection) {
-                        assocModel = sails.models[association.collection];
-                        assocCriteria[association.via] = ids;
-                        assocModel.find(assocCriteria).exec((err, recs) => {
-                            associatedRecords[association.alias] = recs;
-                            next(err, associatedRecords);
-                        });
-                    } else if (association.model) {
-                        // belongs-To associations should already have the index
-                        assocModel = sails.models[association.model];
-                        next(null, associatedRecords);
-                    }
-                    if (assocModel === null) {
-                        return next(new Error('Could not find associated model for: ' + association.alias));
-                    }
-                } else {
-                    return next(null, associatedRecords);
+                    let assocModel = sails.models[association.collection];
+                    assocCriteria[association.via] = ids;
+                    hash[association.alias] = (done) => {
+                        assocModel.find(assocCriteria).exec(done); //it may be necessary to implement .limit() here at some point...
+                    };
                 }
-            },
-            done
-        );
+            }
+        });
+        async.parallel(hash, done);
     },
 
     /**
@@ -129,7 +107,7 @@ module.exports = {
     populateRecords(query, associations, force) {
         associations.forEach(assoc => {
             // if the associations is to be populated with the full records...
-            if (assoc.include === 'record' || force) {
+            if (assoc.include === 'record' || (assoc.through && assoc.include !== 'link') || force) {
                 query.populate(assoc.alias);
             }
         });
@@ -267,6 +245,7 @@ module.exports = {
      * @return {Object}                     the WHERE criteria object
      */
     parseCriteria(req) {
+        const Model = module.exports.parseModel(req);
         // Allow customizable blacklist for params NOT to include as criteria.
         req.options.criteria = req.options.criteria || {};
         req.options.criteria.blacklist = req.options.criteria.blacklist || ['limit', 'skip', 'sort', 'populate'];
@@ -302,9 +281,11 @@ module.exports = {
             });
 
             // Transform ids[ .., ..] request
-            if (where.ids) {
-                where.id = where.ids;
-                delete where.ids;
+            if (where.ids || where.id) {
+                let key = where.ids ? 'ids' : 'id'
+                let tmp = where.ids || where.id;
+                delete where[key];
+                where[Model.primaryKey] = tmp;
             }
 
             // Omit jsonp callback param (but only if jsonp is enabled)

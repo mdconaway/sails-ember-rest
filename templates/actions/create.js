@@ -46,18 +46,23 @@ module.exports = function(interrupts) {
                     () => {
                         // Do a final query to populate the associations of the record.
                         const query = Model.findOne(newInstance[Model.primaryKey]);
-                        actionUtil.populateRecords(query, associations).exec((err, populatedRecord) => {
+                        async.parallel({
+                            populatedRecord: (done) => {
+                                actionUtil.populateRecords(query, associations).exec(done);
+                            },
+                            associated: (done) => {
+                                actionUtil.populateIndexes(Model, newInstance[Model.primaryKey], associations, done);
+                            }
+                        }, (err, results) => {
                             if (err) return res.serverError(err);
-                            actionUtil.populateIndexes(Model, populatedRecord.id, associations, (err, associated) => {
-                                if (err) return res.serverError(err);
-                                if (!populatedRecord) return res.serverError('Could not find record after updating!');
-                                // Send JSONP-friendly response if it's supported
-                                // (HTTP 201: Created)
-                                res.created(
-                                    Ember.buildResponse(Model, populatedRecord, associations, true, associated),
-                                    actionUtil.parseLocals(req)
-                                );
-                            });
+                            const { populatedRecord, associated } = results;
+                            if (!populatedRecord) return res.serverError('Could not find record after updating!');
+                            // Send JSONP-friendly response if it's supported
+                            // (HTTP 201: Created)
+                            res.created(
+                                Ember.buildResponse(Model, populatedRecord, associations, associated),
+                                actionUtil.parseLocals(req)
+                            );
                         });
                     },
                     Model,

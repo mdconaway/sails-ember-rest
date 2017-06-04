@@ -84,29 +84,27 @@ module.exports = function(interrupts) {
                 if (err) {
                     return res.serverError(err);
                 }
-                const children = results.records.children;
+                const { parent, children } = results.records;
+                // Subcribe to instance, if relevant
+                // TODO: only subscribe to populated attribute- not the entire model
+                if (sails.hooks.pubsub && req.isSocket) {
+                    Model.subscribe(req, parent);
+                    actionUtil.subscribeDeep(req, parent);
+                }
+                // find the model identity and the Collection for this relation
+                const documentIdentifier = pluralize(_.kebabCase(RelatedModel.globalId));
+                const json = {};
+
+                json[documentIdentifier] = Ember.linkAssociations(RelatedModel, children);
+                //BOOM! counted relationships!
+                json.meta = {
+                    total: results.count
+                };
                 interrupts.populate.call(
                     this,
                     req,
                     res,
                     () => {
-                        // Subcribe to instance, if relevant
-                        // TODO: only subscribe to populated attribute- not the entire model
-                        if (sails.hooks.pubsub && req.isSocket) {
-                            Model.subscribe(req, results.records.parent);
-                            actionUtil.subscribeDeep(req, results.records.parent);
-                        }
-                        // find the model identity and the Collection for this relation
-
-                        const documentIdentifier = pluralize(_.kebabCase(RelatedModel.globalId));
-                        const related = Ember.linkAssociations(RelatedModel, children);
-                        const json = {};
-
-                        json[documentIdentifier] = related;
-                        //BOOM! counted relationships!
-                        json.meta = {
-                            total: results.count
-                        };
                         res.ok(json, actionUtil.parseLocals(req));
                     },
                     Model,

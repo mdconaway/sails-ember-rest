@@ -46,7 +46,7 @@ module.exports = {
             model.associations.forEach(assoc => {
                 if (assoc.type === 'collection') {
                     //Had to modify this code to run on app hosted at subroute
-                    links[assoc.alias] = linkPrefix + '/' + modelPlural + '/' + record.id + '/' + assoc.alias;
+                    links[assoc.alias] = linkPrefix + '/' + modelPlural + '/' + record[model.primaryKey] + '/' + assoc.alias;
                 }
             });
             if (Object.keys(links).length > 0) {
@@ -65,7 +65,6 @@ module.exports = {
      */
     finalizeSideloads(json, documentIdentifier) {
         // filter duplicates in sideloaded records
-        // @todo: prune empty association arrays
         Object.keys(json).forEach(key => {
             let array = json[key];
             if (key === documentIdentifier) return;
@@ -73,21 +72,12 @@ module.exports = {
                 delete json[key];
                 return;
             }
-            json[key] = _.uniq(array, record => record.id);
+            let model = sails.models[pluralize(_.kebabCase(key).toLowerCase(), 1)];
+            let pk = model ? model.primaryKey : 'id';
+            json[key] = _.uniq(array, record => record[pk]);
+            Ember.linkAssociations(model, json[key]);
         });
 
-        // add *links* for relationships to sideloaded records
-        Object.keys(json).forEach(key => {
-            let array = json[key];
-            if (key === documentIdentifier) return;
-            if (array.length > 0) {
-                if (!_.isNumber(array[0]) && !_.isString(array[0])) {
-                    // this is probably an array of records
-                    let model = sails.models[pluralize(_.kebabCase(key).toLowerCase(), 1)];
-                    Ember.linkAssociations(model, array);
-                }
-            }
-        });
         return json;
     },
 
@@ -97,10 +87,10 @@ module.exports = {
      * @param {Collection} model Waterline collection object (returned from parseModel)
      * @param {Array|Object} records A record or an array of records returned from a Waterline query
      * @param {Associations} associations Definition of the associations, from `req.option.associations`
-     * @param {Boolean} sideload Sideload embedded records or reduce them to primary keys?
      * @return {Object} The returned structure can be consumed by DS.RESTAdapter when passed to res.json()
      */
-    buildResponse(model, records, associations, sideload, associatedRecords) {
+    buildResponse(model, records, associations, associatedRecords) {
+        let primaryKey = model.primaryKey;
         let emberModelIdentity = model.globalId;
         let modelPlural = pluralize(emberModelIdentity);
         let linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
@@ -114,23 +104,21 @@ module.exports = {
 
         json[documentIdentifier] = [];
         records = Array.isArray(records) ? records : [records];
-        sideload = sideload || false;
 
-        if (sideload) {
-            // prepare for sideloading
-            associations.forEach(assoc => {
-                // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
-                if (assoc.include === 'record') {
-                    let assocModelIdentifier = pluralize(
-                        _.camelCase(sails.models[assoc.collection || assoc.model].globalId)
-                    );
-                    // initialize jsoning object
-                    if (!json.hasOwnProperty(assoc.alias)) {
-                        json[assocModelIdentifier] = [];
-                    }
+        // prepare for sideloading
+        associations.forEach(assoc => {
+            // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
+            if (assoc.include === 'record') {
+                let assocModelIdentifier = pluralize(
+                    _.camelCase(sails.models[assoc.collection || assoc.model].globalId)
+                );
+                // initialize jsoning object
+                if (!json.hasOwnProperty(assoc.alias)) {
+                    json[assocModelIdentifier] = [];
                 }
-            });
-        }
+            }
+        });
+        
 
         records.forEach(record => {
             // get rid of the record's prototype ( otherwise the .toJSON called in res.send would re-insert embedded records)
@@ -141,16 +129,18 @@ module.exports = {
                     _.camelCase(sails.models[assoc.collection || assoc.model].globalId)
                 );
                 let assocModel;
+                let assocPK;
                 if (assoc.type === 'collection') {
                     assocModel = sails.models[assoc.collection];
-                    let via = _.kebabCase(emberModelIdentity);
+                    assocPK = assocModel.primaryKey;
+                    let via = assoc.via;/*_.kebabCase(emberModelIdentity);
                     // check if inverse is using a different name
                     if (via !== pluralize(assoc.via, 1)) {
                         via = pluralize(assoc.via, 1);
-                    }
+                    }*/
+
                     if (
-                        sideload &&
-                        assoc.include === 'record' &&
+                        (assoc.include === 'index' || assoc.include === 'record') &&
                         record[assoc.alias] &&
                         record[assoc.alias].length > 0
                     ) {
@@ -162,55 +152,43 @@ module.exports = {
                         record[assoc.alias] = _.reduce(
                             record[assoc.alias],
                             (filtered, rec) => {
-                                filtered.push(rec.id);
+                                filtered.push(rec[assocPK]);
                                 return filtered;
                             },
                             []
                         );
                     }
-                    if (assoc.include === 'index' && associatedRecords[assoc.alias]) {
-                        if (assoc.through) {
-                            // handle hasMany-Through associations
-                            if (assoc.include === 'index' && associatedRecords[assoc.alias]) {
-                                record[assoc.alias] = _.reduce(
-                                    associatedRecords[assoc.alias],
-                                    (filtered, rec) => {
-                                        if (rec[via] === record.id) {
-                                            filtered.push(rec[assoc.collection]); //is this correct??
-                                        }
-                                        return filtered;
-                                    },
-                                    []
-                                );
-                            }
-                        } else {
-                            record[assoc.alias] = _.reduce(
-                                associatedRecords[assoc.alias],
-                                (filtered, rec) => {
-                                    if (rec[via] === record.id) {
-                                        filtered.push(rec.id);
-                                    }
-                                    return filtered;
-                                },
-                                []
-                            );
-                        }
+
+                    //through relations not in link mode are now covered by populate instead of index associations,
+                    //so they are processed in the if statement above ^
+                    if (!assoc.through && assoc.include === 'index' && associatedRecords[assoc.alias]) {
+                        record[assoc.alias] = _.reduce(
+                            associatedRecords[assoc.alias],
+                            (filtered, rec) => {
+                                if (rec[via] === record[primaryKey]) {
+                                    filtered.push(rec[assocPK]);
+                                }
+                                return filtered;
+                            },
+                            []
+                        );   
                     }
+
                     //@todo if assoc.include startsWith index: ... fill contents from selected column of join table
                     if (assoc.include === 'link') {
                         links[assoc.alias] =
-                            linkPrefix + '/' + modelPlural.toLowerCase() + '/' + record.id + '/' + assoc.alias; //"/" + sails.config.blueprints.prefix
+                            linkPrefix + '/' + modelPlural.toLowerCase() + '/' + record[model.primaryKey] + '/' + assoc.alias; //"/" + sails.config.blueprints.prefix
                         delete record[assoc.alias];
                     }
                     //record[assoc.alias] = _.map(record[assoc.alias], 'id');
                 }
-                if (assoc.type === 'model' && record[assoc.alias]) {
-                    if (sideload && assoc.include === 'record') {
-                        assocModel = sails.models[assoc.model];
-                        let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
-                        json[assocModelIdentifier] = json[assocModelIdentifier].concat(record[assoc.alias]);
-                        record[assoc.alias] = linkedRecords[0].id; // reduce embedded record to id
-                    }
+
+                if (assoc.include === 'record' && assoc.type === 'model' && record[assoc.alias]) {
+                    assocModel = sails.models[assoc.model];
+                    assocPK = assocModel.primaryKey;
+                    let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
+                    json[assocModelIdentifier] = json[assocModelIdentifier].concat(record[assoc.alias]);
+                    record[assoc.alias] = linkedRecords[0][assocPK]; // reduce embedded record to id
                     /*
                     // while it's possible, we should not really do this, it is more efficient to return a single model in a 1 to 1 relationship
                     if (assoc.include === "link")
@@ -226,9 +204,8 @@ module.exports = {
             }
             json[documentIdentifier].push(record);
         });
-        if (sideload) {
-            json = Ember.finalizeSideloads(json, documentIdentifier);
-        }
+        json = Ember.finalizeSideloads(json, documentIdentifier);
+        
         return json;
     }
 };

@@ -41,42 +41,41 @@ module.exports = function(interrupts) {
                 const ids = matchingRecords.map(record => {
                     return record[Model.primaryKey];
                 });
-                interrupts.find.call(
-                    this,
-                    req,
-                    res,
-                    () => {
-                        actionUtil.populateIndexes(Model, ids, associations, (err, associated) => {
-                            if (err) return res.serverError(err);
-                            // Only `.watch()` for new instances of the model if
-                            // `autoWatch` is enabled.
-                            if (req._sails.hooks.pubsub && req.isSocket) {
-                                Model.subscribe(req, matchingRecords);
-                                if (req.options.autoWatch) {
-                                    Model.watch(req);
-                                }
-                                // Also subscribe to instances of all associated models
-                                // @todo this might need an update to include associations included by index only
-                                matchingRecords.forEach(record => {
-                                    actionUtil.subscribeDeep(req, record);
-                                });
-                            }
-                            const emberizedJSON = Ember.buildResponse(
-                                Model,
-                                matchingRecords,
-                                associations,
-                                true,
-                                associated
-                            );
-                            emberizedJSON.meta = {
-                                total: results.count
-                            };
-                            res.ok(emberizedJSON, actionUtil.parseLocals(req));
+                actionUtil.populateIndexes(Model, ids, associations, (err, associated) => {
+                    if (err) return res.serverError(err);
+                    // Only `.watch()` for new instances of the model if
+                    // `autoWatch` is enabled.
+                    if (req._sails.hooks.pubsub && req.isSocket) {
+                        Model.subscribe(req, matchingRecords);
+                        if (req.options.autoWatch) {
+                            Model.watch(req);
+                        }
+                        // Also subscribe to instances of all associated models
+                        // @todo this might need an update to include associations included by index only
+                        matchingRecords.forEach(record => {
+                            actionUtil.subscribeDeep(req, record);
                         });
-                    },
-                    Model,
-                    matchingRecords
-                );
+                    }
+                    const emberizedJSON = Ember.buildResponse(
+                        Model,
+                        matchingRecords,
+                        associations,
+                        associated
+                    );
+                    emberizedJSON.meta = {
+                        total: results.count
+                    };
+                    interrupts.find.call(
+                        this,
+                        req,
+                        res,
+                        () => {
+                            res.ok(emberizedJSON, actionUtil.parseLocals(req));
+                        },
+                        Model,
+                        matchingRecords
+                    );
+                });
             }
         );
     };
