@@ -29,12 +29,12 @@ module.exports = function(interrupts) {
                     return res.serverError(err, actionUtil.parseLocals(req));
                 }
                 if (sails.hooks.pubsub) {
-                    Model.publishDestroy(pk, !sails.config.blueprints.mirror && req, {
+                    Model._publishDestroy(pk, !sails.config.blueprints.mirror && req, {
                         previous: record
                     });
                     if (req.isSocket) {
-                        Model.unsubscribe(req, record);
-                        Model.retire(record);
+                        Model.unsubscribe(req, [pk]);
+                        Model._retire(record);
                     }
                 }
                 interrupts.destroy.call(this, req, res, () => res.ok(null, actionUtil.parseLocals(req)), Model, record);

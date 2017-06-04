@@ -7,6 +7,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const _ = require('lodash');
 
 module.exports = function(interrupts) {
     return function(req, res) {
@@ -46,9 +47,9 @@ module.exports = function(interrupts) {
                     // Only `.watch()` for new instances of the model if
                     // `autoWatch` is enabled.
                     if (req._sails.hooks.pubsub && req.isSocket) {
-                        Model.subscribe(req, matchingRecords);
+                        Model.subscribe(req, _.pluck(matchingRecords, Model.primaryKey));
                         if (req.options.autoWatch) {
-                            Model.watch(req);
+                            Model._watch(req);
                         }
                         // Also subscribe to instances of all associated models
                         // @todo this might need an update to include associations included by index only

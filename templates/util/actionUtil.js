@@ -179,17 +179,17 @@ module.exports = {
             let ident = assoc[assoc.type];
             let AssociatedModel = sails.models[ident];
             if (req.options.autoWatch) {
-                AssociatedModel.watch(req);
+                AssociatedModel._watch(req);
             }
 
             // Subscribe to each associated model instance in a collection
             if (assoc.type === 'collection') {
                 record[assoc.alias].forEach(associatedInstance => {
-                    AssociatedModel.subscribe(req, associatedInstance);
+                    AssociatedModel.subscribe(req, [associatedInstance[AssociatedModel.primaryKey]]);
                 });
             } else if (assoc.type === 'model' && record[assoc.alias]) {
                 // If there is an associated to-one model instance, subscribe to it
-                AssociatedModel.subscribe(req, record[assoc.alias]);
+                AssociatedModel.subscribe(req, [record[assoc.alias][AssociatedModel.primaryKey]]);
             }
         });
     },

@@ -40,7 +40,7 @@ module.exports = function(interrupts) {
                     res,
                     () => {
                         if (req._sails.hooks.pubsub && req.isSocket) {
-                            Model.subscribe(req, matchingRecord);
+                            Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
                             actionUtil.subscribeDeep(req, matchingRecord);
                         }
                         const record = Object.assign({}, toJSON.call(matchingRecord));

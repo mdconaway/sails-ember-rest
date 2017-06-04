@@ -34,10 +34,10 @@ module.exports = function(interrupts) {
             async.parallel(saveMany, () => {
                 if (req._sails.hooks.pubsub) {
                     if (req.isSocket) {
-                        Model.subscribe(req, newInstance);
-                        Model.introduce(newInstance);
+                        Model.subscribe(req, [newInstance[Model.primaryKey]]);
+                        Model._introduce(newInstance);
                     }
-                    Model.publishCreate(newInstance, !req.options.mirror && req);
+                    Model._publishCreate(newInstance, !req.options.mirror && req);
                 }
                 interrupts.create.call(
                     this,

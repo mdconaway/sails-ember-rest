@@ -88,7 +88,7 @@ module.exports = function(interrupts) {
                 // Subcribe to instance, if relevant
                 // TODO: only subscribe to populated attribute- not the entire model
                 if (sails.hooks.pubsub && req.isSocket) {
-                    Model.subscribe(req, parent);
+                    Model.subscribe(req, [parent[Model.primaryKey]]);
                     actionUtil.subscribeDeep(req, parent);
                 }
                 // find the model identity and the Collection for this relation
