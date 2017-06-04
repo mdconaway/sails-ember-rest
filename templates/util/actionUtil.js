@@ -49,8 +49,8 @@ module.exports = {
                 });
                 delete data[assoc.alias];
             }
-            return targets;
         });
+        return targets;
     },
 
     /**
