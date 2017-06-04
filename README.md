@@ -10,6 +10,8 @@ The following versions of this library are designed for the listed versions of s
 
 - The Version 1.x.x series of this library is under active testing and development. If you find a bug, please open an issue or make a pull request!
 
+- Version 1.0.6 and above of sails-ember-rest should be fully Sails 1.0.0 compliant.
+
 # Summary
 
 Ember Data REST-Adapter compatible controllers, policies, services and generators for Sails v0.12+

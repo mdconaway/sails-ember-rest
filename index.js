@@ -94,18 +94,6 @@ module.exports = {
                 if (!fs.existsSync(scope.rootPath + '/api')) {
                     fs.mkdirSync(scope.rootPath + '/api');
                 }
-                // check for previous installation
-                if (!scope.force && fs.existsSync(scope.rootPath + '/api/services/Ember.js')) {
-                    console.info('Ember service detected, not overwriting. To overwrite use --force.');
-                } else {
-                    if (!fs.existsSync(scope.rootPath + '/api/services')) {
-                        fs.mkdirSync(scope.rootPath + '/api/services');
-                    }
-                    fs.writeFileSync(
-                        scope.rootPath + '/api/services/Ember.js',
-                        "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
-                    );
-                }
                 if (!scope.force && fs.existsSync(scope.rootPath + '/api/responses/created.js')) {
                     console.info('Create response detected, not overwriting. To overwrite use --force.');
                 } else {
@@ -116,6 +104,20 @@ module.exports = {
                         scope.rootPath + '/api/responses/created.js',
                         "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.responses.created;\n"
                     );
+                }
+                if (scope.generatorName === 'controller' || scope.generatorName === 'policies') {
+                    // check for previous installation
+                    if (!scope.force && fs.existsSync(scope.rootPath + '/api/services/Ember.js')) {
+                        console.info('Ember service detected, not overwriting. To overwrite use --force.');
+                    } else {
+                        if (!fs.existsSync(scope.rootPath + '/api/services')) {
+                            fs.mkdirSync(scope.rootPath + '/api/services');
+                        }
+                        fs.writeFileSync(
+                            scope.rootPath + '/api/services/Ember.js',
+                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
+                        );
+                    }
                 }
                 if (scope.generatorName === 'controller') {
                     if (!scope.force && fs.existsSync(scope.rootPath + '/api/controllers/' + scope.filename + '.js')) {
@@ -134,18 +136,6 @@ module.exports = {
                         );
                         console.info(
                             'Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js'
-                        );
-                    }
-                } else if (scope.generatorName === 'responses') {
-                    if (!scope.force && fs.existsSync(scope.rootPath + '/api/responses/created.js')) {
-                        console.info('Create response detected, not overwriting. To overwrite use --force.');
-                    } else {
-                        if (!fs.existsSync(scope.rootPath + '/api/responses')) {
-                            fs.mkdirSync(scope.rootPath + '/api/responses');
-                        }
-                        fs.writeFileSync(
-                            scope.rootPath + '/api/responses/created.js',
-                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.responses.created;\n"
                         );
                     }
                 } else {
