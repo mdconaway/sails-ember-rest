@@ -126,43 +126,11 @@ module.exports = {
     populateEach(query, req) {
         const DEFAULT_POPULATE_LIMIT = sails.config.blueprints.defaultLimit || 30;
         const _options = req.options;
-        let aliasFilter = req.param('populate');
-        let shouldPopulate = _options.populate;
-
-        // Convert the string representation of the filter list to an Array. We
-        // need this to provide flexibility in the request param. This way both
-        // list string representations are supported:
-        //  /model?populate=alias1,alias2,alias3
-        //  /model?populate=[alias1,alias2,alias3]
-        if (typeof aliasFilter === 'string') {
-            aliasFilter = aliasFilter.replace(/\[|\]/g, '');
-            aliasFilter = aliasFilter ? aliasFilter.split(',') : [];
-        }
-
+        
         return _(_options.associations).reduce((query, association) => {
-            // If an alias filter was provided, override the blueprint config.
-            if (aliasFilter) {
-                shouldPopulate = _.contains(aliasFilter, association.alias);
-            }
-
-            // Only populate associations if a population filter has been supplied
-            // with the request or if `populate` is set within the blueprint config.
-            // Population filters will override any value stored in the config.
-            //
-            // Additionally, allow an object to be specified, where the key is the
-            // name of the association attribute, and value is true/false
-            // (true to populate, false to not)
-            if (shouldPopulate) {
-                const populationLimit =
-                    _options['populate_' + association.alias + '_limit'] ||
-                    _options.populate_limit ||
-                    _options.limit ||
-                    DEFAULT_POPULATE_LIMIT;
-
-                return query.populate(association.alias, {
-                    limit: populationLimit
-                });
-            } else return query;
+            return query.populate(association.alias, {
+                limit: populationLimit
+            });
         }, query);
     },
 

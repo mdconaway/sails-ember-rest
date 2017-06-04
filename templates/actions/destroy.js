@@ -22,7 +22,7 @@ module.exports = function(interrupts) {
                 return res.serverError(err);
             }
             if (!record) {
-                return res.notFound('No record found with the specified `id`.');
+                return res.notFound('No record found with the specified ' + Model.primaryKey + '.');
             }
             Model.destroy(pk).exec(err => {
                 if (err) {
