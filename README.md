@@ -42,6 +42,10 @@ From this require statement the following classes/objects will be available:
 
 (TO BE DOCUMENTED, WORK COMPLETED)
 
+**responses**
+
+(TO BE DOCUMENTED, WORK COMPLETED)
+
 **util**
 
 (TO BE DOCUMENTED, WORK COMPLETED)
@@ -53,17 +57,21 @@ import { controller, service, policies, util } from 'sails-ember-rest';
 ```
 
 * controller and policies subelements are class constructors
-* service and util are singleton objects
+* service, response, and util are singleton objects / functions
 
-sails-ember-rest will also install 2 sails generators to make scaffolding out your application easier:
+sails-ember-rest will also install 3 sails generators to make scaffolding out your application easier:
 
 `sails generate ember-rest controller <name of controller>`
+
+`sails generate ember-rest responses`
 
 and
 
 `sails generate ember-rest policies`
 
 The controller generator creates a singleton instance of the ember-rest controller, and custom actions can be added by simply binding new properties to the singleton, or passing an instance extension object into the class constructor.  Future work will include improving extension functionality.
+
+The response generator adds the required "create" response if it does not yet exist.
 
 The policy generator creates a set of helper policies that can allow a sails application to run "virtual" controllers on top of specific actions when conditions needed.  This allows an application to have a set of default base application controllers (like graphQL controllers, or JSON API controllers), but still run an Ember REST compatible controller when policies determine this is what a client needs.  Think of it as a way to layer several controllers over an identical route, giving your server the ability to serve several frontend client adapters at the same URL.
 

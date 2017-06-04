@@ -5,7 +5,7 @@
 const fs = require('fs');
 const util = require('util');
 const _ = require('lodash');
-const acceptedCommands = ['controller', 'policies'];
+const acceptedCommands = ['controller', 'responses', 'policies'];
 _.defaults = require('merge-defaults');
 /**
  * INVALID_SCOPE_VARIABLE()
@@ -103,7 +103,18 @@ module.exports = {
                     }
                     fs.writeFileSync(
                         scope.rootPath + '/api/services/Ember.js',
-                        "var SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
+                        "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
+                    );
+                }
+                if (!scope.force && fs.existsSync(scope.rootPath + '/api/responses/created.js')) {
+                    console.info('Create response detected, not overwriting. To overwrite use --force.');
+                } else {
+                    if (!fs.existsSync(scope.rootPath + '/api/responses')) {
+                        fs.mkdirSync(scope.rootPath + '/api/responses');
+                    }
+                    fs.writeFileSync(
+                        scope.rootPath + '/api/responses/created.js',
+                        "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.responses.created;\n"
                     );
                 }
                 if (scope.generatorName === 'controller') {
@@ -119,10 +130,22 @@ module.exports = {
                         }
                         fs.writeFileSync(
                             scope.rootPath + '/api/controllers/' + scope.filename + '.js',
-                            "var SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.controller();\n"
+                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.controller();\n"
                         );
                         console.info(
                             'Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js'
+                        );
+                    }
+                } else if (scope.generatorName === 'responses') {
+                    if (!scope.force && fs.existsSync(scope.rootPath + '/api/responses/created.js')) {
+                        console.info('Create response detected, not overwriting. To overwrite use --force.');
+                    } else {
+                        if (!fs.existsSync(scope.rootPath + '/api/responses')) {
+                            fs.mkdirSync(scope.rootPath + '/api/responses');
+                        }
+                        fs.writeFileSync(
+                            scope.rootPath + '/api/responses/created.js',
+                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.responses.created;\n"
                         );
                     }
                 } else {
@@ -144,7 +167,7 @@ module.exports = {
                         } else {
                             fs.writeFileSync(
                                 scope.rootPath + '/api/policies/ember' + file + '.js',
-                                "var SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
+                                "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
                                     file +
                                     '();\n'
                             );
@@ -179,5 +202,8 @@ module.exports.policies = {
     emberPopulate: require('./templates/policies/emberPopulate'),
     emberSetHeader: require('./templates/policies/emberSetHeader'),
     emberUpdate: require('./templates/policies/emberUpdate')
+};
+module.exports.responses = {
+    created: require('./templates/responses/created')
 };
 module.exports.util = require('./templates/util/actionUtil');
