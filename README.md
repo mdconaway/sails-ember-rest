@@ -55,7 +55,7 @@ From this require statement the following classes/objects will be available:
 If you are using es6, you can import these elements and inspect them using the following code:
 
 ```javascript
-import { controller, service, policies, util } from 'sails-ember-rest';
+import { controller, service, policies, responses, util } from 'sails-ember-rest';
 ```
 
 * controller and policies subelements are class constructors
