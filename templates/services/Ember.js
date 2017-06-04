@@ -133,12 +133,7 @@ module.exports = {
                 if (assoc.type === 'collection') {
                     assocModel = sails.models[assoc.collection];
                     assocPK = assocModel.primaryKey;
-                    let via =
-                        assoc.via; /*_.kebabCase(emberModelIdentity);
-                    // check if inverse is using a different name
-                    if (via !== pluralize(assoc.via, 1)) {
-                        via = pluralize(assoc.via, 1);
-                    }*/
+                    let via = assoc.via; 
 
                     if (
                         (assoc.include === 'index' || assoc.include === 'record') &&
