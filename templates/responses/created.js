@@ -24,27 +24,22 @@ module.exports = function(data, options) {
 
     // If appropriate, serve data as JSON(P)
     // If views are disabled, revert to json
-    if (req.wantsJSON || sails.config.hooks.views === false) 
-    {
+    if (req.wantsJSON || sails.config.hooks.views === false) {
         return res.json(data);
     }
 
     // If second argument is a string, we take that to mean it refers to a view.
     // If it was omitted, use an empty object (`{}`)
-    options = (typeof options === 'string') ? { view: options } : options || {};
+    options = typeof options === 'string' ? { view: options } : options || {};
 
     // If a view was provided in options, serve it.
     // Otherwise try to guess an appropriate view, or if that doesn't
     // work, just send JSON.
-    if (options.view) 
-    {
+    if (options.view) {
         return res.view(options.view, { data, locals: options, title: 'Created' });
-    }
-
-    // If no second argument provided, try to serve the implied view,
-    // but fall back to sending JSON(P) if no view can be inferred.
-    else 
-    {
+    } else {
+        // If no second argument provided, try to serve the implied view,
+        // but fall back to sending JSON(P) if no view can be inferred.
         return res.guessView({ data, title: 'Created' }, () => {
             return res.json(data);
         });
