@@ -56,12 +56,7 @@ module.exports = function(interrupts) {
                             actionUtil.subscribeDeep(req, record);
                         });
                     }
-                    const emberizedJSON = Ember.buildResponse(
-                        Model,
-                        matchingRecords,
-                        associations,
-                        associated
-                    );
+                    const emberizedJSON = Ember.buildResponse(Model, matchingRecords, associations, associated);
                     emberizedJSON.meta = {
                         total: results.count
                     };

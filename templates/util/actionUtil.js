@@ -83,13 +83,13 @@ module.exports = {
      */
     populateIndexes(parentModel, ids, associations, done) {
         const hash = {};
-        associations.forEach((association) => {
+        associations.forEach(association => {
             if (association.include === 'index') {
                 if (association.collection && !association.through) {
                     let assocCriteria = {};
                     let assocModel = sails.models[association.collection];
                     assocCriteria[association.via] = ids;
-                    hash[association.alias] = (done) => {
+                    hash[association.alias] = done => {
                         assocModel.find(assocCriteria).exec(done); //it may be necessary to implement .limit() here at some point...
                     };
                 }
@@ -282,7 +282,7 @@ module.exports = {
 
             // Transform ids[ .., ..] request
             if (where.ids || where.id) {
-                let key = where.ids ? 'ids' : 'id'
+                let key = where.ids ? 'ids' : 'id';
                 let tmp = where.ids || where.id;
                 delete where[key];
                 where[Model.primaryKey] = tmp;

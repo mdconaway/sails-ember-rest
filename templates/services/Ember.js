@@ -46,7 +46,8 @@ module.exports = {
             model.associations.forEach(assoc => {
                 if (assoc.type === 'collection') {
                     //Had to modify this code to run on app hosted at subroute
-                    links[assoc.alias] = linkPrefix + '/' + modelPlural + '/' + record[model.primaryKey] + '/' + assoc.alias;
+                    links[assoc.alias] =
+                        linkPrefix + '/' + modelPlural + '/' + record[model.primaryKey] + '/' + assoc.alias;
                 }
             });
             if (Object.keys(links).length > 0) {
@@ -118,7 +119,6 @@ module.exports = {
                 }
             }
         });
-        
 
         records.forEach(record => {
             // get rid of the record's prototype ( otherwise the .toJSON called in res.send would re-insert embedded records)
@@ -133,7 +133,8 @@ module.exports = {
                 if (assoc.type === 'collection') {
                     assocModel = sails.models[assoc.collection];
                     assocPK = assocModel.primaryKey;
-                    let via = assoc.via;/*_.kebabCase(emberModelIdentity);
+                    let via =
+                        assoc.via; /*_.kebabCase(emberModelIdentity);
                     // check if inverse is using a different name
                     if (via !== pluralize(assoc.via, 1)) {
                         via = pluralize(assoc.via, 1);
@@ -171,13 +172,19 @@ module.exports = {
                                 return filtered;
                             },
                             []
-                        );   
+                        );
                     }
 
                     //@todo if assoc.include startsWith index: ... fill contents from selected column of join table
                     if (assoc.include === 'link') {
                         links[assoc.alias] =
-                            linkPrefix + '/' + modelPlural.toLowerCase() + '/' + record[model.primaryKey] + '/' + assoc.alias; //"/" + sails.config.blueprints.prefix
+                            linkPrefix +
+                            '/' +
+                            modelPlural.toLowerCase() +
+                            '/' +
+                            record[model.primaryKey] +
+                            '/' +
+                            assoc.alias; //"/" + sails.config.blueprints.prefix
                         delete record[assoc.alias];
                     }
                     //record[assoc.alias] = _.map(record[assoc.alias], 'id');
@@ -205,7 +212,7 @@ module.exports = {
             json[documentIdentifier].push(record);
         });
         json = Ember.finalizeSideloads(json, documentIdentifier);
-        
+
         return json;
     }
 };

@@ -46,24 +46,32 @@ module.exports = function(interrupts) {
                     () => {
                         // Do a final query to populate the associations of the record.
                         const query = Model.findOne(newInstance[Model.primaryKey]);
-                        async.parallel({
-                            populatedRecord: (done) => {
-                                actionUtil.populateRecords(query, associations).exec(done);
+                        async.parallel(
+                            {
+                                populatedRecord: done => {
+                                    actionUtil.populateRecords(query, associations).exec(done);
+                                },
+                                associated: done => {
+                                    actionUtil.populateIndexes(
+                                        Model,
+                                        newInstance[Model.primaryKey],
+                                        associations,
+                                        done
+                                    );
+                                }
                             },
-                            associated: (done) => {
-                                actionUtil.populateIndexes(Model, newInstance[Model.primaryKey], associations, done);
+                            (err, results) => {
+                                if (err) return res.serverError(err);
+                                const { populatedRecord, associated } = results;
+                                if (!populatedRecord) return res.serverError('Could not find record after updating!');
+                                // Send JSONP-friendly response if it's supported
+                                // (HTTP 201: Created)
+                                res.created(
+                                    Ember.buildResponse(Model, populatedRecord, associations, associated),
+                                    actionUtil.parseLocals(req)
+                                );
                             }
-                        }, (err, results) => {
-                            if (err) return res.serverError(err);
-                            const { populatedRecord, associated } = results;
-                            if (!populatedRecord) return res.serverError('Could not find record after updating!');
-                            // Send JSONP-friendly response if it's supported
-                            // (HTTP 201: Created)
-                            res.created(
-                                Ember.buildResponse(Model, populatedRecord, associations, associated),
-                                actionUtil.parseLocals(req)
-                            );
-                        });
+                        );
                     },
                     Model,
                     newInstance

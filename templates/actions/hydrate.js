@@ -56,7 +56,7 @@ module.exports = function(interrupts) {
                             if (assoc.type === 'model' && record[assoc.alias]) {
                                 assocModel = req._sails.models[assoc.model];
                                 let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
-                                record[assoc.alias] = linkedRecords[0]; 
+                                record[assoc.alias] = linkedRecords[0];
                             }
                         });
                         response[documentIdentifier] = [record];

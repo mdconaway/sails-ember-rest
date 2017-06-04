@@ -87,32 +87,29 @@ module.exports = function(interrupts) {
                                     }
                                     // Do a final query to populate the associations of the record.
                                     const query = Model.findOne(updatedRecord[Model.primaryKey]);
-                                    async.parallel({
-                                        populatedRecord: (done) => {
-                                            actionUtil.populateRecords(query, associations).exec(done);
-                                        },
-                                        associated: (done) => {
-                                            actionUtil.populateIndexes(Model, pk, associations, done);
-                                        }
-                                    }, (err, results) => {
-                                        if(err)
+                                    async.parallel(
                                         {
-                                            return res.serverError(err);
+                                            populatedRecord: done => {
+                                                actionUtil.populateRecords(query, associations).exec(done);
+                                            },
+                                            associated: done => {
+                                                actionUtil.populateIndexes(Model, pk, associations, done);
+                                            }
+                                        },
+                                        (err, results) => {
+                                            if (err) {
+                                                return res.serverError(err);
+                                            }
+                                            const { associated, populatedRecord } = results;
+                                            if (!populatedRecord) {
+                                                return res.serverError('Could not find record after updating!');
+                                            }
+                                            res.ok(
+                                                Ember.buildResponse(Model, populatedRecord, associations, associated),
+                                                actionUtil.parseLocals(req)
+                                            );
                                         }
-                                        const { associated, populatedRecord } = results;
-                                        if (!populatedRecord) {
-                                            return res.serverError('Could not find record after updating!');
-                                        }
-                                        res.ok(
-                                            Ember.buildResponse(
-                                                Model,
-                                                populatedRecord,
-                                                associations,
-                                                associated
-                                            ),
-                                            actionUtil.parseLocals(req)
-                                        );
-                                    });
+                                    );
                                 },
                                 Model,
                                 { before: matchingRecord, after: updatedRecord }
