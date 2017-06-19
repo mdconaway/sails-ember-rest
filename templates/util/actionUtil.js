@@ -129,7 +129,7 @@ module.exports = {
         const populationLimit = req.param('limit') || options.limit || DEFAULT_POPULATE_LIMIT;
 
         return _(options.associations).reduce((query, association) => {
-            if(association.type === 'model') {
+            if (association.type === 'model') {
                 query.populate(association.alias);
             } else {
                 query.populate(association.alias, {

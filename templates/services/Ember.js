@@ -133,7 +133,7 @@ module.exports = {
                 if (assoc.type === 'collection') {
                     assocModel = sails.models[assoc.collection];
                     assocPK = assocModel.primaryKey;
-                    let via = assoc.via; 
+                    let via = assoc.via;
 
                     if (
                         (assoc.include === 'index' || assoc.include === 'record') &&
