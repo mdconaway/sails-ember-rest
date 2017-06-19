@@ -1,6 +1,6 @@
 {
   "name": "sails-ember-rest",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "sails generate ember-rest",
   "main": "index.js",
   "scripts": {
