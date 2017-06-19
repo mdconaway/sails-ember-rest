@@ -125,13 +125,18 @@ module.exports = {
      */
     populateEach(query, req) {
         const DEFAULT_POPULATE_LIMIT = sails.config.blueprints.defaultLimit || 30;
-        const _options = req.options;
-        const populationLimit = req.param('limit') || _options.limit || DEFAULT_POPULATE_LIMIT;
+        const options = req.options;
+        const populationLimit = req.param('limit') || options.limit || DEFAULT_POPULATE_LIMIT;
 
-        return _(_options.associations).reduce((query, association) => {
-            return query.populate(association.alias, {
-                limit: populationLimit
-            });
+        return _(options.associations).reduce((query, association) => {
+            if(association.type === 'model') {
+                query.populate(association.alias);
+            } else {
+                query.populate(association.alias, {
+                    limit: populationLimit
+                });
+            }
+            return query;
         }, query);
     },
 
