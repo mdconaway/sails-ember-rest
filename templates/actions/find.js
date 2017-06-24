@@ -37,13 +37,13 @@ module.exports = function(interrupts) {
                 }
             },
             (err, results) => {
-                if (err) return res.serverError(err);
+                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                 const matchingRecords = results.records;
                 const ids = matchingRecords.map(record => {
                     return record[Model.primaryKey];
                 });
                 actionUtil.populateIndexes(Model, ids, associations, (err, associated) => {
-                    if (err) return res.serverError(err);
+                    if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                     // Only `.watch()` for new instances of the model if
                     // `autoWatch` is enabled.
                     if (req._sails.hooks.pubsub && req.isSocket) {

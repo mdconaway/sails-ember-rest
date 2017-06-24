@@ -36,7 +36,7 @@ module.exports = function(interrupts) {
 
         Model.findOne(pk).exec((err, matchingRecord) => {
             if (err) {
-                return res.serverError(err);
+                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
             }
             if (!matchingRecord) {
                 return res.notFound();
@@ -53,7 +53,7 @@ module.exports = function(interrupts) {
                         // and serious underlying issues. Respond with badRequest if a
                         // validation error is encountered, w/ validation info.
                         if (err) {
-                            return res.serverError(err, actionUtil.parseLocals(req));
+                            return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                         }
                         // Because this should only update a single record and update
                         // returns an array, just use the first item.  If more than one
@@ -98,7 +98,7 @@ module.exports = function(interrupts) {
                                         },
                                         (err, results) => {
                                             if (err) {
-                                                return res.serverError(err);
+                                                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                                             }
                                             const { associated, populatedRecord } = results;
                                             if (!populatedRecord) {

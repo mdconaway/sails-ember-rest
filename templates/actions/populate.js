@@ -82,7 +82,7 @@ module.exports = function(interrupts) {
             },
             (err, results) => {
                 if (err) {
-                    return res.serverError(err);
+                    return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                 }
                 const { parent, children } = results.records;
                 // Subcribe to instance, if relevant

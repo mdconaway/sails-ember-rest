@@ -31,6 +31,24 @@ function tryToParseJSON(json) {
  */
 module.exports = {
     /**
+     * Negotiate the proper way to handle an error in an action
+     * 
+     * @param {Response} res A response object
+     * @param {Error} err The error object to negotiate
+     * @param {Object} locals The locals object to propogate to the responder/view
+     */
+    negotiate(res, err, locals) {
+        if (err.name === 'AdapterError') {
+            if (err.code === 'E_UNIQUE') {
+                return res.badRequest(err, locals);
+            }
+            return res.serverError(err, locals);
+        } else if (err.name === 'UsageError') {
+            return res.badRequest(err, locals);
+        }
+        return res.serverError(err, locals);
+    },
+    /**
      * Prepare records for create / update using Sails 1.0 relationship methods
      *
      * This method will alter the DATA object! (it must prevent many relations from directly saving)

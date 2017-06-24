@@ -21,7 +21,7 @@ module.exports = function(interrupts) {
             // Differentiate between waterline-originated validation errors
             // and serious underlying issues. Respond with badRequest if a
             // validation error is encountered, w/ validation info.
-            if (err) return res.serverError(err, actionUtil.parseLocals(req));
+            if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
             // If we have the pubsub hook, use the model class's publish method
             // to notify all subscribers about the created item
             const pk = newInstance[Model.primaryKey];
@@ -61,7 +61,7 @@ module.exports = function(interrupts) {
                                 }
                             },
                             (err, results) => {
-                                if (err) return res.serverError(err);
+                                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                                 const { populatedRecord, associated } = results;
                                 if (!populatedRecord) return res.serverError('Could not find record after updating!');
                                 // Send JSONP-friendly response if it's supported

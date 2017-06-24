@@ -26,7 +26,7 @@ module.exports = function(interrupts) {
                 }
             },
             (err, results) => {
-                if (err) return res.serverError(err);
+                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                 const { matchingRecord, associated } = results;
                 if (!matchingRecord)
                     return res.notFound('No record found with the specified ' + Model.primaryKey + '.');

@@ -32,7 +32,7 @@ module.exports = function(interrupts) {
             .populateRecords(query, associations, true)
             .where(actionUtil.parseCriteria(req))
             .exec((err, matchingRecord) => {
-                if (err) return res.serverError(err);
+                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                 if (!matchingRecord) return res.notFound('No record found with the specified `id`.');
                 interrupts.hydrate.call(
                     this,
