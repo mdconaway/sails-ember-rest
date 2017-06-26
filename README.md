@@ -153,7 +153,7 @@ In the case of the `update` interrupt, the `record` parameter will be an object 
 }
 ```
 
-You don't have to use interrupts in your code, but as the demands on your server grow you may find them to be incredibly useful for making your code my DRY and less error-prone, as well as providing a whole new lifecycle type to the sails ecosystem.
+You don't have to use interrupts in your code, but as the demands on your server grow you may find them to be incredibly useful for making your code more DRY and less error-prone, as well as providing a whole new lifecycle type to the sails ecosystem.
 
 ## service
 
