@@ -63,7 +63,7 @@ export default new controller();
 
 It's that simple!
 
-The controller constructor functions simliarly to ember-objects, in that it can recieve an extension object as input to the constructor itself. An example would be:
+The controller constructor functions similarly to ember-objects, in that it can recieve an extension object as input to the constructor itself. An example would be:
 ```javascript
 import { controller } from 'sails-ember-rest';
 
