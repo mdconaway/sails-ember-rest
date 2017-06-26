@@ -135,7 +135,9 @@ The following interrupts are available for your bolt-on code by default:
 
 **create**
 
-**update**
+**beforeUpdate**
+
+**afterUpdate**
 
 **destroy**
 
@@ -143,7 +145,9 @@ The following interrupts are available for your bolt-on code by default:
 
 In each case, the `record` parameter will be the record or records that were found/created/destroyed.
 
-In the case of the `update` interrupt, the `record` parameter will be an object with a `before` and `after` state of the updated record.
+In the case of the `beforeUpdate` interrupt, the `record` parameter will be an object containing all the values the user sent to apply against the target record.
+
+In the case of the `afterUpdate` interrupt, the `record` parameter will be an object with a `before` and `after` state of the updated record.
 
 ```javascript
 //The object representation of the "record" parameter for the update interrupt:
