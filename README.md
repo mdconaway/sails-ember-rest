@@ -32,23 +32,146 @@ This package ships as a standard node module that will export all of its assets 
 
 From this require statement the following classes/objects will be available:
 
-**controller**
+## controller
+
+The controller class is the fundamental building block of sails-ember-rest. It exports a class constructor that will handle all basic crud operations for any model type by default. The default actions handled by the controller class are as follows:
+
+**find**
+
+**findone**
+
+**populate**
+
+**create**
+
+**update**
+
+**destroy**
+
+**hydrate**
+
+Hydrate is a special, non-standard action that is provided for all of your controller instances by default. If a call is made to resource/:id/hydrate (you will have to bind this in your config.routes file) The JSON response will conform to the ember embedded-records mixin expectations, and a record with all first-order relationships populated and directly embedded will be returned.  
+
+The hydrate action is included by default, but you don't have to use it, and most of the time you wont have to! (But it can be useful as a support mechanism for non-ember-data clients like React components!)
+
+To create a new controller instance without using the built-in generators, you can simply make a controller file as follows: 
+```javascript
+import { controller } from 'sails-ember-rest';
+
+export default new controller();
+```
+
+It's that simple!
+
+The controller constructor functions similarly to ember-objects, in that it can recieve an extension object as input to the constructor itself. An example would be:
+```javascript
+import { controller } from 'sails-ember-rest';
+
+export default new controller({
+    mySpecialAction(req, res){
+        res.status(200);
+        res.json({
+            foo: 'bar'
+        });
+    }
+});
+```
+This would produce a controller with all of the default methods specified above, but with the additional method `mySpecialAction`
+
+In the controller constructor, you can also override default controller methods, but there is currently no way to invoke the original default action if you override it in the constructor.
+
+The following is possible:
+```javascript
+import { controller } from 'sails-ember-rest';
+
+export default new controller({
+    create(req, res){
+        //...some special creation code
+        res.status(201);
+        res.json({
+            foo: 'bar'
+        });
+    }
+});
+```
+This would return a controller that has a custom create action, but all other actions remain the default sails-ember-rest actions.
+
+Sails-ember-rest controllers also offer a powerful new feature that does not exist anywhere else in the sails ecosystem: `interrupts`.
+
+At a high level, an interrupt can be though of as a policy, or function that you can execute *after* the action itself has occured but *before* a response is sent to the client. Whatever function you register as an interrupt will also be handed all of the important data generated in the action itself as it's input parameters. The best way to demonstrate the utility of the interruptor paradigm is through example:
+
+```javascript
+import { controller } from 'sails-ember-rest';
+
+const myController = new controller();
+
+myController.setServiceInterrupt('create', function(req, res, next, Model, record){
+    //req, res, next - are all the express equivalent functions for a middleware. MAKE SURE YOU CALL NEXT WHEN YOU ARE DONE!
+    //Model - is the parsed model class that represents the base resource used in this action
+    //record - is the new record instance that has been successfully persisted to the database as this is a create action
+    Logger.create(Model, record, (err) => {
+        if(err) {
+            return res.serverError(err);
+        }
+        Session.addRecordToMyManagedObjects(req.session, Model.identity, record, next);
+    });
+});
+
+//If you wanted to gain access to the interruption object, for some low-level use in your own actions, you can call the following function:
+//myController.getInterrupts();
+//^ This will return all possible interrupts synchronously in a hash object
+
+export default myController;
+```
+The above example could automatically create "tracking" objects through some kind of Logger service that would help maintain history about some important source object, and it could also add any new created objects of this type directly into a user's existing session profile (through some service called Session) to enable them to access/edit it for the remainder of their session.  What is really powerful about this paradigm is that it enables you to bolt on *post-action* code to any sails-ember-rest action, without altering the battle-tested action itself. An interrupt is like a policy that can be run after instead of before all of the asynchronous database interaction, but is more powerful than model lifecycle hooks because it will also have access to the request and response objects that are critical to the context of the logic that is occurring.
+
+The following interrupts are available for your bolt-on code by default:
+
+**find**
+
+**findone**
+
+**populate**
+
+**create**
+
+**beforeUpdate**
+
+**afterUpdate**
+
+**destroy**
+
+**hydrate**
+
+In each case, the `record` parameter will be the record or records that were found/created/destroyed.
+
+In the case of the `beforeUpdate` interrupt, the `record` parameter will be an object containing all the values the user sent to apply against the target record.
+
+In the case of the `afterUpdate` interrupt, the `record` parameter will be an object with a `before` and `after` state of the updated record.
+
+```javascript
+//The object representation of the "record" parameter for the update interrupt:
+{
+    before: oldRecordInstance,
+    after: newRecordInstance
+}
+```
+
+You don't have to use interrupts in your code, but as the demands on your server grow you may find them to be incredibly useful for making your code more DRY and less error-prone, as well as providing a whole new lifecycle type to the sails ecosystem.
+
+## service
 
 (TO BE DOCUMENTED, WORK COMPLETED)
 
-**service**
+## policies
 
 (TO BE DOCUMENTED, WORK COMPLETED)
 
-**policies**
+## responses
 
 (TO BE DOCUMENTED, WORK COMPLETED)
 
-**responses**
-
-(TO BE DOCUMENTED, WORK COMPLETED)
-
-**util**
+## util
 
 (TO BE DOCUMENTED, WORK COMPLETED)
 
