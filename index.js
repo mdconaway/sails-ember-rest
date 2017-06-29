@@ -132,7 +132,7 @@ module.exports = {
                         }
                         fs.writeFileSync(
                             scope.rootPath + '/api/controllers/' + scope.filename + '.js',
-                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.controller();\n"
+                            "const SailsEmber = require('sails-ember-rest');\nconst controller = new SailsEmber.controller({\n});\n\nmodule.exports = controller;\n"
                         );
                         console.info(
                             'Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js'
