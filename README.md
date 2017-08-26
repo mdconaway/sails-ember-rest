@@ -161,15 +161,74 @@ You don't have to use interrupts in your code, but as the demands on your server
 
 ## service
 
-(TO BE DOCUMENTED, WORK COMPLETED)
+The service exported by sails-ember-rest is typically used internally by various actions on the Ember REST controller. The available methods within the service are:
+
+```javascript
+countRelationship(model, association, pk)
+```
+```javascript
+linkAssociations(model, records)
+```
+```javascript
+finalizeSideloads(json, documentIdentifier)
+```
+```javascript
+buildResponse(model, records, associations, associatedRecords)
+```
+
+You should not typically need to interact with any of these methods, but if you want to override some action on the REST controller, and want to maintain compliance with the Ember RESTAdapter, you will probably need to use these methods to assemble your response data properly.
+
+For usage examples, reference the action you are overriding under templates/actions
 
 ## policies
 
-(TO BE DOCUMENTED, WORK COMPLETED)
+The policies exported by sails-ember-rest are designed to allow you to actually layer a 'virtual' ember-rest controller on top of any other controller you may be using by default.
+
+If an incoming request has a header value of {'ember': true}, then the virtual controller will execute it's own action handler instead of the controller contained within your sails application.
+
+A good use case can be described as follows:
+
+If in your application you are using some custom controller that normally performs backend rendering for an action, but you want Ember clients to be able to request ember-style JSON from the same URL, then the sails-ember-rest policies are the solution to your problem.
+
+To layer the virtual controller on top of the normal controller, just edit your config/policies.js file to look something like:
+
+```javascript
+module.exports.policies = {
+    CustomController: {
+        find: ['somePolicyA', 'somePolicyB', 'emberFind']
+    }
+};
+```
+
+Note that you should add the ember virtual controller policies as the *last* policy for any action that you want to add an override fork to. This will allow all other policies to execute appropriately before the action is diverted to an Ember REST JSON serializer action.
+
+A client (or some other policy) can then force the response to the Ember controller by just adding a request header field indicating 'ember': true.
+
+The available policies that can be applied to your policy config:
+
+**emberCreate**
+
+**emberDestroy**
+
+**emberFind**
+
+**emberFindOne**
+
+**emberHydrate**
+
+**emberPopulate**
+
+**emberSetHeader**
+
+**emberUpdate**
+
+Note that **emberSetHeader** is just a drop-in policy that will divert any action directly to the Ember controller by default as long as it is in the policy chain before the virtual controller policy.
 
 ## responses
 
-(TO BE DOCUMENTED, WORK COMPLETED)
+**created**
+
+Adds a response with a status of 201, as expected by Ember after a new record is created. This response is utilized by the `create` action in the Ember controller.
 
 ## util
 
