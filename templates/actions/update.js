@@ -79,7 +79,7 @@ module.exports = function(interrupts) {
                                     // to notify all subscribers about the update.
                                     if (req._sails.hooks.pubsub) {
                                         if (req.isSocket) {
-                                            Model.subscribe(req, _.pluck(records, Model.primaryKey));
+                                            Model.subscribe(req, _.map(records, Model.primaryKey));
                                         }
                                         Model._publishUpdate(pk, _.cloneDeep(data), !req.options.mirror && req, {
                                             previous: toJSON.call(matchingRecord)

@@ -1,6 +1,6 @@
 {
     "name": "sails-ember-rest",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "sails generate ember-rest",
     "main": "index.js",
     "scripts": {
@@ -29,8 +29,8 @@
     "homepage": "https://github.com/mdconaway/sails-ember-rest#readme",
     "author": "Michael Conaway",
     "license": "MIT",
-    "engines" : { 
-        "node" : ">=6.0.0" 
+    "engines": {
+        "node": ">=6.0.0"
     },
     "dependencies": {
         "lodash": "^4.0.0",

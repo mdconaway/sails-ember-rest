@@ -47,7 +47,7 @@ module.exports = function(interrupts) {
                     // Only `.watch()` for new instances of the model if
                     // `autoWatch` is enabled.
                     if (req._sails.hooks.pubsub && req.isSocket) {
-                        Model.subscribe(req, _.pluck(matchingRecords, Model.primaryKey));
+                        Model.subscribe(req, _.map(matchingRecords, Model.primaryKey));
                         if (req.options.autoWatch) {
                             Model._watch(req);
                         }
