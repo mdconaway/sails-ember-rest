@@ -9,6 +9,10 @@ export default {
             collection: 'foo',
             via: 'bars'
         },
+        identiField: {
+            type: 'string',
+            minLength: 1
+        },
         myFoo: {
             model: 'foo'
         }

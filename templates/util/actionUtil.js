@@ -194,12 +194,16 @@ module.exports = {
      * @return {Integer|String}
      */
     parsePk(req) {
-        const pk = req.options.id || (req.options.where && req.options.where.id) || req.param('id');
-
-        // TODO: make this smarter...
-        // (e.g. look for actual primary key of model and look for it
-        //  in the absence of `id`.)
-        // See coercePK for reference (although be aware it is not currently in use)
+        const Model = module.exports.parseModel(req);
+        const isNumber = Model.attributes[Model.primaryKey].type === 'number';
+        const roughPk =
+            req.options[Model.primaryKey] ||
+            req.param(Model.primaryKey) ||
+            (req.options.where && req.options.where[Model.primaryKey]) ||
+            req.options.id ||
+            (req.options.where && req.options.where.id) ||
+            req.param('id');
+        const pk = isNumber ? +roughPk : roughPk;
 
         // exclude criteria on id field
         return _.isPlainObject(pk) ? undefined : pk;
@@ -219,9 +223,7 @@ module.exports = {
         if (!pk) {
             const err = new Error(
                 'No `id` parameter provided.' +
-                    "(Note: even if the model's primary key is not named `id`- " +
-                    '`id` should be used as the name of the parameter- it will be ' +
-                    'mapped to the proper primary key name)'
+                    '(Note: the dynamic segment name should match the primary key name, or be :id)'
             );
             err.status = 400;
             throw err;

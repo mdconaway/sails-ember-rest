@@ -6,6 +6,7 @@ const loadFixtures = require('./helpers/loadFixtures');
 const sails = require('sails');
 const { expect } = require('chai');
 global.expect = expect;
+process.env.NODE_ENV = 'test';
 
 // Before running any tests...
 before(function(done) {
@@ -15,7 +16,7 @@ before(function(done) {
     sails.lift(
         {
             hooks: { grunt: false },
-            log: { level: 'warn' }
+            log: { level: 'silent' }
         },
         err => {
             if (err) {
