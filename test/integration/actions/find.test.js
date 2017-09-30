@@ -142,7 +142,7 @@ describe('Integration | Action | find', function() {
         });
         it('should support simple sort parameter (ASC)', function(done) {
             supertest(sails.hooks.http.app)
-                .get('/bars?sort=name ASC')
+                .get('/bars?sort=name%20ASC')
                 .expect(res => {
                     expect(res.body.bars).to.have.lengthOf(4);
                     expect(res.body.meta.total).to.equal(4);
@@ -155,7 +155,7 @@ describe('Integration | Action | find', function() {
         });
         it('should support simple sort parameter (DESC)', function(done) {
             supertest(sails.hooks.http.app)
-                .get('/bars?sort=name DESC')
+                .get('/bars?sort=name%20DESC')
                 .expect(res => {
                     expect(res.body.bars).to.have.lengthOf(4);
                     expect(res.body.meta.total).to.equal(4);
