@@ -28,7 +28,9 @@ module.exports = function(interrupts) {
             const saveMany = [];
             preppedRelations.forEach(rel => {
                 saveMany.push(done => {
-                    Model.replaceCollection(pk, rel.collection).members(rel.values).exec(done);
+                    Model.replaceCollection(pk, rel.collection)
+                        .members(rel.values)
+                        .exec(done);
                 });
             });
             async.parallel(saveMany, () => {

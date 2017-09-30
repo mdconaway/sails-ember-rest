@@ -62,22 +62,28 @@ module.exports = function(interrupts) {
             {
                 count: Ember.countRelationship(Model, association, parentPk),
                 records: done => {
-                    Model.findOne(parentPk).populate(relation, populateOptions).exec((err, matchingRecord) => {
-                        if (err) {
-                            return done(err);
-                        }
-                        if (!matchingRecord) {
-                            return done(new Error('No record found with the specified id.'));
-                        }
-                        if (!matchingRecord[relation]) {
-                            return done(
-                                new Error(
-                                    util.format('Specified record (%s) is missing relation `%s`', parentPk, relation)
-                                )
-                            );
-                        }
-                        done(null, { parent: matchingRecord, children: matchingRecord[relation] });
-                    });
+                    Model.findOne(parentPk)
+                        .populate(relation, populateOptions)
+                        .exec((err, matchingRecord) => {
+                            if (err) {
+                                return done(err);
+                            }
+                            if (!matchingRecord) {
+                                return done(new Error('No record found with the specified id.'));
+                            }
+                            if (!matchingRecord[relation]) {
+                                return done(
+                                    new Error(
+                                        util.format(
+                                            'Specified record (%s) is missing relation `%s`',
+                                            parentPk,
+                                            relation
+                                        )
+                                    )
+                                );
+                            }
+                            done(null, { parent: matchingRecord, children: matchingRecord[relation] });
+                        });
                 }
             },
             (err, results) => {

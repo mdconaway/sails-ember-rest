@@ -19,7 +19,10 @@ module.exports = function(interrupts) {
         async.parallel(
             {
                 matchingRecord: done => {
-                    actionUtil.populateRecords(query, associations).where(actionUtil.parseCriteria(req)).exec(done);
+                    actionUtil
+                        .populateRecords(query, associations)
+                        .where(actionUtil.parseCriteria(req))
+                        .exec(done);
                 },
                 associated: done => {
                     actionUtil.populateIndexes(Model, pk, associations, done);

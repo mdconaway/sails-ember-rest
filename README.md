@@ -419,21 +419,17 @@ As a **quick example**, if you create a `post` model under the namespace `api/v1
 
 # Todo
 
-### Refactor into ES6
-
-- Because it's 2017!
-
 ### Generator: Improve installation
 
-- setup configuration while running the generator
+- Setup configuration while running the generator
 
 ### Blueprints: Support pagination metadata
 
-- the controller supports pagination meta data on direct requests. However, sideloaded records from relationships are currently not paginated.
+- The controller supports pagination meta data on direct requests. However, sideloaded records from relationships are currently not paginated.
 
 ### Testing: Make all the things testable
 
-I am still working out how to make this repo more maintainable and testable.
+- Continue to improve integration tests for this library
 
 # Scope
 

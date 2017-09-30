@@ -28,12 +28,15 @@ module.exports = function generateManyMap(models) {
                     //count result of populate call on parent model
                     aliasMap[name][assoc.alias] = function(pk) {
                         return function(done) {
-                            model.findOne(pk).populate(assoc.alias).exec((err, record) => {
-                                if (err || !record) {
-                                    return done(null, 0);
-                                }
-                                return done(null, record[assoc.alias] ? 1 : 0);
-                            });
+                            model
+                                .findOne(pk)
+                                .populate(assoc.alias)
+                                .exec((err, record) => {
+                                    if (err || !record) {
+                                        return done(null, 0);
+                                    }
+                                    return done(null, record[assoc.alias] ? 1 : 0);
+                                });
                         };
                     };
                 }
