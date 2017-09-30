@@ -43,6 +43,7 @@ describe('Integration | Action | find', function() {
                 .end(done);
         });
     });
+
     describe(':: data integrity', function() {
         it('should return 2 foos', function(done) {
             supertest(sails.hooks.http.app)
@@ -61,6 +62,7 @@ describe('Integration | Action | find', function() {
                 .end(done);
         });
     });
+
     describe(':: query functions', function() {
         it('should support belongsTo query', function(done) {
             supertest(sails.hooks.http.app)
@@ -107,6 +109,24 @@ describe('Integration | Action | find', function() {
                     expect(res.body.foos).to.have.lengthOf(1);
                     expect(res.body.foos[0].name).to.include('2 Foo');
                     expect(res.body.meta.total).to.equal(1);
+                })
+                .end(done);
+        });
+        it('should support limit parameter', function(done) {
+            supertest(sails.hooks.http.app)
+                .get('/foos?limit=1')
+                .expect(res => {
+                    expect(res.body.foos).to.have.lengthOf(1);
+                    expect(res.body.meta.total).to.equal(2);
+                })
+                .end(done);
+        });
+        it('should support skip parameter', function(done) {
+            supertest(sails.hooks.http.app)
+                .get('/foos?skip=1')
+                .expect(res => {
+                    expect(res.body.foos).to.have.lengthOf(1);
+                    expect(res.body.meta.total).to.equal(2);
                 })
                 .end(done);
         });
