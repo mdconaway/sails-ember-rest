@@ -63,10 +63,13 @@ module.exports = function(interrupts) {
                         if (err) {
                             return done(err);
                         }
+                        if (!Array.isArray(records)) {
+                            return done(new Error(`${Model.globalId}.update returned no records!`));
+                        }
                         // Because this should only update a single record and update
                         // returns an array, just use the first item.  If more than one
                         // record was returned, something is amiss.
-                        if (!records || !records.length || records.length > 1) {
+                        if (records.length > 1) {
                             log.warn(`Unexpected output from ${Model.globalId}.update.`);
                         }
                         const updatedRecord = records[0];
