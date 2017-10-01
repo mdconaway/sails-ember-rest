@@ -7,6 +7,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const { parallel } = require('async');
 const _ = require('lodash');
 
 module.exports = function(interrupts) {
@@ -19,7 +20,8 @@ module.exports = function(interrupts) {
         // Look up the association configuration and determine how to populate the query
         // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'list');
-        async.parallel(
+
+        parallel(
             {
                 count(done) {
                     Model.count(criteria).exec(done);
@@ -37,35 +39,39 @@ module.exports = function(interrupts) {
                 }
             },
             (err, results) => {
-                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                if (err) {
+                    return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                }
                 const matchingRecords = results.records;
                 const ids = matchingRecords.map(record => {
                     return record[Model.primaryKey];
                 });
                 actionUtil.populateIndexes(Model, ids, associations, (err, associated) => {
-                    if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-                    // Only `.watch()` for new instances of the model if
-                    // `autoWatch` is enabled.
-                    if (req._sails.hooks.pubsub && req.isSocket) {
-                        Model.subscribe(req, _.map(matchingRecords, Model.primaryKey));
-                        if (req.options.autoWatch) {
-                            Model._watch(req);
-                        }
-                        // Also subscribe to instances of all associated models
-                        // @todo this might need an update to include associations included by index only
-                        matchingRecords.forEach(record => {
-                            actionUtil.subscribeDeep(req, record);
-                        });
+                    if (err) {
+                        return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
                     }
-                    const emberizedJSON = Ember.buildResponse(Model, matchingRecords, associations, associated);
-                    emberizedJSON.meta = {
-                        total: results.count
-                    };
                     interrupts.find.call(
                         this,
                         req,
                         res,
                         () => {
+                            // Only `.watch()` for new instances of the model if
+                            // `autoWatch` is enabled.
+                            if (req._sails.hooks.pubsub && req.isSocket) {
+                                Model.subscribe(req, _.map(matchingRecords, Model.primaryKey));
+                                if (req.options.autoWatch) {
+                                    Model._watch(req);
+                                }
+                                // Also subscribe to instances of all associated models
+                                // @todo this might need an update to include associations included by index only
+                                matchingRecords.forEach(record => {
+                                    actionUtil.subscribeDeep(req, record);
+                                });
+                            }
+                            const emberizedJSON = Ember.buildResponse(Model, matchingRecords, associations, associated);
+                            emberizedJSON.meta = {
+                                total: results.count
+                            };
                             res.ok(emberizedJSON, actionUtil.parseLocals(req));
                         },
                         Model,

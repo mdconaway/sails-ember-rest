@@ -8,12 +8,14 @@
  */
 const util = require('util');
 const actionUtil = require('./../util/actionUtil');
+const { parallel, waterfall } = require('async');
 const _ = require('lodash');
 
 module.exports = function(interrupts) {
     return function(req, res) {
         // Look up the model
         const Model = actionUtil.parseModel(req);
+        const { log } = req._sails;
         const toJSON = Model.customToJSON
             ? Model.customToJSON
             : function() {
@@ -28,100 +30,120 @@ module.exports = function(interrupts) {
         // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
         const preppedRelations = actionUtil.prepareManyRelations(associations, data);
-        // Find and update the targeted record.
-        //
-        // (Note: this could be achieved in a single query, but a separate `findOne`
-        //  is used first to provide a better experience for front-end developers
-        //  integrating with the API.)
 
-        Model.findOne(pk).exec((err, matchingRecord) => {
-            if (err) {
-                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-            }
-            if (!matchingRecord) {
-                return res.notFound();
-            }
-            //also, we gain context on what the record looks like before it is updated,
-            //which will be used in the afterUpdate interrupt
-            interrupts.beforeUpdate.call(
-                this,
-                req,
-                res,
-                () => {
-                    Model.update(pk, data).exec((err, records) => {
-                        // Differentiate between waterline-originated validation errors
-                        // and serious underlying issues. Respond with badRequest if a
-                        // validation error is encountered, w/ validation info.
+        waterfall(
+            [
+                done => {
+                    Model.findOne(pk).exec((err, matchingRecord) => {
                         if (err) {
-                            return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                            return done(err);
+                        }
+                        if (!matchingRecord) {
+                            return done(404);
+                        }
+                        done(null, matchingRecord);
+                    });
+                },
+                (matchingRecord, done) => {
+                    //also, we gain context on what the record looks like before it is updated,
+                    //which will be used in the afterUpdate interrupt
+                    interrupts.beforeUpdate.call(
+                        this,
+                        req,
+                        res,
+                        () => {
+                            done(null, matchingRecord);
+                        },
+                        Model,
+                        data
+                    );
+                },
+                (matchingRecord, done) => {
+                    Model.update(pk, data).exec((err, records) => {
+                        if (err) {
+                            return done(err);
                         }
                         // Because this should only update a single record and update
                         // returns an array, just use the first item.  If more than one
                         // record was returned, something is amiss.
                         if (!records || !records.length || records.length > 1) {
-                            req._sails.log.warn(util.format('Unexpected output from `%s.update`.', Model.globalId));
+                            log.warn(`Unexpected output from ${Model.globalId}.update.`);
                         }
                         const updatedRecord = records[0];
-                        const saveMany = [];
-
-                        preppedRelations.forEach(rel => {
-                            saveMany.push(done => {
-                                Model.replaceCollection(pk, rel.collection)
-                                    .members(rel.values)
-                                    .exec(done);
-                            });
-                        });
-                        async.parallel(saveMany, () => {
-                            interrupts.afterUpdate.call(
-                                this,
-                                req,
-                                res,
-                                () => {
-                                    // If we have the pubsub hook, use the Model's publish method
-                                    // to notify all subscribers about the update.
-                                    if (req._sails.hooks.pubsub) {
-                                        if (req.isSocket) {
-                                            Model.subscribe(req, _.map(records, Model.primaryKey));
-                                        }
-                                        Model._publishUpdate(pk, _.cloneDeep(data), !req.options.mirror && req, {
-                                            previous: toJSON.call(matchingRecord)
-                                        });
-                                    }
-                                    // Do a final query to populate the associations of the record.
-                                    const query = Model.findOne(updatedRecord[Model.primaryKey]);
-                                    async.parallel(
-                                        {
-                                            populatedRecord: done => {
-                                                actionUtil.populateRecords(query, associations).exec(done);
-                                            },
-                                            associated: done => {
-                                                actionUtil.populateIndexes(Model, pk, associations, done);
-                                            }
-                                        },
-                                        (err, results) => {
-                                            if (err) {
-                                                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-                                            }
-                                            const { associated, populatedRecord } = results;
-                                            if (!populatedRecord) {
-                                                return res.serverError('Could not find record after updating!');
-                                            }
-                                            res.ok(
-                                                Ember.buildResponse(Model, populatedRecord, associations, associated),
-                                                actionUtil.parseLocals(req)
-                                            );
-                                        }
-                                    );
-                                },
-                                Model,
-                                { before: matchingRecord, after: updatedRecord }
-                            );
-                        });
+                        done(null, { matchingRecord, updatedRecord });
                     });
                 },
-                Model,
-                data
-            );
-        });
+                ({ matchingRecord, updatedRecord }, done) => {
+                    const saveMany = [];
+                    preppedRelations.forEach(rel => {
+                        saveMany.push(done => {
+                            Model.replaceCollection(pk, rel.collection)
+                                .members(rel.values)
+                                .exec(done);
+                        });
+                    });
+                    parallel(saveMany, () => {
+                        done(null, { matchingRecord, updatedRecord });
+                    });
+                },
+                ({ matchingRecord, updatedRecord }, done) => {
+                    interrupts.afterUpdate.call(
+                        this,
+                        req,
+                        res,
+                        () => {
+                            done(null, { matchingRecord, updatedRecord });
+                        },
+                        Model,
+                        { before: matchingRecord, after: updatedRecord }
+                    );
+                },
+                ({ matchingRecord, updatedRecord }, done) => {
+                    const query = Model.findOne(updatedRecord[Model.primaryKey]);
+                    parallel(
+                        {
+                            populatedRecord: done => {
+                                actionUtil.populateRecords(query, associations).exec(done);
+                            },
+                            associated: done => {
+                                actionUtil.populateIndexes(Model, pk, associations, done);
+                            }
+                        },
+                        (err, results) => {
+                            if (err) {
+                                return done(err);
+                            }
+                            const { associated, populatedRecord } = results;
+                            if (!populatedRecord) {
+                                return done(new Error('Could not find record after updating!'));
+                            }
+                            done(null, { associated, matchingRecord, populatedRecord });
+                        }
+                    );
+                },
+                ({ associated, matchingRecord, populatedRecord }, done) => {
+                    const emberizedJSON = Ember.buildResponse(Model, populatedRecord, associations, associated);
+                    return done(null, { emberizedJSON, matchingRecord });
+                }
+            ],
+            (err, results) => {
+                if (err) {
+                    if (err === 404) {
+                        return res.notFound();
+                    }
+                    return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                }
+                const { emberizedJSON, matchingRecord } = results;
+                if (req._sails.hooks.pubsub) {
+                    if (req.isSocket) {
+                        Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
+                    }
+                    Model._publishUpdate(pk, _.cloneDeep(data), !req.options.mirror && req, {
+                        previous: toJSON.call(matchingRecord)
+                    });
+                }
+                res.ok(emberizedJSON, actionUtil.parseLocals(req));
+            }
+        );
     };
 };

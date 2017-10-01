@@ -7,6 +7,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const { parallel } = require('async');
 
 module.exports = function(interrupts) {
     return function(req, res) {
@@ -16,7 +17,8 @@ module.exports = function(interrupts) {
         // Look up the association configuration and determine how to populate the query
         // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
-        async.parallel(
+
+        parallel(
             {
                 matchingRecord: done => {
                     actionUtil
@@ -29,19 +31,22 @@ module.exports = function(interrupts) {
                 }
             },
             (err, results) => {
-                if (err) return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                if (err) {
+                    return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+                }
                 const { matchingRecord, associated } = results;
-                if (!matchingRecord)
+                if (!matchingRecord) {
                     return res.notFound('No record found with the specified ' + Model.primaryKey + '.');
-                if (sails.hooks.pubsub && req.isSocket) {
-                    Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
-                    actionUtil.subscribeDeep(req, matchingRecord);
                 }
                 interrupts.findone.call(
                     this,
                     req,
                     res,
                     () => {
+                        if (sails.hooks.pubsub && req.isSocket) {
+                            Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
+                            actionUtil.subscribeDeep(req, matchingRecord);
+                        }
                         res.ok(
                             Ember.buildResponse(Model, matchingRecord, associations, associated),
                             actionUtil.parseLocals(req)

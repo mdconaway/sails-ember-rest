@@ -193,9 +193,8 @@ module.exports = {
      * @param   {Request} req
      * @return {Integer|String}
      */
-    parsePk(req) {
-        const Model = module.exports.parseModel(req);
-        const isNumber = Model.attributes[Model.primaryKey].type === 'number';
+    parsePk(req, modelOverride) {
+        const Model = modelOverride ? modelOverride : module.exports.parseModel(req);
         const roughPk =
             req.options[Model.primaryKey] ||
             req.param(Model.primaryKey) ||
@@ -203,10 +202,21 @@ module.exports = {
             req.options.id ||
             (req.options.where && req.options.where.id) ||
             req.param('id');
-        const pk = isNumber ? +roughPk : roughPk;
+        const pk = module.exports.formatPk(Model, roughPk);
 
         // exclude criteria on id field
         return _.isPlainObject(pk) ? undefined : pk;
+    },
+
+    /**
+     * Coerce a pk value to its correct type.
+     *
+     * @param   {Request} req
+     * @return {Integer|String}
+     */
+    formatPk(Model, roughPk) {
+        const isNumber = Model.attributes[Model.primaryKey].type === 'number';
+        return isNumber ? +roughPk : roughPk;
     },
 
     /**

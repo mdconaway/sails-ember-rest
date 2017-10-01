@@ -13,8 +13,6 @@ module.exports = function(interrupts) {
         const Model = actionUtil.parseModel(req);
         const pk = actionUtil.requirePk(req);
         const query = Model.findOne(pk);
-        // Look up the association configuration and determine how to populate the query
-        // @todo support request driven selection of includes/populate
         const associations = actionUtil.getAssociationConfiguration(Model, 'list');
 
         actionUtil.populateEach(query, req).exec((err, record) => {
@@ -22,7 +20,7 @@ module.exports = function(interrupts) {
                 return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
             }
             if (!record) {
-                return res.notFound('No record found with the specified ' + Model.primaryKey + '.');
+                return res.notFound(`No record found with the specified ${Model.primaryKey}.`);
             }
             Model.destroy(pk).exec(err => {
                 if (err) {
