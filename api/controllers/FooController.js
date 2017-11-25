@@ -1,5 +1,5 @@
-import { controller } from './../../index';
+import { Controller } from './../../index';
 
-const FooController = new controller({});
+const FooController = new Controller({});
 
 export default FooController;

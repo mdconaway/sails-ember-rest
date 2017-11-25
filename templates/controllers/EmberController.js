@@ -11,6 +11,7 @@ const findone = require('./../actions/findone');
 const hydrate = require('./../actions/hydrate');
 const populate = require('./../actions/populate');
 const update = require('./../actions/update');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 
 function baseController(interrupts) {
     return {
@@ -22,10 +23,6 @@ function baseController(interrupts) {
         populate: populate(interrupts),
         update: update(interrupts)
     };
-}
-
-function defaultInterrupt(req, res, next, Model, record) {
-    next();
 }
 
 module.exports = function(instanceOverrides = {}) {

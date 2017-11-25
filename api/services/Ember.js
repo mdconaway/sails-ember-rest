@@ -1,3 +1,3 @@
-import { service } from './../../index';
+import { Service } from './../../index';
 
-export default service;
+export default Service;

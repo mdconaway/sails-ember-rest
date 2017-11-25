@@ -1,5 +1,5 @@
-import { controller } from './../../index';
+import { Controller } from './../../index';
 
-const BarController = new controller({});
+const BarController = new Controller({});
 
 export default BarController;

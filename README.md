@@ -281,7 +281,7 @@ The policy generator creates a set of helper policies that can allow a sails app
 ```
 * Run the generator: 
 * `sails generate ember-rest controller <name>`
-* `sails generate ember-rest policies`
+* (OPTIONAL) `sails generate ember-rest policies`
 * Go through ALL configuration steps below, and then...
 * Generate some models for your controllers, e.g. `sails generate model user`
 * Start your app with `sails lift`

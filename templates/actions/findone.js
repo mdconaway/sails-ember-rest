@@ -7,9 +7,12 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel } = require('async');
 
-module.exports = function(interrupts) {
+module.exports = function(interrupts = {}) {
+    interrupts.findone = interrupts.findone ? interrupts.findone : defaultInterrupt;
+
     return function(req, res) {
         const Model = actionUtil.parseModel(req);
         const pk = actionUtil.requirePk(req);

@@ -6,12 +6,15 @@
  * @description :: Server-side logic for a generic crud controller update action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-const util = require('util');
 const actionUtil = require('./../util/actionUtil');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel, waterfall } = require('async');
 const _ = require('lodash');
 
-module.exports = function(interrupts) {
+module.exports = function(interrupts = {}) {
+    interrupts.beforeUpdate = interrupts.beforeUpdate ? interrupts.beforeUpdate : defaultInterrupt;
+    interrupts.afterUpdate = interrupts.afterUpdate ? interrupts.afterUpdate : defaultInterrupt;
+
     return function(req, res) {
         // Look up the model
         const Model = actionUtil.parseModel(req);

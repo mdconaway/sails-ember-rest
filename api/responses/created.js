@@ -1,5 +1,4 @@
-import { responses } from './../../index';
-
-const { created } = responses;
+import { Responses } from './../../index';
+const { created } = Responses;
 
 export default created;

@@ -7,8 +7,11 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 
-module.exports = function(interrupts) {
+module.exports = function(interrupts = {}) {
+    interrupts.destroy = interrupts.destroy ? interrupts.destroy : defaultInterrupt;
+
     return function(req, res) {
         const Model = actionUtil.parseModel(req);
         const pk = actionUtil.requirePk(req);

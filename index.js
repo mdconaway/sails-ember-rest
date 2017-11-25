@@ -161,9 +161,7 @@ module.exports = {
                                     file +
                                     '();\n'
                             );
-                            console.info(
-                                'Created policy: ' + scope.rootPath + '/api/controllers/policies/ember' + file + '.js'
-                            );
+                            console.info('Created policy: ' + scope.rootPath + '/api/policies/ember' + file + '.js');
                         }
                     });
                 }
@@ -181,9 +179,27 @@ module.exports = {
     templatesDirectory: require('path').resolve(__dirname, './templates')
 };
 
+module.exports.Actions = module.exports.actions = {
+    create: require('./templates/actions/create'),
+    destroy: require('./templates/actions/destroy'),
+    find: require('./templates/actions/find'),
+    findone: require('./templates/actions/findone'),
+    hydrate: require('./templates/actions/hydrate'),
+    populate: require('./templates/actions/populate'),
+    update: require('./templates/actions/update'),
+    Create: require('./templates/actions/create'),
+    Destroy: require('./templates/actions/destroy'),
+    Find: require('./templates/actions/find'),
+    FindOne: require('./templates/actions/findone'),
+    Hydrate: require('./templates/actions/hydrate'),
+    Populate: require('./templates/actions/populate'),
+    Update: require('./templates/actions/update')
+};
 module.exports.controller = require('./templates/controllers/EmberController');
+module.exports.Controller = require('./templates/controllers/EmberController');
 module.exports.service = require('./templates/services/Ember');
-module.exports.policies = {
+module.exports.Service = require('./templates/services/Ember');
+module.exports.Policies = module.exports.policies = {
     emberCreate: require('./templates/policies/emberCreate'),
     emberDestroy: require('./templates/policies/emberDestroy'),
     emberFind: require('./templates/policies/emberFind'),
@@ -191,9 +207,17 @@ module.exports.policies = {
     emberHydrate: require('./templates/policies/emberHydrate'),
     emberPopulate: require('./templates/policies/emberPopulate'),
     emberSetHeader: require('./templates/policies/emberSetHeader'),
-    emberUpdate: require('./templates/policies/emberUpdate')
+    emberUpdate: require('./templates/policies/emberUpdate'),
+    EmberCreate: require('./templates/policies/emberCreate'),
+    EmberDestroy: require('./templates/policies/emberDestroy'),
+    EmberFind: require('./templates/policies/emberFind'),
+    EmberFindOne: require('./templates/policies/emberFindOne'),
+    EmberHydrate: require('./templates/policies/emberHydrate'),
+    EmberPopulate: require('./templates/policies/emberPopulate'),
+    EmberSetHeader: require('./templates/policies/emberSetHeader'),
+    EmberUpdate: require('./templates/policies/emberUpdate')
 };
-module.exports.responses = {
+module.exports.Responses = module.exports.responses = {
     created: require('./templates/responses/created')
 };
-module.exports.util = require('./templates/util/actionUtil');
+module.exports.Util = module.exports.util = require('./templates/util/actionUtil');

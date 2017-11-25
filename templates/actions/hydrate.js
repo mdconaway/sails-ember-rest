@@ -7,10 +7,13 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
 const _ = require('lodash');
 
-module.exports = function(interrupts) {
+module.exports = function(interrupts = {}) {
+    interrupts.hydrate = interrupts.hydrate ? interrupts.hydrate : defaultInterrupt;
+
     return function(req, res) {
         const Model = actionUtil.parseModel(req);
         const pk = actionUtil.requirePk(req);

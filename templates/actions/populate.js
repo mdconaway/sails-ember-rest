@@ -6,13 +6,15 @@
  * @description :: Server-side logic for a generic crud controller populate action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-const util = require('util');
 const actionUtil = require('./../util/actionUtil');
+const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
 const { parallel } = require('async');
 const _ = require('lodash');
 
-module.exports = function(interrupts) {
+module.exports = function(interrupts = {}) {
+    interrupts.populate = interrupts.populate ? interrupts.populate : defaultInterrupt;
+
     return function(req, res) {
         const Model = actionUtil.parseModel(req);
         const relation = req.options.alias;
