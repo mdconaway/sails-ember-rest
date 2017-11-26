@@ -7,7 +7,11 @@ export default {
         },
         foos: {
             collection: 'foo',
-            via: 'bars'
+            via: 'bars',
+            meta: {
+                list: 'record',
+                detail: 'record'
+            }
         },
         identiField: {
             type: 'string',

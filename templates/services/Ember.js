@@ -68,15 +68,15 @@ module.exports = {
         // filter duplicates in sideloaded records
         Object.keys(json).forEach(key => {
             let array = json[key];
-            if (key === documentIdentifier) return;
+            if (key === documentIdentifier) {
+                return;
+            }
             if (array.length === 0) {
                 delete json[key];
                 return;
             }
             let model = sails.models[pluralize(_.kebabCase(key).toLowerCase(), 1)];
-            let pk = model ? model.primaryKey : 'id';
-            json[key] = _.uniq(array, record => record[pk]);
-            Ember.linkAssociations(model, json[key]);
+            Ember.linkAssociations(model, array);
         });
 
         return json;
@@ -141,8 +141,9 @@ module.exports = {
                         record[assoc.alias].length > 0
                     ) {
                         // sideload association records with links for 3rd level associations
-                        json[assocModelIdentifier] = json[assocModelIdentifier].concat(
-                            Ember.linkAssociations(assocModel, record[assoc.alias])
+                        json[assocModelIdentifier] = _.uniqBy(
+                            json[assocModelIdentifier].concat(Ember.linkAssociations(assocModel, record[assoc.alias])),
+                            assocPK
                         );
                         // reduce association on primary record to an array of IDs
                         record[assoc.alias] = _.reduce(
@@ -189,7 +190,10 @@ module.exports = {
                     assocModel = sails.models[assoc.model];
                     assocPK = assocModel.primaryKey;
                     let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
-                    json[assocModelIdentifier] = json[assocModelIdentifier].concat(record[assoc.alias]);
+                    json[assocModelIdentifier] = _.uniqBy(
+                        json[assocModelIdentifier].concat(record[assoc.alias]),
+                        assocPK
+                    );
                     record[assoc.alias] = linkedRecords[0][assocPK]; // reduce embedded record to id
                     /*
                     // while it's possible, we should not really do this, it is more efficient to return a single model in a 1 to 1 relationship

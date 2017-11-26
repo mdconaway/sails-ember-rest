@@ -72,7 +72,7 @@ module.exports = {
     },
 
     /**
-     * Extend the model's `associations` property with the presentation configuration (taken from the Model's attributes `includeIn` option or from Sails configuration)
+     * Extend the model's `associations` property with the presentation configuration (taken from the Model's attributes `meta` option or from Sails configuration)
      * @param  {Waterline Collection}  Model
      * @return {Array}                 Extended version of the Model.associations with `includeIn` defintions
      */
@@ -85,7 +85,8 @@ module.exports = {
         let associations = Model.associations;
         let attributes = Model.attributes;
         associations.forEach(assoc => {
-            assoc.include = _.extend({}, presentationDefaults, attributes[assoc.alias].includeIn)[style]; // extend association object with presentation configuration
+            let attrMeta = attributes[assoc.alias].meta ? attributes[assoc.alias].meta : {};
+            assoc.include = _.extend({}, presentationDefaults, attrMeta)[style]; // extend association object with presentation configuration
             if (attributes[assoc.alias].through) {
                 assoc.through = attributes[assoc.alias].through;
             }
