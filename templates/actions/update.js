@@ -7,11 +7,17 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel, waterfall } = require('async');
 const _ = require('lodash');
 
-module.exports = function(interrupts = {}) {
+module.exports = function(interrupts = {}, afterUpdate) {
+    const shimmedAfterUpdate = shimFunction(afterUpdate, 'afterUpdate');
+    interrupts = shimFunction(interrupts, 'beforeUpdate');
+    if (shimmedAfterUpdate) {
+        Object.assign(interrupts, shimmedAfterUpdate);
+    }
     interrupts.beforeUpdate = interrupts.beforeUpdate ? interrupts.beforeUpdate : defaultInterrupt;
     interrupts.afterUpdate = interrupts.afterUpdate ? interrupts.afterUpdate : defaultInterrupt;
 

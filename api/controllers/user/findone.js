@@ -1,4 +1,5 @@
-import { Actions } from '../../../index.js';
-const { FindOne } = Actions;
-
-export default new FindOne();
+export default function(req, res) {
+    return res.ok({
+        message: 'This action has been overriden!'
+    });
+}

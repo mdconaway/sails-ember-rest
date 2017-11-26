@@ -7,11 +7,13 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel } = require('async');
 const _ = require('lodash');
 
 module.exports = function(interrupts = {}) {
+    interrupts = shimFunction(interrupts, 'find');
     interrupts.find = interrupts.find ? interrupts.find : defaultInterrupt;
 
     return function(req, res) {

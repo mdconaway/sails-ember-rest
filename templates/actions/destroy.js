@@ -7,9 +7,11 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const actionUtil = require('./../util/actionUtil');
+const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 
 module.exports = function(interrupts = {}) {
+    interrupts = shimFunction(interrupts, 'destroy');
     interrupts.destroy = interrupts.destroy ? interrupts.destroy : defaultInterrupt;
 
     return function(req, res) {
