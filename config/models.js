@@ -38,9 +38,6 @@ export const models = {
     fetchRecordsOnDestroy: true,
     fetchRecordsOnCreate: true,
     fetchRecordsOnCreateEach: true,
-    validations: {
-        ignoreProperties: ['includeIn']
-    },
     /***************************************************************************
     *                                                                          *
     * Base attributes that are included in all of your models by default.      *
