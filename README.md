@@ -56,19 +56,19 @@ The hydrate action is included by default, but you don't have to use it, and mos
 
 To create a new controller instance without using the built-in generators, you can simply make a controller file as follows: 
 ```javascript
-import { controller } from 'sails-ember-rest';
+import { Controller } from 'sails-ember-rest';
 
-export default new controller();
+export default new Controller();
 ```
 
 It's that simple!
 
 The controller constructor functions similarly to ember-objects, in that it can recieve an extension object as input to the constructor itself. An example would be:
 ```javascript
-import { controller } from 'sails-ember-rest';
+import { Controller } from 'sails-ember-rest';
 
-export default new controller({
-    mySpecialAction(req, res){
+export default new Controller({
+    mySpecialAction(req, res) {
         res.status(200);
         res.json({
             foo: 'bar'
@@ -82,10 +82,10 @@ In the controller constructor, you can also override default controller methods,
 
 The following is possible:
 ```javascript
-import { controller } from 'sails-ember-rest';
+import { Controller } from 'sails-ember-rest';
 
-export default new controller({
-    create(req, res){
+export default new Controller({
+    create(req, res) {
         //...some special creation code
         res.status(201);
         res.json({
@@ -101,11 +101,11 @@ Sails-ember-rest controllers also offer a powerful new feature that does not exi
 At a high level, an interrupt can be though of as a policy, or function that you can execute *after* the action itself has occured but *before* a response is sent to the client. Whatever function you register as an interrupt will also be handed all of the important data generated in the action itself as it's input parameters. The best way to demonstrate the utility of the interruptor paradigm is through example:
 
 ```javascript
-import { controller } from 'sails-ember-rest';
+import { Controller } from 'sails-ember-rest';
 
-const myController = new controller();
+const myController = new Controller();
 
-myController.setServiceInterrupt('create', function(req, res, next, Model, record){
+myController.setServiceInterrupt('create', function(req, res, next, Model, record) {
     //req, res, next - are all the express equivalent functions for a middleware. MAKE SURE YOU CALL NEXT WHEN YOU ARE DONE!
     //Model - is the parsed model class that represents the base resource used in this action
     //record - is the new record instance that has been successfully persisted to the database as this is a create action
@@ -158,6 +158,90 @@ In the case of the `afterUpdate` interrupt, the `record` parameter will be an ob
 ```
 
 You don't have to use interrupts in your code, but as the demands on your server grow you may find them to be incredibly useful for making your code more DRY and less error-prone, as well as providing a whole new lifecycle type to the sails ecosystem.
+
+## actions
+
+This library also exports each action individually. If you want to build your controllers using the Sails 1.0 actions2 paradigm, you will need to import each ember action your controller needs within a folder that represents your controller under `api/controllers`.  As an example, you can reference the `api/controllers/user` folder in this library.
+
+Each action is a constructor function that can recieve a context interruptor function, or hash object as the constructor input. An interruptor input is not required however, and you can just create a new instance of whatever action you need.
+
+Below are some examples of how to create individual actions.
+
+```javascript
+//An example of a create action with a named create interrupt
+import { Actions } from 'sails-ember-rest';
+const { Create } = Actions;
+
+//If using single exported actions, a named interrupt can be passed to the action
+//This is optional, and the action constructor can also be sent no value
+export default new Create({
+    create(req, res, next, Model, record) {
+        //you can interrupt the action after database interaction here...
+        next();
+    }
+});
+```
+
+```javascript
+//An example of an update action with named before and after update interrupts
+import { Actions } from 'sails-ember-rest';
+const { Update } = Actions;
+
+export default new Update({
+    //beforeUpdate interruptor
+    beforeUpdate(req, res, next, Model, record) {
+        next();
+    },
+    //afterUpdate interruptor
+    afterUpdate(req, res, next, Model, updateHash) {
+        next();
+    }
+});
+```
+
+```javascript
+//An example of an update action with anonymous before and after update interrupts
+import { Actions } from 'sails-ember-rest';
+const { Update } = Actions;
+
+export default new Update(
+    //beforeUpdate interruptor
+    function(req, res, next, Model, record) {
+        next();
+    },
+    //afterUpdate interruptor
+    function(req, res, next, Model, updateHash) {
+        next();
+    }
+);
+```
+
+```javascript
+//The simple way to make a new action if you don't need interrupts
+import { Actions } from 'sails-ember-rest';
+const { Destroy } = Actions;
+
+export default new Destroy();
+```
+
+To gain access to any actions you require, import the `Actions` object from sails-ember-rest.
+
+The following actions are available under the exported action class namespace:
+
+**Create**
+
+**Destroy**
+
+**Find**
+
+**FindOne**
+
+**Hydrate**
+
+**Populate**
+
+**Update**
+
 
 ## service
 
@@ -237,7 +321,7 @@ Adds a response with a status of 201, as expected by Ember after a new record is
 If you are using es6, you can import these elements and inspect them using the following code:
 
 ```javascript
-import { controller, service, policies, responses, util } from 'sails-ember-rest';
+import { Controller, Service, Policies, Responses, Util } from 'sails-ember-rest';
 ```
 
 * controller and policies subelements are class constructors
@@ -322,19 +406,16 @@ module.exports.models = {
 };
  ```
 
-* Add a configuration option `validations: { ignoreProperties: [ 'includeIn' ] }`
-to `myproject/config/models.js`. This tells Sails to ignore our individual configuration on a model's attributes.
+* (Optional) In `myproject/config/blueprints.js` you can configure a prefix for link relationships. You will need to configure this setting if you will be running your sails server behind another server like Apache with redirect routing.  This prefix should match the URL route that Apache would forward to your sails server port.
 
 ```javascript
-module.exports.models = {
+module.exports.blueprints = {
     // ...
-    validations: {
-        ignoreProperties: ['includeIn']
-    }
+    linkPrefix: '/redirectedPath'
 };
 ```
 
-* (Optional) Setup individual presentation on a by-model by-attribute basis by adding `includeIn: { list: "option", detail: "option"}` where option is one of `link`, `index`, `record`.
+* (Optional) Setup individual presentation on a by-model by-attribute basis by adding `meta: { list: "option", detail: "option"}` where option is one of `link`, `index`, `record`.
 
 ```javascript
 attributes: {
@@ -344,7 +425,7 @@ attributes: {
     posts: {
         collection: "post",
         via: "user",
-        includeIn: {
+        meta: {
             list: "record",
             detail: "record"
         }
@@ -409,10 +490,10 @@ As a **quick example**, if you create a `post` model under the namespace `api/v1
 
 ```javascript
 {
-  "post": {
-    "title": "A new post"
-    "content": "This is the wonderful content of this new post."
-  }
+    "post": {
+        "title": "A new post"
+        "content": "This is the wonderful content of this new post."
+    }
 }
 ```
 
@@ -423,9 +504,9 @@ As a **quick example**, if you create a `post` model under the namespace `api/v1
 
 - Setup configuration while running the generator
 
-### Blueprints: Support pagination metadata
+### Support pagination metadata
 
-- The controller supports pagination meta data on direct requests. However, sideloaded records from relationships are currently not paginated.
+- The controller actions support pagination meta data on direct requests. However, sideloaded records from relationships are currently not paginated.
 
 ### Testing: Make all the things testable
 

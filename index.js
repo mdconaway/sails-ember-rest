@@ -195,10 +195,8 @@ module.exports.Actions = module.exports.actions = {
     Populate: require('./templates/actions/populate'),
     Update: require('./templates/actions/update')
 };
-module.exports.controller = require('./templates/controllers/EmberController');
-module.exports.Controller = require('./templates/controllers/EmberController');
-module.exports.service = require('./templates/services/Ember');
-module.exports.Service = require('./templates/services/Ember');
+module.exports.Controller = module.exports.controller = require('./templates/controllers/EmberController');
+module.exports.Service = module.exports.service = require('./templates/services/Ember');
 module.exports.Policies = module.exports.policies = {
     emberCreate: require('./templates/policies/emberCreate'),
     emberDestroy: require('./templates/policies/emberDestroy'),
