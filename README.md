@@ -63,7 +63,7 @@ export default new Controller();
 
 It's that simple!
 
-The controller constructor functions similarly to ember-objects, in that it can recieve an extension object as input to the constructor itself. An example would be:
+The controller constructor functions similarly to ember-objects, in that it can receive an extension object as input to the constructor itself. An example would be:
 ```javascript
 import { Controller } from 'sails-ember-rest';
 
@@ -163,7 +163,7 @@ You don't have to use interrupts in your code, but as the demands on your server
 
 This library also exports each action individually. If you want to build your controllers using the Sails 1.0 actions2 paradigm, you will need to import each ember action your controller needs within a folder that represents your controller under `api/controllers`.  As an example, you can reference the `api/controllers/user` folder in this library.
 
-Each action is a constructor function that can recieve a context interruptor function, or hash object as the constructor input. An interruptor input is not required however, and you can just create a new instance of whatever action you need.
+Each action is a constructor function that can receive a context interruptor function, or hash object as the constructor input. An interruptor input is not required however, and you can just create a new instance of whatever action you need.
 
 Below are some examples of how to create individual actions.
 
