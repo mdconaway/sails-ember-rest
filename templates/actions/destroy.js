@@ -1,8 +1,8 @@
 /**
  * destroy
- * 
+ *
  * returns a function with access to an interruption context
- * 
+ *
  * @description :: Server-side logic for a generic crud controller destroy action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */

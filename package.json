@@ -1,12 +1,12 @@
 {
     "name": "sails-ember-rest",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "description": "sails generate ember-rest",
     "main": "index.js",
     "scripts": {
         "start": "node app.js",
         "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
-        "format": "node ./node_modules/prettier/bin/prettier --single-quote --tab-width 4 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\""
+        "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 4 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\""
     },
     "keywords": [
         "ember",
@@ -47,23 +47,23 @@
         "chai": "^4.1.2",
         "fs-extra": "*",
         "mocha": "^3.5.3",
-        "prettier": "^1.7.2",
+        "prettier": "^1.12.0",
         "reportback": "*",
-        "sails": "^1.0.0-41",
+        "sails": "^1.0.0",
         "sails-disk": "^1.0.0-11",
         "sails-generate": "*",
         "sails-hook-orm": "^2.0.0-16",
         "sails-hook-sockets": "^1.4.0",
         "supertest": "^3.0.0",
-        "waterline": "^0.13.1-9"
+        "waterline": "^0.13.3"
     },
     "peerDependencies": {
-        "waterline": "^0.13.1-9",
-        "sails": "^1.0.0-41"
+        "waterline": "^0.13.3",
+        "sails": "^1.0.0"
     },
     "sailsGenerator": {
         "type": "ember-rest",
         "behavior": "adds `sails generate ember-rest`",
-        "sailsVersion": "^1.0.0-41"
+        "sailsVersion": "^1.0.0"
     }
 }

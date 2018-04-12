@@ -1,4 +1,5 @@
 import { waterfall } from 'async';
+import AssessmentQuestions from './../fixtures/AssessmentQuestion';
 import Bars from './../fixtures/Bar';
 import Foos from './../fixtures/Foo';
 import Relations from './../fixtures/BarFoosFooBars';
@@ -13,6 +14,11 @@ export default function(sails, done) {
             },
             done => {
                 sails.models.foo.createEach(Foos).exec(() => {
+                    done();
+                });
+            },
+            done => {
+                sails.models.assessmentquestion.createEach(AssessmentQuestions).exec(() => {
                     done();
                 });
             },

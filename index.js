@@ -4,9 +4,9 @@
 
 const fs = require('fs');
 const util = require('util');
-const _ = require('lodash');
 const acceptedCommands = ['controller', 'responses', 'policies'];
-_.defaults = require('merge-defaults');
+const defaults = require('merge-defaults');
+
 /**
  * INVALID_SCOPE_VARIABLE()
  *
@@ -67,7 +67,7 @@ module.exports = {
             return cb(INVALID_SCOPE_VARIABLE('rootPath'));
         }
 
-        _.defaults(scope, {
+        defaults(scope, {
             createdAt: new Date()
         });
 
@@ -142,28 +142,23 @@ module.exports = {
                     if (!fs.existsSync(scope.rootPath + '/api/policies')) {
                         fs.mkdirSync(scope.rootPath + '/api/policies');
                     }
-                    [
-                        'Create',
-                        'Destroy',
-                        'Find',
-                        'FindOne',
-                        'Hydrate',
-                        'Populate',
-                        'SetHeader',
-                        'Update'
-                    ].forEach(function(file) {
-                        if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/ember' + file + '.js')) {
-                            console.info('Policy ember' + file + ' detected, skipping. To overwrite use --force.');
-                        } else {
-                            fs.writeFileSync(
-                                scope.rootPath + '/api/policies/ember' + file + '.js',
-                                "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
-                                    file +
-                                    '();\n'
-                            );
-                            console.info('Created policy: ' + scope.rootPath + '/api/policies/ember' + file + '.js');
+                    ['Create', 'Destroy', 'Find', 'FindOne', 'Hydrate', 'Populate', 'SetHeader', 'Update'].forEach(
+                        function(file) {
+                            if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/ember' + file + '.js')) {
+                                console.info('Policy ember' + file + ' detected, skipping. To overwrite use --force.');
+                            } else {
+                                fs.writeFileSync(
+                                    scope.rootPath + '/api/policies/ember' + file + '.js',
+                                    "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
+                                        file +
+                                        '();\n'
+                                );
+                                console.info(
+                                    'Created policy: ' + scope.rootPath + '/api/policies/ember' + file + '.js'
+                                );
+                            }
                         }
-                    });
+                    );
                 }
                 cb();
             }

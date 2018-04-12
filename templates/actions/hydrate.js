@@ -1,8 +1,8 @@
 /**
  * hydrate
- * 
+ *
  * returns a function with access to an interruption context
- * 
+ *
  * @description :: Server-side logic for a generic crud controller hydrate action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
-const _ = require('lodash');
+const { camelCase } = require('lodash');
 
 module.exports = function(interrupts = {}) {
     interrupts = shimFunction(interrupts, 'hydrate');
@@ -22,7 +22,7 @@ module.exports = function(interrupts = {}) {
         const query = Model.findOne(pk);
         const emberModelIdentity = Model.globalId;
         const modelPlural = pluralize(emberModelIdentity);
-        const documentIdentifier = _.kebabCase(modelPlural);
+        const documentIdentifier = camelCase(modelPlural);
         const response = {};
         const toJSON = Model.customToJSON
             ? Model.customToJSON

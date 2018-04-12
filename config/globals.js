@@ -11,40 +11,40 @@
 
 export const globals = {
     /****************************************************************************
-  *                                                                           *
-  * Whether to expose the locally-installed `lodash` as a global variable     *
-  * (`_`), making  it accessible throughout your app.                         *
-  * (See the link above for help.)                                            *
-  *                                                                           *
-  ****************************************************************************/
+     *                                                                           *
+     * Whether to expose the locally-installed `lodash` as a global variable     *
+     * (`_`), making  it accessible throughout your app.                         *
+     * (See the link above for help.)                                            *
+     *                                                                           *
+     ****************************************************************************/
 
     _: require('lodash'),
 
     /****************************************************************************
-  *                                                                           *
-  * Whether to expose the locally-installed `async` as a global variable      *
-  * (`async`), making it accessible throughout your app.                      *
-  * (See the link above for help.)                                            *
-  *                                                                           *
-  ****************************************************************************/
+     *                                                                           *
+     * Whether to expose the locally-installed `async` as a global variable      *
+     * (`async`), making it accessible throughout your app.                      *
+     * (See the link above for help.)                                            *
+     *                                                                           *
+     ****************************************************************************/
 
     async: require('async'),
 
     /****************************************************************************
-  *                                                                           *
-  * Whether to expose each of your app's models as global variables.          *
-  * (See the link at the top of this file for more information.)              *
-  *                                                                           *
-  ****************************************************************************/
+     *                                                                           *
+     * Whether to expose each of your app's models as global variables.          *
+     * (See the link at the top of this file for more information.)              *
+     *                                                                           *
+     ****************************************************************************/
 
     models: true,
 
     /****************************************************************************
-  *                                                                           *
-  * Whether to expose the Sails app instance as a global variable (`sails`),  *
-  * making it accessible throughout your app.                                 *
-  *                                                                           *
-  ****************************************************************************/
+     *                                                                           *
+     * Whether to expose the Sails app instance as a global variable (`sails`),  *
+     * making it accessible throughout your app.                                 *
+     *                                                                           *
+     ****************************************************************************/
 
     sails: true
 };

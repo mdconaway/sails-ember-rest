@@ -1,8 +1,8 @@
 /**
  * find
- * 
+ *
  * returns a function with access to an interruption context
- * 
+ *
  * @description :: Server-side logic for a generic crud controller find action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel } = require('async');
-const _ = require('lodash');
+const { map } = require('lodash');
 
 module.exports = function(interrupts = {}) {
     interrupts = shimFunction(interrupts, 'find');
@@ -63,7 +63,7 @@ module.exports = function(interrupts = {}) {
                             // Only `.watch()` for new instances of the model if
                             // `autoWatch` is enabled.
                             if (req._sails.hooks.pubsub && req.isSocket) {
-                                Model.subscribe(req, _.map(matchingRecords, Model.primaryKey));
+                                Model.subscribe(req, map(matchingRecords, Model.primaryKey));
                                 if (req.options.autoWatch) {
                                     Model._watch(req);
                                 }

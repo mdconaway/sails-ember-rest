@@ -7,6 +7,18 @@ const newFoo = {
         bars: [1, 2, 3, 4]
     }
 };
+const newAssessmentQuestion = {
+    assessmentQuestion: {
+        name: 'Question 3',
+        identiField: 'XX'
+    }
+};
+const badAssessmentQuestion = {
+    'assessment-question': {
+        name: 'Question 4',
+        identiField: 'YY'
+    }
+};
 
 describe('Integration | Action | create', function() {
     after(function(done) {
@@ -96,6 +108,30 @@ describe('Integration | Action | create', function() {
                         })
                         .end(done);
                 });
+        });
+    });
+
+    describe(':: multi-word model name', function() {
+        it('should receive and return a camelCase payload envelope', function(done) {
+            supertest(sails.hooks.http.app)
+                .post('/assessmentquestions')
+                .send(newAssessmentQuestion)
+                .expect(201)
+                .expect(res => {
+                    expect(res.body.assessmentQuestions).to.be.an.instanceof(Array);
+                })
+                .expect(res => {
+                    expect(res.body.assessmentQuestions[0].name).to.equal('Question 3');
+                })
+                .end(done);
+        });
+
+        it('should fail if sent a kebab-case payload envelope', function(done) {
+            supertest(sails.hooks.http.app)
+                .post('/assessmentquestions')
+                .send(badAssessmentQuestion)
+                .expect(400)
+                .end(done);
         });
     });
 });

@@ -1,7 +1,7 @@
 /**
  * Module dependencies
  */
-const _ = require('lodash');
+const { camelCase, extend, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
 const util = require('util');
 // Parameter used for jsonp callback is constant, as far as
 // blueprints are concerned (for now.)
@@ -16,7 +16,7 @@ const JSONP_CALLBACK_PARAM = 'callback';
 // If JSON is falsey, return null
 // (this is so that it will be ignored if not specified)
 function tryToParseJSON(json) {
-    if (!_.isString(json)) return null;
+    if (!isString(json)) return null;
     try {
         return JSON.parse(json);
     } catch (e) {
@@ -32,7 +32,7 @@ function tryToParseJSON(json) {
 module.exports = {
     /**
      * Negotiate the proper way to handle an error in an action
-     * 
+     *
      * @param {Response} res A response object
      * @param {Error} err The error object to negotiate
      * @param {Object} locals The locals object to propogate to the responder/view
@@ -52,7 +52,7 @@ module.exports = {
      * Prepare records for create / update using Sails 1.0 relationship methods
      *
      * This method will alter the DATA object! (it must prevent many relations from directly saving)
-     * 
+     *
      * @param {Associations} associations Definition of the associations, from `req.option.associations`
      * @param {Object} data The individual record that is about to be persisted
      * @return {Array} The returned structure can be utilized by controller actions create / update
@@ -86,7 +86,7 @@ module.exports = {
         let attributes = Model.attributes;
         associations.forEach(assoc => {
             let attrMeta = attributes[assoc.alias].meta ? attributes[assoc.alias].meta : {};
-            assoc.include = _.extend({}, presentationDefaults, attrMeta)[style]; // extend association object with presentation configuration
+            assoc.include = extend({}, presentationDefaults, attrMeta)[style]; // extend association object with presentation configuration
             if (attributes[assoc.alias].through) {
                 assoc.through = attributes[assoc.alias].through;
             }
@@ -161,7 +161,7 @@ module.exports = {
 
     /**
      * Subscribe deep (associations)
-     * This likely needs to be refactored to fully support sails 1.0. 
+     * This likely needs to be refactored to fully support sails 1.0.
      * @param   {[type]} associations   [description]
      * @param   {[type]} record         [description]
      * @return {[type]}                 [description]
@@ -206,7 +206,7 @@ module.exports = {
         const pk = module.exports.formatPk(Model, roughPk);
 
         // exclude criteria on id field
-        return _.isPlainObject(pk) ? undefined : pk;
+        return isPlainObject(pk) ? undefined : pk;
     },
 
     /**
@@ -266,7 +266,7 @@ module.exports = {
         let where = req.allParams().where;
 
         // If `where` parameter is a string, try to interpret it as JSON
-        if (_.isString(where)) {
+        if (isString(where)) {
             where = tryToParseJSON(where);
         }
 
@@ -278,11 +278,11 @@ module.exports = {
             where = req.allParams();
 
             // Omit built-in runtime config (like query modifiers)
-            where = _.omit(where, blacklist || ['limit', 'skip', 'sort']);
+            where = omit(where, blacklist || ['limit', 'skip', 'sort']);
 
             // Omit any params w/ undefined values
-            where = _.omit(where, p => {
-                if (_.isUndefined(p)) return true;
+            where = omit(where, p => {
+                if (isUndefined(p)) return true;
             });
 
             // Transform ids[ .., ..] request
@@ -295,18 +295,18 @@ module.exports = {
 
             // Omit jsonp callback param (but only if jsonp is enabled)
             let jsonpOpts = req.options.jsonp && !req.isSocket;
-            jsonpOpts = _.isObject(jsonpOpts)
+            jsonpOpts = isPlainObject(jsonpOpts)
                 ? jsonpOpts
                 : {
                       callback: JSONP_CALLBACK_PARAM
                   };
             if (jsonpOpts) {
-                where = _.omit(where, [jsonpOpts.callback]);
+                where = omit(where, [jsonpOpts.callback]);
             }
         }
 
         // Merge w/ req.options.where and return
-        where = _.merge({}, req.options.where || {}, where) || undefined;
+        where = merge({}, req.options.where || {}, where) || undefined;
 
         return where;
     },
@@ -332,25 +332,25 @@ module.exports = {
         }
 
         // Get valufunctiones using the model identity as resource identifier
-        let values = req.param(_.kebabCase(model.globalId)) || {};
+        let values = req.param(camelCase(model.globalId)) || {};
 
         // Omit built-in runtime config (like query modifiers)
-        values = _.omit(values, blacklist || []);
+        values = omit(values, blacklist || []);
 
         // Omit any params w/ undefined values
-        values = _.omit(values, p => {
-            if (_.isUndefined(p)) return true;
+        values = omit(values, p => {
+            if (isUndefined(p)) return true;
         });
 
         // Omit jsonp callback param (but only if jsonp is enabled)
         let jsonpOpts = req.options.jsonp && !req.isSocket;
-        jsonpOpts = _.isObject(jsonpOpts)
+        jsonpOpts = isPlainObject(jsonpOpts)
             ? jsonpOpts
             : {
                   callback: JSONP_CALLBACK_PARAM
               };
         if (jsonpOpts) {
-            values = _.omit(values, [jsonpOpts.callback]);
+            values = omit(values, [jsonpOpts.callback]);
         }
 
         return values;
@@ -380,13 +380,13 @@ module.exports = {
      */
     parseSort(req) {
         let sort = req.param('sort') || req.options.sort;
-        if (_.isUndefined(sort)) {
+        if (isUndefined(sort)) {
             return undefined;
         }
 
         // If `sort` is a string, attempt to JSON.parse() it.
         // (e.g. `{"name": 1}`)
-        if (_.isString(sort)) {
+        if (isString(sort)) {
             try {
                 sort = JSON.parse(sort);
             } catch (e) {

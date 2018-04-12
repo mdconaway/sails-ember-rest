@@ -3,7 +3,7 @@
  *
  * @module Ember
  */
-const _ = require('lodash');
+const { camelCase, reduce, uniqBy } = require('lodash');
 const pluralize = require('pluralize');
 const generateManyMap = require('./../util/manyMapGenerator');
 let aliasMap = {};
@@ -75,7 +75,7 @@ module.exports = {
                 delete json[key];
                 return;
             }
-            let model = sails.models[pluralize(_.kebabCase(key).toLowerCase(), 1)];
+            let model = sails.models[pluralize(camelCase(key).toLowerCase(), 1)];
             Ember.linkAssociations(model, array);
         });
 
@@ -95,7 +95,7 @@ module.exports = {
         let emberModelIdentity = model.globalId;
         let modelPlural = pluralize(emberModelIdentity);
         let linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
-        let documentIdentifier = _.camelCase(modelPlural);
+        let documentIdentifier = camelCase(modelPlural);
         const toJSON = model.customToJSON
             ? model.customToJSON
             : function() {
@@ -111,7 +111,7 @@ module.exports = {
             // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
             if (assoc.include === 'record') {
                 let assocModelIdentifier = pluralize(
-                    _.camelCase(sails.models[assoc.collection || assoc.model].globalId)
+                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
                 );
                 // initialize jsoning object
                 if (!json.hasOwnProperty(assoc.alias)) {
@@ -126,7 +126,7 @@ module.exports = {
             record = Object.assign({}, toJSON.call(record));
             associations.forEach(assoc => {
                 let assocModelIdentifier = pluralize(
-                    _.camelCase(sails.models[assoc.collection || assoc.model].globalId)
+                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
                 );
                 let assocModel;
                 let assocPK;
@@ -141,12 +141,12 @@ module.exports = {
                         record[assoc.alias].length > 0
                     ) {
                         // sideload association records with links for 3rd level associations
-                        json[assocModelIdentifier] = _.uniqBy(
+                        json[assocModelIdentifier] = uniqBy(
                             json[assocModelIdentifier].concat(Ember.linkAssociations(assocModel, record[assoc.alias])),
                             assocPK
                         );
                         // reduce association on primary record to an array of IDs
-                        record[assoc.alias] = _.reduce(
+                        record[assoc.alias] = reduce(
                             record[assoc.alias],
                             (filtered, rec) => {
                                 filtered.push(rec[assocPK]);
@@ -159,7 +159,7 @@ module.exports = {
                     //through relations not in link mode are now covered by populate instead of index associations,
                     //so they are processed in the if statement above ^
                     if (!assoc.through && assoc.include === 'index' && associatedRecords[assoc.alias]) {
-                        record[assoc.alias] = _.reduce(
+                        record[assoc.alias] = reduce(
                             associatedRecords[assoc.alias],
                             (filtered, rec) => {
                                 if (rec[via] === record[primaryKey]) {
@@ -183,14 +183,14 @@ module.exports = {
                             assoc.alias; //"/" + sails.config.blueprints.prefix
                         delete record[assoc.alias];
                     }
-                    //record[assoc.alias] = _.map(record[assoc.alias], 'id');
+                    //record[assoc.alias] = map(record[assoc.alias], 'id');
                 }
 
                 if (assoc.include === 'record' && assoc.type === 'model' && record[assoc.alias]) {
                     assocModel = sails.models[assoc.model];
                     assocPK = assocModel.primaryKey;
                     let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
-                    json[assocModelIdentifier] = _.uniqBy(
+                    json[assocModelIdentifier] = uniqBy(
                         json[assocModelIdentifier].concat(record[assoc.alias]),
                         assocPK
                     );

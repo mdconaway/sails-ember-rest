@@ -1,8 +1,8 @@
 /**
  * update
- * 
+ *
  * returns a function with access to an interruption context
- * 
+ *
  * @description :: Server-side logic for a generic crud controller update action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel, waterfall } = require('async');
-const _ = require('lodash');
+const { cloneDeep } = require('lodash');
 
 module.exports = function(interrupts = {}, afterUpdate) {
     const shimmedAfterUpdate = shimFunction(afterUpdate, 'afterUpdate');
@@ -150,7 +150,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
                     if (req.isSocket) {
                         Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
                     }
-                    Model._publishUpdate(pk, _.cloneDeep(data), !req.options.mirror && req, {
+                    Model._publishUpdate(pk, cloneDeep(data), !req.options.mirror && req, {
                         previous: toJSON.call(matchingRecord)
                     });
                 }

@@ -15,19 +15,19 @@
 
 export const models = {
     /***************************************************************************
-    *                                                                          *
-    * How and whether Sails will attempt to automatically rebuild the          *
-    * tables/collections/etc. in your schema.                                  *
-    *                                                                          *
-    * > Note that, when running in a production environment, this will be      *
-    * > automatically set to `migrate: 'safe'`, no matter what you configure   *
-    * > here.  This is a failsafe to prevent Sails from accidentally running   *
-    * > auto-migrations on your production database.                           *
-    * >                                                                        *
-    * > For more info, see:                                                    *
-    * > https://sailsjs.com/docs/concepts/orm/model-settings#?migrate          *
-    *                                                                          *
-    ***************************************************************************/
+     *                                                                          *
+     * How and whether Sails will attempt to automatically rebuild the          *
+     * tables/collections/etc. in your schema.                                  *
+     *                                                                          *
+     * > Note that, when running in a production environment, this will be      *
+     * > automatically set to `migrate: 'safe'`, no matter what you configure   *
+     * > here.  This is a failsafe to prevent Sails from accidentally running   *
+     * > auto-migrations on your production database.                           *
+     * >                                                                        *
+     * > For more info, see:                                                    *
+     * > https://sailsjs.com/docs/concepts/orm/model-settings#?migrate          *
+     *                                                                          *
+     ***************************************************************************/
 
     migrate: 'alter',
     associations: {
@@ -39,16 +39,16 @@ export const models = {
     fetchRecordsOnCreate: true,
     fetchRecordsOnCreateEach: true,
     /***************************************************************************
-    *                                                                          *
-    * Base attributes that are included in all of your models by default.      *
-    * By convention, this is your primary key attribute (`id`), as well as two *
-    * other timestamp attributes for tracking when records were last created   *
-    * or updated.                                                              *
-    *                                                                          *
-    * > For more info, see:                                                    *
-    * > https://sailsjs.com/docs/concepts/orm/model-settings#?attributes       *
-    *                                                                          *
-    ***************************************************************************/
+     *                                                                          *
+     * Base attributes that are included in all of your models by default.      *
+     * By convention, this is your primary key attribute (`id`), as well as two *
+     * other timestamp attributes for tracking when records were last created   *
+     * or updated.                                                              *
+     *                                                                          *
+     * > For more info, see:                                                    *
+     * > https://sailsjs.com/docs/concepts/orm/model-settings#?attributes       *
+     *                                                                          *
+     ***************************************************************************/
     attributes: {
         createdAt: { type: 'ref', columnType: 'date', autoCreatedAt: true },
         updatedAt: { type: 'ref', columnType: 'date', autoUpdatedAt: true },

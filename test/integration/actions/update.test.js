@@ -11,6 +11,18 @@ const updateFoo = {
         myBar: 2
     }
 };
+const updateAssessmentQuestion = {
+    assessmentQuestion: {
+        name: 'Question 1:Addendum',
+        identiField: 'Now Z'
+    }
+};
+const badAssessmentQuestion = {
+    'assessment-question': {
+        name: 'Question 1:Addendum',
+        identiField: 'ZZ'
+    }
+};
 let targetFoo = null;
 
 describe('Integration | Action | update', function() {
@@ -111,6 +123,33 @@ describe('Integration | Action | update', function() {
                         })
                         .end(done);
                 });
+        });
+    });
+
+    describe(':: multi-word model name', function() {
+        it('should receive and return a camelCase payload envelope', function(done) {
+            supertest(sails.hooks.http.app)
+                .patch('/assessmentquestions/1')
+                .send(updateAssessmentQuestion)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body.assessmentQuestions).to.be.an.instanceof(Array);
+                })
+                .expect(res => {
+                    expect(res.body.assessmentQuestions[0].name).to.equal('Question 1:Addendum');
+                })
+                .end(done);
+        });
+
+        it('should fail to update attributes if sent a kebab-case payload envelope', function(done) {
+            supertest(sails.hooks.http.app)
+                .patch('/assessmentquestions/1')
+                .send(badAssessmentQuestion)
+                .expect(200)
+                .expect(res => {
+                    expect(res.body.assessmentQuestions[0].identiField).not.to.equal('ZZ');
+                })
+                .end(done);
         });
     });
 });

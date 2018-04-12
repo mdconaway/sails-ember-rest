@@ -1,8 +1,8 @@
 /**
  * populate
- * 
+ *
  * returns a function with access to an interruption context
- * 
+ *
  * @description :: Server-side logic for a generic crud controller populate action that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
@@ -11,7 +11,7 @@ const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
 const { parallel } = require('async');
-const _ = require('lodash');
+const { camelCase, find } = require('lodash');
 
 module.exports = function(interrupts = {}) {
     interrupts = shimFunction(interrupts, 'populate');
@@ -23,7 +23,7 @@ module.exports = function(interrupts = {}) {
         if (!relation || !Model) {
             return res.serverError(new Error('No model or relationship identified!'));
         }
-        const association = _.find(req.options.associations, {
+        const association = find(req.options.associations, {
             alias: relation
         });
         const relationIdentity = association.type === 'model' ? association.model : association.collection;
@@ -100,7 +100,7 @@ module.exports = function(interrupts = {}) {
                             actionUtil.subscribeDeep(req, parent);
                         }
                         // find the model identity and the Collection for this relation
-                        const documentIdentifier = pluralize(_.kebabCase(RelatedModel.globalId));
+                        const documentIdentifier = pluralize(camelCase(RelatedModel.globalId));
                         const json = {};
 
                         json[documentIdentifier] = Ember.linkAssociations(RelatedModel, children);
