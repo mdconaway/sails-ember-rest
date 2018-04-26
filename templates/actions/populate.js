@@ -11,7 +11,7 @@ const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
 const { parallel } = require('async');
-const { camelCase, find } = require('lodash');
+const { kebabCase, find } = require('lodash');
 
 module.exports = function(interrupts = {}) {
     interrupts = shimFunction(interrupts, 'populate');
@@ -100,7 +100,7 @@ module.exports = function(interrupts = {}) {
                             actionUtil.subscribeDeep(req, parent);
                         }
                         // find the model identity and the Collection for this relation
-                        const documentIdentifier = pluralize(camelCase(RelatedModel.globalId));
+                        const documentIdentifier = pluralize(kebabCase(RelatedModel.globalId));
                         const json = {};
 
                         json[documentIdentifier] = Ember.linkAssociations(RelatedModel, children);
