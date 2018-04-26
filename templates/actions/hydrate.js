@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
-const { camelCase } = require('lodash');
+const { kebabCase } = require('lodash');
 
 module.exports = function(interrupts = {}) {
     interrupts = shimFunction(interrupts, 'hydrate');
@@ -22,7 +22,7 @@ module.exports = function(interrupts = {}) {
         const query = Model.findOne(pk);
         const emberModelIdentity = Model.globalId;
         const modelPlural = pluralize(emberModelIdentity);
-        const documentIdentifier = camelCase(modelPlural);
+        const documentIdentifier = kebabCase(modelPlural);
         const response = {};
         const toJSON = Model.customToJSON
             ? Model.customToJSON

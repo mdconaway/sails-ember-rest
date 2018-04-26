@@ -127,7 +127,7 @@ describe('Integration | Action | update', function() {
     });
 
     describe(':: multi-word model name', function() {
-        it('should receive and return a camelCase payload envelope', function(done) {
+        it('should receive and return a kebabCase payload envelope', function(done) {
             supertest(sails.hooks.http.app)
                 .patch('/assessmentquestions/1')
                 .send(updateAssessmentQuestion)

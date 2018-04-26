@@ -3,7 +3,7 @@
  *
  * @module Ember
  */
-const { camelCase, reduce, uniqBy } = require('lodash');
+const { kebabCase, reduce, uniqBy } = require('lodash');
 const pluralize = require('pluralize');
 const generateManyMap = require('./../util/manyMapGenerator');
 let aliasMap = {};
@@ -75,7 +75,7 @@ module.exports = {
                 delete json[key];
                 return;
             }
-            let model = sails.models[pluralize(camelCase(key).toLowerCase(), 1)];
+            let model = sails.models[pluralize(kebabCase(key).toLowerCase(), 1)];
             Ember.linkAssociations(model, array);
         });
 
@@ -95,7 +95,7 @@ module.exports = {
         let emberModelIdentity = model.globalId;
         let modelPlural = pluralize(emberModelIdentity);
         let linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
-        let documentIdentifier = camelCase(modelPlural);
+        let documentIdentifier = kebabCase(modelPlural);
         const toJSON = model.customToJSON
             ? model.customToJSON
             : function() {
@@ -111,7 +111,7 @@ module.exports = {
             // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
             if (assoc.include === 'record') {
                 let assocModelIdentifier = pluralize(
-                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
+                    kebabCase(sails.models[assoc.collection || assoc.model].globalId)
                 );
                 // initialize jsoning object
                 if (!json.hasOwnProperty(assoc.alias)) {
@@ -126,7 +126,7 @@ module.exports = {
             record = Object.assign({}, toJSON.call(record));
             associations.forEach(assoc => {
                 let assocModelIdentifier = pluralize(
-                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
+                    kebabCase(sails.models[assoc.collection || assoc.model].globalId)
                 );
                 let assocModel;
                 let assocPK;

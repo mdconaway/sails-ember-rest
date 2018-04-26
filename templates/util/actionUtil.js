@@ -1,7 +1,7 @@
 /**
  * Module dependencies
  */
-const { camelCase, extend, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
+const { kebabCase, extend, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
 const util = require('util');
 // Parameter used for jsonp callback is constant, as far as
 // blueprints are concerned (for now.)
@@ -332,7 +332,7 @@ module.exports = {
         }
 
         // Get valufunctiones using the model identity as resource identifier
-        let values = req.param(camelCase(model.globalId)) || {};
+        let values = req.param(kebabCase(model.globalId)) || {};
 
         // Omit built-in runtime config (like query modifiers)
         values = omit(values, blacklist || []);
