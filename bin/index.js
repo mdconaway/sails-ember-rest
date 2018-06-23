@@ -13,19 +13,19 @@ const path = require('path');
 
 const args = Array.prototype.slice.call(process.argv, 2);
 const scope = {
-    generatorType: 'ember-jsonapi',
-    rootPath: process.cwd(),
-    modules: {
-        'ember-jsonapi': path.resolve(__dirname, '../')
-    },
-    args
+  generatorType: 'ember-jsonapi',
+  rootPath: process.cwd(),
+  modules: {
+    'ember-jsonapi': path.resolve(__dirname, '../')
+  },
+  args
 };
 
 sailsgen(scope, err => {
-    if (err) {
-        throw err;
-    }
+  if (err) {
+    throw err;
+  }
 
-    // It worked.
-    console.log('Done.');
+  // It worked.
+  console.log('Done.');
 });
