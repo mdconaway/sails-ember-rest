@@ -9,13 +9,13 @@
  */
 
 export const custom = {
-    /**************************************************************************
-     *                                                                          *
-     * Default settings for custom configuration used in your app.              *
-     * (these may also be overridden in config/env/production.js)               *
-     *                                                                          *
-     ***************************************************************************/
-    // mailgunDomain: 'transactional-mail.example.com',
-    // mailgunApiKey: 'key-testkeyb183848139913858e8abd9a3',
-    // stripeSecret: 'sk_test_Zzd814nldl91104qor5911gjald',
+  /**************************************************************************
+   *                                                                          *
+   * Default settings for custom configuration used in your app.              *
+   * (these may also be overridden in config/env/production.js)               *
+   *                                                                          *
+   ***************************************************************************/
+  // mailgunDomain: 'transactional-mail.example.com',
+  // mailgunApiKey: 'key-testkeyb183848139913858e8abd9a3',
+  // stripeSecret: 'sk_test_Zzd814nldl91104qor5911gjald',
 };
