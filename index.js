@@ -23,9 +23,9 @@ const defaults = require('merge-defaults');
 
 function INVALID_SCOPE_VARIABLE(varname, details, message) {
     let DEFAULT_MESSAGE =
-        'Issue encountered in generator "ember-rest":\n' +
+        'Issue encountered in generator "ember-jsonapi":\n' +
         'Missing required scope variable: `%s`"\n' +
-        'If you are the author of `sails-ember-rest`, please resolve this ' +
+        'If you are the author of `sails-generate-ember-jsonapi`, please resolve this ' +
         'issue and publish a new patch release.';
 
     message = (message || DEFAULT_MESSAGE) + (details ? '\n' + details : '');
@@ -34,12 +34,12 @@ function INVALID_SCOPE_VARIABLE(varname, details, message) {
     return new Error(message);
 }
 /**
- * sails-generate-ember-rest
+ * sails-generate-ember-jsonapi
  *
  * Usage:
- * `sails generate ember-rest`
+ * `sails generate ember-jsonapi`
  *
- * @description Generates an ember-rest entity
+ * @description Generates an ember-jsonapi entity
  * @help See http://links.sailsjs.org/docs/generators
  */
 
@@ -57,7 +57,7 @@ module.exports = {
 
     before(scope, cb) {
         if (!scope.args[0]) {
-            return cb(new Error('Please provide a type for ember-rest to generate.'));
+            return cb(new Error('Please provide a type for ember-jsonapi to generate.'));
         } else if (acceptedCommands.indexOf(scope.args[0]) === -1) {
             return cb(new Error('Please enter a valid command. Supported commands: ' + acceptedCommands.join()));
         }
@@ -102,7 +102,7 @@ module.exports = {
                     }
                     fs.writeFileSync(
                         scope.rootPath + '/api/responses/created.js',
-                        "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.responses.created;\n"
+                        "const SailsEmber = require('sails-generate-ember-jsonapi');\nmodule.exports = SailsEmber.responses.created;\n"
                     );
                 }
                 if (scope.generatorName === 'controller' || scope.generatorName === 'policies') {
@@ -115,7 +115,7 @@ module.exports = {
                         }
                         fs.writeFileSync(
                             scope.rootPath + '/api/services/Ember.js',
-                            "const SailsEmber = require('sails-ember-rest');\nmodule.exports = SailsEmber.service;\n"
+                            "const SailsEmber = require('sails-generate-ember-jsonapi');\nmodule.exports = SailsEmber.service;\n"
                         );
                     }
                 }
@@ -132,7 +132,7 @@ module.exports = {
                         }
                         fs.writeFileSync(
                             scope.rootPath + '/api/controllers/' + scope.filename + '.js',
-                            "const SailsEmber = require('sails-ember-rest');\nconst controller = new SailsEmber.controller({\n});\n\nmodule.exports = controller;\n"
+                            "const SailsEmber = require('sails-generate-ember-jsonapi');\nconst controller = new SailsEmber.controller({\n});\n\nmodule.exports = controller;\n"
                         );
                         console.info(
                             'Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js'
@@ -149,7 +149,7 @@ module.exports = {
                             } else {
                                 fs.writeFileSync(
                                     scope.rootPath + '/api/policies/ember' + file + '.js',
-                                    "const SailsEmber = require('sails-ember-rest');\nmodule.exports = new SailsEmber.policies.ember" +
+                                    "const SailsEmber = require('sails-generate-ember-jsonapi');\nmodule.exports = new SailsEmber.policies.ember" +
                                         file +
                                         '();\n'
                                 );
