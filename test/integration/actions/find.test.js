@@ -265,5 +265,14 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
+    it('should support empty query results', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles?title[contains]=EMPTY YO')
+        .expect(res => {
+          expect(res.body.data).to.have.lengthOf(0);
+          expect(res.body.meta.total).to.equal(0);
+        })
+        .end(done);
+    });
   });
 });
