@@ -1,9 +1,9 @@
-Sails-Hook-Ember-JSONAPI
+Sails-Generate-Ember-JSONAPI
 ======================
 
 # STATEMENT
 
-Sails-Hook-Ember-JSONAPI is in the VERY early stages and should be treated as a WIP until further notice!
+Sails-Generate-Ember-JSONAPI is in the VERY early stages and should be treated as a WIP until further notice!
 
 # VERSIONS
 
@@ -19,4 +19,4 @@ Ember Data JSONAPI-Adapter compatible controllers, policies, services and genera
 
 THIS PACKAGE DERIVES THE MAJORITY OF ITS ORIGINAL IDEAS AND CODE FROM THE FOLLOWING LIBRARY: [Sails-Ember-REST](https://github.com/mdconaway/sails-ember-rest)
 
-Sails-Hook-Ember-JSONAPI is a port of the popular [Sails-Ember-Rest](https://github.com/mdconaway/sails-ember-rest) library that directly supports the Ember Data REST-Adapter. Although the REST-envelope style format is perfectly supported, Ember.js prefers the more expressive [JSON API](http://jsonapi.org/) standard.
+Sails-Generate-Ember-JSONAPI is a port of the popular [Sails-Ember-Rest](https://github.com/mdconaway/sails-ember-rest) library that directly supports the Ember Data REST-Adapter. Although the REST-envelope style format is perfectly supported, Ember.js prefers the more expressive [JSON API](http://jsonapi.org/) standard.
