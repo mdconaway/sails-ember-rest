@@ -1,7 +1,7 @@
 /**
  * Module dependencies
  */
-const { camelCase, extend, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
+const { camelCase, extend, kababCase, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
 const util = require('util');
 // Parameter used for jsonp callback is constant, as far as
 // blueprints are concerned (for now.)
@@ -328,8 +328,13 @@ module.exports = {
       throw new Error('Invalid `req.options.values.blacklist`. Should be an array of strings (parameter names.)');
     }
 
-    // Get valufunctiones using the model identity as resource identifier
-    let values = req.param(camelCase(model.globalId)) || {};
+    // Get values from the data param in the body and merge attributes with relationships
+    let values = req.param('data') || {};
+    const { attributes = {}, relationships = {} } = values;
+    values = Object.assign({}, attributes, Object.keys(relationships).reduce((acc, key) => {
+      const { data = {} } = relationships[key];
+      return data.id ? Object.assign({}, acc, { [key]: data.id }) : acc;
+    }, {}));
 
     // Omit built-in runtime config (like query modifiers)
     values = omit(values, blacklist || []);
