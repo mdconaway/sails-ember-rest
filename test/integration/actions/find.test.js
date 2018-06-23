@@ -161,9 +161,9 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
-    it('should support simple sort parameter (ASC)', function(done) {
+    it('should support simple ascending sorting', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/authors?sort=name%20ASC')
+        .get('/authors?sort=name')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
@@ -174,9 +174,9 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
-    it('should support simple sort parameter (DESC)', function(done) {
+    it('should support simple descending sorting', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/authors?sort=name%20DESC')
+        .get('/authors?sort=-name')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
@@ -187,81 +187,16 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
-    it('should support object sort parameter (1)', function(done) {
+    it('should support multi-field, mixed direction sorting', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/authors?sort={"name":1}')
+        .get('/authors?sort=-age,name')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
           expect(res.body.data[0].attributes.name).to.equal('Bob');
-          expect(res.body.data[1].attributes.name).to.equal('Cob');
-          expect(res.body.data[2].attributes.name).to.equal('Lob');
-          expect(res.body.data[3].attributes.name).to.equal('Rob');
-        })
-        .end(done);
-    });
-    it('should support object sort parameter (-1)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/authors?sort={"name":-1}')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(4);
-          expect(res.body.meta.total).to.equal(4);
-          expect(res.body.data[0].attributes.name).to.equal('Rob');
           expect(res.body.data[1].attributes.name).to.equal('Lob');
-          expect(res.body.data[2].attributes.name).to.equal('Cob');
-          expect(res.body.data[3].attributes.name).to.equal('Bob');
-        })
-        .end(done);
-    });
-    it('should support multi-column object sort parameter (1)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/authors?sort={"age":1,"name":1}')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(4);
-          expect(res.body.meta.total).to.equal(4);
-          expect(res.body.data[0].attributes.name).to.equal('Rob');
-          expect(res.body.data[1].attributes.name).to.equal('Cob');
-          expect(res.body.data[2].attributes.name).to.equal('Bob');
-          expect(res.body.data[3].attributes.name).to.equal('Lob');
-        })
-        .end(done);
-    });
-    it('should support array sort parameter (single ASC)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/authors?sort=[{"name":"ASC"}]')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(4);
-          expect(res.body.meta.total).to.equal(4);
-          expect(res.body.data[0].attributes.name).to.equal('Bob');
-          expect(res.body.data[1].attributes.name).to.equal('Cob');
-          expect(res.body.data[2].attributes.name).to.equal('Lob');
-          expect(res.body.data[3].attributes.name).to.equal('Rob');
-        })
-        .end(done);
-    });
-    it('should support array sort parameter (single DESC)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/authors?sort=[{"name":"DESC"}]')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(4);
-          expect(res.body.meta.total).to.equal(4);
-          expect(res.body.data[0].attributes.name).to.equal('Rob');
-          expect(res.body.data[1].attributes.name).to.equal('Lob');
-          expect(res.body.data[2].attributes.name).to.equal('Cob');
-          expect(res.body.data[3].attributes.name).to.equal('Bob');
-        })
-        .end(done);
-    });
-    it('should support array sort parameter (multi-column)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/authors?sort=[{"age":"ASC"},{"name":"ASC"}]')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(4);
-          expect(res.body.meta.total).to.equal(4);
-          expect(res.body.data[0].attributes.name).to.equal('Rob');
-          expect(res.body.data[1].attributes.name).to.equal('Cob');
-          expect(res.body.data[2].attributes.name).to.equal('Bob');
-          expect(res.body.data[3].attributes.name).to.equal('Lob');
+          expect(res.body.data[2].attributes.name).to.equal('Rob');
+          expect(res.body.data[3].attributes.name).to.equal('Cob');
         })
         .end(done);
     });
