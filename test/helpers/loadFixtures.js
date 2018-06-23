@@ -1,29 +1,23 @@
 import { waterfall } from 'async';
-import AssessmentQuestions from './../fixtures/AssessmentQuestion';
-import Bars from './../fixtures/Bar';
-import Foos from './../fixtures/Foo';
-import Relations from './../fixtures/BarFoosFooBars';
+import Articles from './../fixtures/Article';
+import Authors from './../fixtures/Author';
+import Comments from './../fixtures/Comment';
 
 export default function(sails, done) {
   waterfall(
     [
       done => {
-        sails.models.bar.createEach(Bars).exec(() => {
+        sails.models.author.createEach(Authors).exec(() => {
           done();
         });
       },
       done => {
-        sails.models.foo.createEach(Foos).exec(() => {
+        sails.models.article.createEach(Articles).exec(() => {
           done();
         });
       },
       done => {
-        sails.models.assessmentquestion.createEach(AssessmentQuestions).exec(() => {
-          done();
-        });
-      },
-      done => {
-        sails.models['bar_foos__foo_bars'].createEach(Relations).exec(() => {
+        sails.models.comment.createEach(Comments).exec(() => {
           done();
         });
       }

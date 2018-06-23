@@ -1,16 +1,16 @@
 export default {
   attributes: {
-    name: {
+    title: {
       type: 'string',
       required: true,
       minLength: 1
     },
-    bars: {
-      collection: 'bar',
-      via: 'foos'
+    author: {
+      model: 'author'
     },
-    myBar: {
-      model: 'bar'
+    comments: {
+      collection: 'comment',
+      via: 'article'
     }
   }
 };
