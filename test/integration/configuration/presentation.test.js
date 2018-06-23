@@ -2,23 +2,23 @@ import supertest from 'supertest';
 
 describe('Integration | Configuration | presentation', function() {
   describe(':: global model config', function() {
-    it('should not return sideloaded bars for model without attribute config', function(done) {
+    it('should not return sideloaded comments for model without attribute config', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
-          expect(res.body.bars).to.be.undefined;
+          expect(res.body.data.included).to.be.undefined;
         })
         .end(done);
     });
   });
 
   describe(':: attribute level config', function() {
-    it('should return sideloaded foos for model with attribute level config', function(done) {
+    it('should return sideloaded articles for model with attribute level config', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars')
+        .get('/authors')
         .expect(res => {
-          expect(res.body.foos).to.be.an.instanceof(Array);
-          expect(res.body.foos).to.have.lengthOf(2);
+          expect(res.body.data.included).to.be.an.instanceof(Array);
+          expect(res.body.data.included).to.have.lengthOf(2);
         })
         .end(done);
     });
