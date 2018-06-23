@@ -5,12 +5,8 @@ export default {
       required: true,
       minLength: 1
     },
-    bars: {
-      collection: 'bar',
-      via: 'foos'
-    },
-    myBar: {
-      model: 'bar'
+    type: {
+      type: 'string'
     }
   }
 };
