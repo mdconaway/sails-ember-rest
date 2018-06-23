@@ -1,125 +1,154 @@
 import supertest from 'supertest';
-const newFoo = {
-  foo: {
-    name: 'updateFoo',
-    myBar: 1
+const ids = [];
+const newArticle = {
+  data: {
+    type: 'articles',
+    attributes: {
+      title: 'I Woke Up in a Car'
+    },
+    relationships: {
+      author: {
+        data: {
+          type: 'authors',
+          id: '2'
+        }
+      }
+    }
   }
 };
-const updateFoo = {
-  foo: {
-    name: 'goodbye foo',
-    myBar: 2
+const updateArticle = {
+  data: {
+    id: '2',
+    type: 'articles',
+    attributes: {
+      title: 'I Slept in a Truck'
+    }
   }
 };
-const updateAssessmentQuestion = {
-  assessmentQuestion: {
-    name: 'Question 1:Addendum',
-    identiField: 'Now Z'
+const updateArticleRelationships = {
+  data: {
+    id: '3',
+    type: 'articles',
+    relationships: {
+      comments: [
+        { data: { type: 'comments', id: '4' }},
+        { data: { type: 'comments', id: '5' }},
+      ]
+    }
   }
 };
-const badAssessmentQuestion = {
-  'assessment-question': {
-    name: 'Question 1:Addendum',
-    identiField: 'ZZ'
+const updateMediaOutlet = {
+  data: {
+    type: 'media-outlets',
+    attributes: {
+      name: "Nate's Newz",
+      type: 'newspaper'
+    }
   }
 };
-let targetFoo = null;
+const badMediaOutlet = {
+  data: {
+    type: 'mediaOutlets',
+    attributes: {
+      name: "Ralph's Radio 93.7",
+      type: 'radio'
+    }
+  }
+};
+let targetArticle = null;
 
 describe('Integration | Action | update', function() {
   before(function(done) {
-    Foo.create(newFoo.foo).exec((err, record) => {
+    Article.create(
+      Object.assign({}, newArticle.data.attributes, { author: newArticle.data.relationships.author.data.id })
+    ).exec((err, record) => {
       if (err) {
         return done(err);
       }
-      targetFoo = record;
+      targetArticle = record;
       done();
     });
   });
   after(function(done) {
-    Foo.destroy(targetFoo.id).exec(done);
+    Article.destroy(targetArticle.id).exec(done);
   });
 
   describe(':: response format', function() {
     it('should respond with status code 200', function(done) {
       supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send(updateFoo)
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticle)
         .expect(200)
+        .end(done);
+    });
+    it('should respond with Content-Type application/vnd.api+json', function(done) {
+      supertest(sails.hooks.http.app)
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticle)
+        .expect(res => {
+          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
         .end(done);
     });
     it('should return an object as root response value', function(done) {
       supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send(updateFoo)
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticle)
         .expect(res => {
           expect(res.body).to.be.an.instanceof(Object);
         })
-        .end(done);
-    });
-    it('should return a pluralized payload envelope', function(done) {
-      supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send(updateFoo)
         .expect(res => {
-          expect(res.body.foos).to.be.an.instanceof(Array);
+          ids.push(res.body.data.id);
         })
         .end(done);
     });
-    it('should not return a meta object', function(done) {
+    it('should return a data object containing the newly updated record info', function(done) {
       supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send(updateFoo)
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticle)
         .expect(res => {
-          expect(res.body.meta).to.be.undefined;
+          expect(res.body.data).to.be.an.instanceof(Object);
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
         })
         .end(done);
     });
   });
 
   describe(':: data integrity', function() {
-    it('should return 1 foo', function(done) {
+    it('should return 1 article with a correctly patched field', function(done) {
       supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send(updateFoo)
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticle)
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data.attributes.title).to.equal('I Slept in a Truck');
         })
         .end(done);
     });
-    it('should return 1 foo with correctly patched field', function(done) {
+    it('should return 1 foo with correctly updated one<->many relation', function(done) {
+      before((cb) => {
+        Comment.createEach([
+          { article: '2', author: '4', text: 'I have a comment!'},
+          { article: '2', author: '3', text: 'Rabble, rabble, rabble'}
+        ]).exec((err, record) => err ? cb(err) : cb());
+      });
+
       supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send({
-          foo: {
-            name: 'special patch',
-            myBar: 1
-          }
-        })
+        .patch(`/articles/${targetArticle.id}`)
+        .send(updateArticleRelationships)
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
-          expect(res.body.foos[0].name).to.equal('special patch');
-        })
-        .end(done);
-    });
-    it('should return 1 foo with correctly updated many<->many relation', function(done) {
-      supertest(sails.hooks.http.app)
-        .patch(`/foos/${targetFoo.id}`)
-        .send({
-          foo: {
-            name: 'relation patch',
-            myBar: 2,
-            bars: [1, 2, 3, 4]
-          }
-        })
-        .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data.relationships.comments).to.have.lengthOf(2);
         })
         .end(() => {
           supertest(sails.hooks.http.app)
-            .get(`/foos/${targetFoo.id}/bars`)
+            .get(`/articles/${targetArticle.id}/comments`)
             .expect(res => {
-              expect(res.body.bars).to.have.lengthOf(4);
-              expect(res.body.meta.total).to.equal(4);
+              expect(res.body.data).to.have.lengthOf(2);
+              expect(res.body.meta.total).to.equal(2);
             })
             .end(done);
         });
@@ -127,28 +156,29 @@ describe('Integration | Action | update', function() {
   });
 
   describe(':: multi-word model name', function() {
-    it('should receive and return a camelCase payload envelope', function(done) {
+    before((cb) => {
+      MediaOutlet.create({ name: 'Fast Freddies', type: 'newspaper' }).exec((err, record) => err ? cb(err) : cb());
+    });
+
+    it('should receive and return a kabab-case type in the data object', function(done) {
       supertest(sails.hooks.http.app)
-        .patch('/assessmentquestions/1')
-        .send(updateAssessmentQuestion)
+        .patch('/mediaoutlets/1')
+        .send(updateMediaOutlet)
         .expect(200)
         .expect(res => {
-          expect(res.body.assessmentQuestions).to.be.an.instanceof(Array);
+          expect(res.body.data.type).to.equal('media-outlets');
         })
         .expect(res => {
-          expect(res.body.assessmentQuestions[0].name).to.equal('Question 1:Addendum');
+          expect(res.body.data.attributes.name).to.equal("Nate's Newz");
         })
         .end(done);
     });
 
-    it('should fail to update attributes if sent a kebab-case payload envelope', function(done) {
+    it('should fail if sent as a non-kebab-case type', function(done) {
       supertest(sails.hooks.http.app)
-        .patch('/assessmentquestions/1')
-        .send(badAssessmentQuestion)
-        .expect(200)
-        .expect(res => {
-          expect(res.body.assessmentQuestions[0].identiField).not.to.equal('ZZ');
-        })
+        .patch('/mediaoutlets/1')
+        .send(badMediaOutlet)
+        .expect(400)
         .end(done);
     });
   });

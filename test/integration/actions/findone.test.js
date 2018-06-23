@@ -87,7 +87,7 @@ describe('Integration | Action | findone', function() {
   });
 
   describe(':: query functions', function() {
-    it.only('should support the "include" query param for a single one-to-many relationship', function(done) {
+    it('should support the "include" query param for a single one-to-many relationship', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles/1?include=comments')
         .expect(res => {

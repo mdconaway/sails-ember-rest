@@ -19,8 +19,8 @@ let targetArticle = null;
 
 describe('Integration | Action | destroy', function() {
   beforeEach(function(done) {
-    Articles.create(
-      Object.assign({}, newArticle.attributes, { author: newArticle.data.relationships.author.data.id })
+    Article.create(
+      Object.assign({}, newArticle.data.attributes, { author: newArticle.data.relationships.author.data.id })
     ).exec((err, record) => {
       if (err) {
         return done(err);
