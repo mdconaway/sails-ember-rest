@@ -1,17 +1,18 @@
 {
-    "name": "sails-ember-rest",
-    "version": "1.0.14",
-    "description": "sails generate ember-rest",
+    "name": "sails-generate-ember-jsonapi",
+    "version": "0.0.1",
+    "description": "Ember Data JSONAPI-Adapter compatible controllers, policies, services and generators for Sails v1.0+",
     "main": "index.js",
     "scripts": {
         "start": "node app.js",
         "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
-        "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 4 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\""
+        "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 2 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\""
     },
     "keywords": [
         "ember",
-        "rest",
-        "ember-rest",
+        "json-api",
+        "jsonapi",
+        "ember-jsonapi",
         "generator",
         "controller",
         "virtual",
@@ -22,48 +23,40 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mdconaway/sails-ember-rest.git"
+        "url": "git+https://github.com/ajgribble/sails-generate-ember-jsonapi.git"
     },
-    "bugs": {
-        "url": "https://github.com/mdconaway/sails-ember-rest/issues"
-    },
-    "homepage": "https://github.com/mdconaway/sails-ember-rest#readme",
-    "author": "Michael Conaway",
+    "homepage": "https://github.com/ajgribble/sails-generate-ember-jsonapi#readme",
+    "author": "Adam Gribble",
     "license": "MIT",
     "engines": {
         "node": ">=6.0.0"
     },
     "dependencies": {
-        "lodash": "^4.0.0",
+        "lodash": "4.17.10",
         "merge-defaults": ">=0.1.0",
-        "pluralize": "^1.1.0"
+        "pluralize": "7.0.0"
     },
     "devDependencies": {
-        "async": "2.0.1",
+        "async": "2.6.1",
         "babel": "^6.23.0",
         "babel-plugin-add-module-exports": "^0.2.1",
         "babel-preset-es2015": "^6.24.1",
         "babel-register": "^6.24.1",
         "chai": "^4.1.2",
-        "fs-extra": "*",
-        "mocha": "^3.5.3",
-        "prettier": "^1.12.0",
+        "fs-extra": "6.0.1",
+        "mocha": "5.2.0",
+        "prettier": "1.13.5",
         "reportback": "*",
-        "sails": "^1.0.0",
-        "sails-disk": "^1.0.0-11",
-        "sails-generate": "*",
-        "sails-hook-orm": "^2.0.0-16",
-        "sails-hook-sockets": "^1.4.0",
-        "supertest": "^3.0.0",
-        "waterline": "^0.13.3"
+        "sails": "1.0.2",
+        "sails-disk": "^1.0.0",
+        "sails-generate": "^1.15.0",
+        "sails-hook-orm": "^2.0.0",
+        "sails-hook-sockets": "^1.5.0",
+        "supertest": "^3.1.0",
+        "waterline": "^0.13.4"
     },
     "peerDependencies": {
-        "waterline": "^0.13.3",
-        "sails": "^1.0.0"
-    },
-    "sailsGenerator": {
-        "type": "ember-rest",
-        "behavior": "adds `sails generate ember-rest`",
-        "sailsVersion": "^1.0.0"
+        "waterline": "^0.13.4",
+        "sails": "1.0.2"
     }
 }
