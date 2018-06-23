@@ -19,7 +19,9 @@ let targetArticle = null;
 
 describe('Integration | Action | destroy', function() {
   beforeEach(function(done) {
-    Articles.create(Object.assign({}, newArticle.attributes, { author: newArticle.data.relationships.author.data.id })).exec((err, record) => {
+    Articles.create(
+      Object.assign({}, newArticle.attributes, { author: newArticle.data.relationships.author.data.id })
+    ).exec((err, record) => {
       if (err) {
         return done(err);
       }
@@ -33,6 +35,14 @@ describe('Integration | Action | destroy', function() {
       supertest(sails.hooks.http.app)
         .delete(`/articles/${targetArticle.id}`)
         .expect(204)
+        .end(done);
+    });
+    it('should respond with Content-Type application/vnd.api+json', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles')
+        .expect(res => {
+          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+        })
         .end(done);
     });
     it('should return a null response text', function(done) {

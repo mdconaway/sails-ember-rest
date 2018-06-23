@@ -21,7 +21,7 @@ const newMediaOutlet = {
   data: {
     type: 'media-outlets',
     attributes: {
-      name: 'Nate\'s Newz',
+      name: "Nate's Newz",
       type: 'newspaper'
     }
   }
@@ -30,7 +30,7 @@ const badMediaOutlet = {
   data: {
     type: 'mediaOutlets',
     attributes: {
-      name: 'Ralph\'s Radio 93.7',
+      name: "Ralph's Radio 93.7",
       type: 'radio'
     }
   }
@@ -52,12 +52,36 @@ describe('Integration | Action | create', function() {
         })
         .end(done);
     });
+    it('should respond with Content-Type application/vnd.api+json', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
     it('should return an object as root response value', function(done) {
       supertest(sails.hooks.http.app)
         .post('/articles')
         .send(newArticle)
         .expect(res => {
           expect(res.body).to.be.an.instanceof(Object);
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+    it('should return a links object containing a self reference', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.body.links.self).to.include(`http://localhost:1338/articles/${res.body.data.id}`);
         })
         .expect(res => {
           ids.push(res.body.data.id);
@@ -105,7 +129,7 @@ describe('Integration | Action | create', function() {
           expect(res.body.data.type).to.equal('media-outlets');
         })
         .expect(res => {
-          expect(res.body.data.attributes.name).to.equal('Nate\'s Newz');
+          expect(res.body.data.attributes.name).to.equal("Nate's Newz");
         })
         .end(done);
     });

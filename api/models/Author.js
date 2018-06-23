@@ -13,8 +13,8 @@ export default {
       collection: 'article',
       via: 'author',
       meta: {
-          list: 'record',
-          detail: 'record'
+        list: 'record',
+        detail: 'record'
       }
     },
     comments: {

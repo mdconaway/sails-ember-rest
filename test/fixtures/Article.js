@@ -8,4 +8,4 @@ export default [
     title: 'JSON API: Whaaa?',
     author: '2'
   }
-]
+];

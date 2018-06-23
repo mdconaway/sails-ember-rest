@@ -4,29 +4,45 @@ describe('Integration | Action | find', function() {
   describe(':: response format', function() {
     it('should respond with status code 200', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(200)
+        .end(done);
+    });
+    it('should respond with Content-Type application/vnd.api+json', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles')
+        .expect(res => {
+          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+        })
         .end(done);
     });
     it('should return an object as root response value', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
           expect(res.body).to.be.an.instanceof(Object);
         })
         .end(done);
     });
-    it('should return a pluralized payload envelope', function(done) {
+    it('should return a links object containing a self reference', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
-          expect(res.body.foos).to.be.an.instanceof(Array);
+          expect(res.body.links.self).to.include('http://localhost:1338/articles');
+        })
+        .end(done);
+    });
+    it('should return a data array containing a collection of resource objects', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles')
+        .expect(res => {
+          expect(res.body.data).to.be.an.instanceof(Array);
         })
         .end(done);
     });
     it('should return a meta object', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
           expect(res.body.meta).to.be.an.instanceof(Object);
         })
@@ -34,7 +50,7 @@ describe('Integration | Action | find', function() {
     });
     it('should return a meta total that is a number', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
           expect(res.body.meta)
             .to.have.property('total')
@@ -45,17 +61,22 @@ describe('Integration | Action | find', function() {
   });
 
   describe(':: data integrity', function() {
-    it('should return 2 foos', function(done) {
+    it('should return 2 articles', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(2);
+          expect(res.body.data).to.have.lengthOf(2);
+          expect(res.body.data[0].id).to.equal('1');
+          expect(res.body.data[0].type).to.equal('articles');
+          expect(res.body.data[0].attributes.title).to.include('XML');
+          expect(res.body.data[0].attributes['created-at']).to.exist;
+          expect(res.body.data[0].attributes['createdAt']).to.not.exist;
         })
         .end(done);
     });
     it('should have meta total of 2', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos')
+        .get('/articles')
         .expect(res => {
           expect(res.body.meta.total).to.equal(2);
         })
@@ -66,181 +87,181 @@ describe('Integration | Action | find', function() {
   describe(':: query functions', function() {
     it('should support belongsTo query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?myBar=1')
+        .get('/articles?author=1')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data).to.have.lengthOf(1);
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support contains query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?name[contains]=2%20Foo')
+        .get('/articles?title[contains]=XML')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
-          expect(res.body.foos[0].name).to.include('2 Foo');
+          expect(res.body.data).to.have.lengthOf(1);
+          expect(res.body.data[0].attributes.title).to.include('XML');
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support in query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?name[]=Fooooooo')
+        .get('/articles?title[]=JSON%20to%20XML')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
-          expect(res.body.foos[0].name).to.equal('Fooooooo');
+          expect(res.body.data).to.have.lengthOf(1);
+          expect(res.body.data[0].attributes.title).to.equal('JSON to XML');
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support equality query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?name=Fooooooo')
+        .get('/articles?title=JSON%20to%20XML')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
-          expect(res.body.foos[0].name).to.equal('Fooooooo');
+          expect(res.body.data).to.have.lengthOf(1);
+          expect(res.body.data[0].attributes.title).to.equal('JSON to XML');
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support id query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?id=1')
+        .get('/articles?id=1')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data).to.have.lengthOf(1);
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support where object query', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?where[name][contains]=2%20Foo')
+        .get('/articles?where[title][contains]=XML')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
-          expect(res.body.foos[0].name).to.include('2 Foo');
+          expect(res.body.data).to.have.lengthOf(1);
+          expect(res.body.data[0].attributes.title).to.include('XML');
           expect(res.body.meta.total).to.equal(1);
         })
         .end(done);
     });
     it('should support limit parameter', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?limit=1')
+        .get('/articles?limit=1')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data).to.have.lengthOf(1);
           expect(res.body.meta.total).to.equal(2);
         })
         .end(done);
     });
     it('should support skip parameter', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/foos?skip=1')
+        .get('/articles?skip=1')
         .expect(res => {
-          expect(res.body.foos).to.have.lengthOf(1);
+          expect(res.body.data).to.have.lengthOf(1);
           expect(res.body.meta.total).to.equal(2);
         })
         .end(done);
     });
     it('should support simple sort parameter (ASC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort=name%20ASC')
+        .get('/authors?sort=name%20ASC')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[0].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[3].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Bob');
+          expect(res.body.data[1].attributes.name).to.equal('Cob');
+          expect(res.body.data[2].attributes.name).to.equal('Lob');
+          expect(res.body.data[3].attributes.name).to.equal('Rob');
         })
         .end(done);
     });
     it('should support simple sort parameter (DESC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort=name%20DESC')
+        .get('/authors?sort=name%20DESC')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[3].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[0].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Rob');
+          expect(res.body.data[1].attributes.name).to.equal('Lob');
+          expect(res.body.data[2].attributes.name).to.equal('Cob');
+          expect(res.body.data[3].attributes.name).to.equal('Bob');
         })
         .end(done);
     });
     it('should support object sort parameter (1)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort={"name":1}')
+        .get('/authors?sort={"name":1}')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[0].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[3].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Bob');
+          expect(res.body.data[1].attributes.name).to.equal('Cob');
+          expect(res.body.data[2].attributes.name).to.equal('Lob');
+          expect(res.body.data[3].attributes.name).to.equal('Rob');
         })
         .end(done);
     });
     it('should support object sort parameter (-1)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort={"name":-1}')
+        .get('/authors?sort={"name":-1}')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[3].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[0].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Rob');
+          expect(res.body.data[1].attributes.name).to.equal('Lob');
+          expect(res.body.data[2].attributes.name).to.equal('Cob');
+          expect(res.body.data[3].attributes.name).to.equal('Bob');
         })
         .end(done);
     });
     it('should support multi-column object sort parameter (1)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort={"identiField":1,"name":1}')
+        .get('/authors?sort={"age":1,"name":1}')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[2].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[0].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[3].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Rob');
+          expect(res.body.data[1].attributes.name).to.equal('Cob');
+          expect(res.body.data[2].attributes.name).to.equal('Bob');
+          expect(res.body.data[3].attributes.name).to.equal('Lob');
         })
         .end(done);
     });
     it('should support array sort parameter (single ASC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort=[{"name":"ASC"}]')
+        .get('/authors?sort=[{"name":"ASC"}]')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[0].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[3].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Bob');
+          expect(res.body.data[1].attributes.name).to.equal('Cob');
+          expect(res.body.data[2].attributes.name).to.equal('Lob');
+          expect(res.body.data[3].attributes.name).to.equal('Rob');
         })
         .end(done);
     });
     it('should support array sort parameter (single DESC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort=[{"name":"DESC"}]')
+        .get('/authors?sort=[{"name":"DESC"}]')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[3].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[2].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[0].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Rob');
+          expect(res.body.data[1].attributes.name).to.equal('Lob');
+          expect(res.body.data[2].attributes.name).to.equal('Cob');
+          expect(res.body.data[3].attributes.name).to.equal('Bob');
         })
         .end(done);
     });
     it('should support array sort parameter (multi-column)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/bars?sort=[{"identiField":"ASC"},{"name":"ASC"}]')
+        .get('/authors?sort=[{"age":"ASC"},{"name":"ASC"}]')
         .expect(res => {
-          expect(res.body.bars).to.have.lengthOf(4);
+          expect(res.body.data).to.have.lengthOf(4);
           expect(res.body.meta.total).to.equal(4);
-          expect(res.body.bars[2].name).to.equal('2 Baaaaar');
-          expect(res.body.bars[0].name).to.equal('3 Baaaaar');
-          expect(res.body.bars[3].name).to.equal('4 Baaaaar');
-          expect(res.body.bars[1].name).to.equal('Baaaaar');
+          expect(res.body.data[0].attributes.name).to.equal('Rob');
+          expect(res.body.data[1].attributes.name).to.equal('Cob');
+          expect(res.body.data[2].attributes.name).to.equal('Bob');
+          expect(res.body.data[3].attributes.name).to.equal('Lob');
         })
         .end(done);
     });

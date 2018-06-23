@@ -21,4 +21,4 @@ export default [
     age: 46,
     articles: []
   }
-]
+];
