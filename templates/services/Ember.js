@@ -110,9 +110,7 @@ module.exports = {
         associations.forEach(assoc => {
             // only sideload, when the full records are to be included, more info on setup here https://github.com/Incom/incom-api/wiki/Models:-Defining-associations
             if (assoc.include === 'record') {
-                let assocModelIdentifier = pluralize(
-                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
-                );
+                let assocModelIdentifier = pluralize(camelCase(sails.models[assoc.collection || assoc.model].globalId));
                 // initialize jsoning object
                 if (!json.hasOwnProperty(assoc.alias)) {
                     json[assocModelIdentifier] = [];
@@ -125,9 +123,7 @@ module.exports = {
             let links = {};
             record = Object.assign({}, toJSON.call(record));
             associations.forEach(assoc => {
-                let assocModelIdentifier = pluralize(
-                    camelCase(sails.models[assoc.collection || assoc.model].globalId)
-                );
+                let assocModelIdentifier = pluralize(camelCase(sails.models[assoc.collection || assoc.model].globalId));
                 let assocModel;
                 let assocPK;
                 if (assoc.type === 'collection') {
