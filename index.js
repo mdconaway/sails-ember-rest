@@ -185,6 +185,9 @@ module.exports.Actions = module.exports.actions = {
   Update: require('./templates/actions/update')
 };
 module.exports.Controller = module.exports.controller = require('./templates/controllers/EmberController');
+module.exports.Hooks = module.exports.hooks = {
+  registerSerializers: require('./templates/hooks/register-serializers')
+};
 module.exports.Service = module.exports.service = require('./templates/services/Ember');
 module.exports.Policies = module.exports.policies = {
   emberCreate: require('./templates/policies/emberCreate'),

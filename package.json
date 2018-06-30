@@ -32,6 +32,7 @@
         "node": ">=6.0.0"
     },
     "dependencies": {
+        "json-api-serializer": "^1.13.0",
         "lodash": "4.17.10",
         "merge-defaults": ">=0.1.0",
         "pluralize": "7.0.0"
@@ -61,7 +62,7 @@
     },
     "sailsGenerator": {
         "type": "ember-jsonapi",
-        "behavior": "adds `sails generate ember-jsonapi`",
+        "behavior": "adds `sails generate json-api`",
         "sailsVersion": "^1.0.0"
     }
 }
