@@ -54,7 +54,17 @@ module.exports = function defineRegisterSerializersHook(sails) {
                 return Ember.generateResourceLink(type, data.id);
               }
             },
-            relationships
+            relationships,
+            topLevelMeta({ total }) {
+              return total ? { total } : {};
+            },
+            topLevelLinks(data, extraData) {
+              return {
+                self: Array.isArray(data)
+                  ? Ember.generateResourceLink(type) 
+                  : Ember.generateResourceLink(type, data.id) 
+              }
+            }
           });
         });
 
