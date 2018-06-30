@@ -30,10 +30,7 @@ const updateArticleRelationships = {
     id: '3',
     type: 'articles',
     relationships: {
-      comments: [
-        { data: { type: 'comments', id: '4' }},
-        { data: { type: 'comments', id: '5' }},
-      ]
+      comments: [{ data: { type: 'comments', id: '4' } }, { data: { type: 'comments', id: '5' } }]
     }
   }
 };
@@ -130,11 +127,11 @@ describe('Integration | Action | update', function() {
         .end(done);
     });
     it('should return 1 foo with correctly updated one<->many relation', function(done) {
-      before((cb) => {
+      before(cb => {
         Comment.createEach([
-          { article: '2', author: '4', text: 'I have a comment!'},
-          { article: '2', author: '3', text: 'Rabble, rabble, rabble'}
-        ]).exec((err, record) => err ? cb(err) : cb());
+          { article: '2', author: '4', text: 'I have a comment!' },
+          { article: '2', author: '3', text: 'Rabble, rabble, rabble' }
+        ]).exec((err, record) => (err ? cb(err) : cb()));
       });
 
       supertest(sails.hooks.http.app)
@@ -156,8 +153,8 @@ describe('Integration | Action | update', function() {
   });
 
   describe(':: multi-word model name', function() {
-    before((cb) => {
-      MediaOutlet.create({ name: 'Fast Freddies', type: 'newspaper' }).exec((err, record) => err ? cb(err) : cb());
+    before(cb => {
+      MediaOutlet.create({ name: 'Fast Freddies', type: 'newspaper' }).exec((err, record) => (err ? cb(err) : cb()));
     });
 
     it('should receive and return a kabab-case type in the data object', function(done) {

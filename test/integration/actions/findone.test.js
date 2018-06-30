@@ -13,11 +13,11 @@ describe('Integration | Action | findone', function() {
         .get('/articles/999')
         .expect(404)
         .expect(res => {
-            console.log(res.body);
-            expect(res.body.errors.length).to.equal(1);
-            expect(res.body.errors[0].status).to.equal('404');
-            expect(res.body.errors[0].title).to.equal('Not Found');
-            expect(res.body.errors[0].detail).to.equal('No record found with the specified id');
+          console.log(res.body);
+          expect(res.body.errors.length).to.equal(1);
+          expect(res.body.errors[0].status).to.equal('404');
+          expect(res.body.errors[0].title).to.equal('Not Found');
+          expect(res.body.errors[0].detail).to.equal('No record found with the specified id');
         })
         .end(done);
     });

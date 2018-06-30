@@ -18,7 +18,7 @@ module.exports = function(interrupts = {}) {
   return function(req, res) {
     // Set the JSONAPI required header
     res.set('Content-Type', 'application/vnd.api+json');
-  
+
     const Model = actionUtil.parseModel(req);
     const data = actionUtil.parseValues(req, Model);
     const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
