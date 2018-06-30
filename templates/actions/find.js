@@ -17,6 +17,9 @@ module.exports = function(interrupts = {}) {
   interrupts.find = interrupts.find ? interrupts.find : defaultInterrupt;
 
   return function(req, res) {
+    // Set the JSONAPI required header
+    res.set('Content-Type', 'application/vnd.api+json');
+
     // Look up the model
     const Model = actionUtil.parseModel(req);
     // parse criteria from request

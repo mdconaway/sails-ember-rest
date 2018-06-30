@@ -15,6 +15,9 @@ module.exports = function(interrupts = {}) {
   interrupts.destroy = interrupts.destroy ? interrupts.destroy : defaultInterrupt;
 
   return function(req, res) {
+    // Set the JSONAPI required header
+    res.set('Content-Type', 'application/vnd.api+json');
+
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
     const query = Model.findOne(pk);
