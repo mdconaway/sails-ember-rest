@@ -90,7 +90,7 @@ module.exports = function(interrupts = {}) {
         },
         ({ associated, newInstance, populatedRecord }, done) => {
           return done(null, {
-            emberizedJSON: Ember.buildResponse(Model, populatedRecord, associations, associated),
+            emberizedJSON: Ember.buildResponse(Model, populatedRecord),
             newInstance
           });
         }

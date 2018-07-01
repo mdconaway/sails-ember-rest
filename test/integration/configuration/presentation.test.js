@@ -12,6 +12,7 @@ describe('Integration | Configuration | presentation', function() {
     });
   });
 
+  /* TODO: turn this back on when the included queryParam is implemented
   describe(':: attribute level config', function() {
     it('should return sideloaded articles for model with attribute level config', function(done) {
       supertest(sails.hooks.http.app)
@@ -23,4 +24,5 @@ describe('Integration | Configuration | presentation', function() {
         .end(done);
     });
   });
+  */
 });

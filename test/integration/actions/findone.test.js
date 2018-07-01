@@ -69,12 +69,12 @@ describe('Integration | Action | findone', function() {
           expect(attributes['created-at']).to.exist;
 
           expect(relationships.author.data.type).to.equal('authors');
-          expect(relationships.author.links.self).to.equal('http://localhost:1337/articles/1/relationships/author');
+          expect(relationships.author.links.self).to.equal('http://localhost:1337/articles/1/author');
           expect(relationships.author.links.related).to.equal('http://localhost:1337/articles/1/author');
 
           expect(relationships.comments.data.length).to.equal(3);
           expect(Object.keys(relationships.comments.data[0])).to.deep.equal(['type', 'id']);
-          expect(relationships.comments.links.self).to.equal('http://localhost:1337/articles/1/relationships/comments');
+          expect(relationships.comments.links.self).to.equal('http://localhost:1337/articles/1/comments');
           expect(relationships.comments.links.related).to.equal('http://localhost:1337/articles/1/comments');
 
           expect(attributes.createdAt).to.not.exist;

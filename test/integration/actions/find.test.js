@@ -270,7 +270,7 @@ describe('Integration | Action | find', function() {
         .get('/articles?title[contains]=EMPTY YO')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(0);
-          expect(res.body.meta.total).to.equal(1);
+          expect(res.body.meta.total).to.equal(0);
         })
         .end(done);
     });

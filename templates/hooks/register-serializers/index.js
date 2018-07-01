@@ -56,7 +56,7 @@ module.exports = function defineRegisterSerializersHook(sails) {
             },
             relationships,
             topLevelMeta({ total }) {
-              return total ? { total } : {};
+              return typeof total !== 'undefined' ? { total } : {};
             },
             topLevelLinks(data, extraData) {
               return {

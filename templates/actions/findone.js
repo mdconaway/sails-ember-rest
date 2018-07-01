@@ -55,7 +55,7 @@ module.exports = function(interrupts = {}) {
               Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
               actionUtil.subscribeDeep(req, matchingRecord);
             }
-            res.ok(Ember.buildResponse(Model, matchingRecord, associations, associated), actionUtil.parseLocals(req));
+            res.ok(Ember.buildResponse(Model, matchingRecord), actionUtil.parseLocals(req));
           },
           Model,
           matchingRecord
