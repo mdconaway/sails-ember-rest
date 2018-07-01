@@ -275,9 +275,6 @@ module.exports = {
       : function() {
           return this;
         };
-    const data = isCollection
-      ? records.map(record => Ember.serializeResource(record, modelPlural, associations)) || []
-      : Ember.serializeResource(records, modelPlural, associations, records[primaryKey]);
 
     /* XXX
     const json = { data };
@@ -293,7 +290,7 @@ module.exports = {
 
     return json;
     */
-    return data;
+    return Ember.serializeResource(records, modelPlural, associations);
   },
 
   /**

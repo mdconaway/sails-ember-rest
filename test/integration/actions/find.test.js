@@ -28,7 +28,7 @@ describe('Integration | Action | find', function() {
       supertest(sails.hooks.http.app)
         .get('/articles')
         .expect(res => {
-          expect(res.body.links.self).to.include('http://localhost:1338/articles');
+          expect(res.body.links.self).to.include('http://localhost:1337/articles');
         })
         .end(done);
     });
