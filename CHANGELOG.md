@@ -9,3 +9,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.0.1] - 2018-06-23
 ### Changed
 - Forked project from https://github.com/mdconaway/sails-ember-rest
+- Implemented 3rd party json-api-serializer for the heavy lifting

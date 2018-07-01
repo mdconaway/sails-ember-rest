@@ -22,6 +22,9 @@ module.exports = function(interrupts = {}, afterUpdate) {
   interrupts.afterUpdate = interrupts.afterUpdate ? interrupts.afterUpdate : defaultInterrupt;
 
   return function(req, res) {
+    // Set the JSONAPI required header
+    res.set('Content-Type', 'application/vnd.api+json');
+
     // Look up the model
     const Model = actionUtil.parseModel(req);
     const { log } = req._sails;
@@ -134,7 +137,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
           );
         },
         ({ associated, matchingRecord, populatedRecord }, done) => {
-          const emberizedJSON = Ember.buildResponse(Model, populatedRecord, associations, associated);
+          const emberizedJSON = Ember.buildResponse(Model, populatedRecord);
           return done(null, { emberizedJSON, matchingRecord });
         }
       ],

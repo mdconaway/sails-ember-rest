@@ -28,7 +28,7 @@ describe('Integration | Action | find', function() {
       supertest(sails.hooks.http.app)
         .get('/articles')
         .expect(res => {
-          expect(res.body.links.self).to.include('http://localhost:1338/articles');
+          expect(res.body.links.self).to.include('http://localhost:1337/articles');
         })
         .end(done);
     });
@@ -270,7 +270,7 @@ describe('Integration | Action | find', function() {
         .get('/articles?title[contains]=EMPTY YO')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(0);
-          expect(res.body.meta.total).to.equal(1);
+          expect(res.body.meta.total).to.equal(0);
         })
         .end(done);
     });

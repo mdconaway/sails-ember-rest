@@ -36,7 +36,7 @@ const badMediaOutlet = {
   }
 };
 
-describe.only('Integration | Action | create', function() {
+describe('Integration | Action | create', function() {
   after(function(done) {
     Article.destroy({ id: ids }).exec(done);
   });

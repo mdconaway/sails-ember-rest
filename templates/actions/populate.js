@@ -103,10 +103,7 @@ module.exports = function(interrupts = {}) {
 
             json[documentIdentifier] = Ember.linkAssociations(RelatedModel, children);
             //BOOM! counted relationships!
-            json.meta = {
-              total: results.count
-            };
-            res.ok(json, actionUtil.parseLocals(req));
+            res.ok(Ember.buildResponse(RelatedModel, Ember.linkAssociations(RelatedModel, children), { total: results.count }), actionUtil.parseLocals(req));
           },
           Model,
           children

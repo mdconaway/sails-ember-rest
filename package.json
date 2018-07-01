@@ -1,5 +1,5 @@
 {
-    "name": "sails-generate-ember-jsonapi",
+    "name": "sails-json-api",
     "version": "0.0.1",
     "description": "Ember Data JSONAPI-Adapter compatible controllers, policies, services and generators for Sails v1.0+",
     "main": "index.js",
@@ -23,15 +23,16 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/ajgribble/sails-generate-ember-jsonapi.git"
+        "url": "git+https://github.com/ajgribble/sails-json-api.git"
     },
-    "homepage": "https://github.com/ajgribble/sails-generate-ember-jsonapi#readme",
+    "homepage": "https://github.com/ajgribble/sails-json-api#readme",
     "author": "Adam Gribble",
     "license": "MIT",
     "engines": {
         "node": ">=6.0.0"
     },
     "dependencies": {
+        "json-api-serializer": "^1.13.0",
         "lodash": "4.17.10",
         "merge-defaults": ">=0.1.0",
         "pluralize": "7.0.0"
@@ -61,7 +62,7 @@
     },
     "sailsGenerator": {
         "type": "ember-jsonapi",
-        "behavior": "adds `sails generate ember-jsonapi`",
+        "behavior": "adds `sails generate json-api`",
         "sailsVersion": "^1.0.0"
     }
 }

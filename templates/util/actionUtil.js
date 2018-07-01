@@ -331,10 +331,14 @@ module.exports = {
     // Get values from the data param in the body and merge attributes with relationships
     let values = req.param('data') || {};
     const { attributes = {}, relationships = {} } = values;
-    values = Object.assign({}, attributes, Object.keys(relationships).reduce((acc, key) => {
-      const { data = {} } = relationships[key];
-      return data.id ? Object.assign({}, acc, { [key]: data.id }) : acc;
-    }, {}));
+    values = Object.assign(
+      {},
+      attributes,
+      Object.keys(relationships).reduce((acc, key) => {
+        const { data = {} } = relationships[key];
+        return data.id ? Object.assign({}, acc, { [key]: data.id }) : acc;
+      }, {})
+    );
 
     // Omit built-in runtime config (like query modifiers)
     values = omit(values, blacklist || []);
