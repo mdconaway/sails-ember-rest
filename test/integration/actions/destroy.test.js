@@ -39,9 +39,9 @@ describe('Integration | Action | destroy', function() {
     });
     it('should respond with Content-Type application/vnd.api+json', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles')
+        .delete(`/articles/${targetArticle.id}`)
         .expect(res => {
-          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+          expect(res.headers['content-type']).to.not.exist;
         })
         .end(done);
     });
@@ -49,7 +49,7 @@ describe('Integration | Action | destroy', function() {
       supertest(sails.hooks.http.app)
         .delete(`/articles/${targetArticle.id}`)
         .expect(res => {
-          expect(res.text).to.equal('null');
+          expect(res.text).to.equal('');
         })
         .end(done);
     });
@@ -60,7 +60,7 @@ describe('Integration | Action | destroy', function() {
       supertest(sails.hooks.http.app)
         .delete(`/articles/${targetArticle.id}`)
         .expect(res => {
-          expect(res.body).to.equal(null);
+          expect(res.body).to.be.empty;
         })
         .end(done);
     });
@@ -68,7 +68,7 @@ describe('Integration | Action | destroy', function() {
       supertest(sails.hooks.http.app)
         .delete(`/articles/${targetArticle.id}`)
         .expect(res => {
-          expect(res.body).to.equal(null);
+          expect(res.body).to.be.empty;
         })
         .end(() => {
           supertest(sails.hooks.http.app)

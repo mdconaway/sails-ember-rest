@@ -16,7 +16,9 @@ module.exports = function(interrupts = {}) {
 
   return function(req, res) {
     // Set the JSONAPI required header
-    res.set('Content-Type', 'application/vnd.api+json');
+    // Technically because there is no content, no content-type header is required and in fact is being
+    // actively removed when calling res.send
+    // res.set('Content-Type', 'application/vnd.api+json');
 
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
@@ -43,7 +45,7 @@ module.exports = function(interrupts = {}) {
             Model._retire(record);
           }
         }
-        interrupts.destroy.call(this, req, res, () => res.ok(null, actionUtil.parseLocals(req)), Model, record);
+        interrupts.destroy.call(this, req, res, () => res.noContent(null, actionUtil.parseLocals(req)), Model, record);
         // @todo --- if neccessary, destroy related records
       });
     });

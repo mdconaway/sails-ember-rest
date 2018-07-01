@@ -208,6 +208,7 @@ module.exports.Policies = module.exports.policies = {
   EmberUpdate: require('./templates/policies/emberUpdate')
 };
 module.exports.Responses = module.exports.responses = {
-  created: require('./templates/responses/created')
+  created: require('./templates/responses/created'),
+  noContent: require('./templates/responses/noContent')
 };
 module.exports.Util = module.exports.util = require('./templates/util/actionUtil');
