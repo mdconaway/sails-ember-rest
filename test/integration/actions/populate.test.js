@@ -16,11 +16,11 @@ describe('Integration | Action | populate', function() {
         })
         .end(done);
     });
-    it('should return a data object representing a single resource object', function(done) {
+    it('should return a data array containing a collection of resource objects', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles/1/comments')
         .expect(res => {
-          expect(res.body.data).to.be.an.instanceof(Object);
+          expect(res.body.data).to.be.an.instanceof(Array);
         })
         .end(done);
     });
@@ -129,45 +129,9 @@ describe('Integration | Action | populate', function() {
         })
         .end(done);
     });
-    it('should support object sort parameter (1)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort={"name":1}')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(3);
-          expect(res.body.meta.total).to.equal(3);
-          expect(res.body.data[0].attributes.text).to.equal('A great try.');
-          expect(res.body.data[1].attributes.text).to.equal('Nice article!');
-          expect(res.body.data[2].attributes.text).to.equal('Terrible article...');
-        })
-        .end(done);
-    });
-    it('should support object sort parameter (-1)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort={"name":-1}')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(3);
-          expect(res.body.meta.total).to.equal(3);
-          expect(res.body.data[0].attributes.text).to.equal('Terrible article...');
-          expect(res.body.data[1].attributes.text).to.equal('Nice article!');
-          expect(res.body.data[2].attributes.text).to.equal('A great try.');
-        })
-        .end(done);
-    });
-    it('should support multi-column object sort parameter (1)', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort={"author":1,"text":1}')
-        .expect(res => {
-          expect(res.body.data).to.have.lengthOf(3);
-          expect(res.body.meta.total).to.equal(3);
-          expect(res.body.data[0].attributes.text).to.equal('Nice article!');
-          expect(res.body.data[1].attributes.text).to.equal('A great try.');
-          expect(res.body.data[2].attributes.text).to.equal('Terrible article...');
-        })
-        .end(done);
-    });
     it('should support array sort parameter (single ASC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort=[{"name":"ASC"}]')
+        .get('/articles/1/comments?sort=[{"text":"ASC"}]')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(3);
           expect(res.body.meta.total).to.equal(3);
@@ -179,7 +143,7 @@ describe('Integration | Action | populate', function() {
     });
     it('should support array sort parameter (single DESC)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort=[{"name":"DESC"}]')
+        .get('/articles/1/comments?sort=[{"text":"DESC"}]')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(3);
           expect(res.body.meta.total).to.equal(3);
@@ -191,7 +155,7 @@ describe('Integration | Action | populate', function() {
     });
     it('should support array sort parameter (multi-column)', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?sort=[{"age":"ASC"},{"name":"ASC"}]')
+        .get('/articles/1/comments?sort=[{"author":"ASC"},{"text":"ASC"}]')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(3);
           expect(res.body.meta.total).to.equal(3);
@@ -206,7 +170,7 @@ describe('Integration | Action | populate', function() {
         .get('/articles/1/comments?text[contains]=EMPTY YO')
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(0);
-          expect(res.body.meta.total).to.equal(0);
+          expect(res.body.meta.total).to.equal(3);
         })
         .end(done);
     });

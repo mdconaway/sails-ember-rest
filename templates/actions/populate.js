@@ -106,7 +106,7 @@ module.exports = function(interrupts = {}) {
             json.meta = {
               total: results.count
             };
-            res.ok(json, actionUtil.parseLocals(req));
+            res.ok(Ember.buildResponse(RelatedModel, Ember.linkAssociations(RelatedModel, children), { total: results.count }), actionUtil.parseLocals(req));
           },
           Model,
           children

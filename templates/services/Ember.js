@@ -151,7 +151,9 @@ module.exports = {
    * @param {string} The type of resource being serialized
    * @return {Object} A JSON:API resource
    */
-  serializeResource(json, type, associations = [], linkSuffix = '') {
+  // XXX serializeResource(json, type, associations = [], linkSuffix = '') {
+  serializeResource(json, type, meta) {
+
     /*
     const { id } = json;
     const attributes = Object.keys(omit(json, ['id'])).reduce(
@@ -182,7 +184,7 @@ module.exports = {
     });
     */
 
-    return JSONAPISerializer.serialize(kebabCase(type), json);
+    return JSONAPISerializer.serialize(kebabCase(type), json, meta);
     // return { id: String(id), type: kebabCase(type), attributes, links, relationships };
   },
 
@@ -264,10 +266,12 @@ module.exports = {
    * @param {Associations} associations Definition of the associations, from `req.option.associations`
    * @return {Object} The returned structure can be consumed by DS.JSONAPIAdapter when passed to res.json()
    */
-  buildResponse(model, records, associations, associatedRecords, include) {
+  // XXX buildResponse(model, records, associations, associatedRecords, include) {
+  buildResponse(model, records, meta) {
     const primaryKey = model.primaryKey;
     const emberModelIdentity = model.globalId;
     const modelPlural = pluralize(emberModelIdentity);
+    /* XXX
     const documentIdentifier = camelCase(modelPlural);
     const isCollection = Array.isArray(records);
     const toJSON = model.customToJSON
@@ -276,7 +280,6 @@ module.exports = {
           return this;
         };
 
-    /* XXX
     const json = { data };
 
     if (isCollection) {
@@ -290,7 +293,7 @@ module.exports = {
 
     return json;
     */
-    return Ember.serializeResource(records, modelPlural, associations);
+    return Ember.serializeResource(records, modelPlural, meta);
   },
 
   /**

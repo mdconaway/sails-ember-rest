@@ -41,7 +41,7 @@ module.exports = function defineRegisterSerializersHook(sails) {
                     const base = Ember.generateResourceLink(modelType, data.id);
                     return {
                       related: `${base}/${alias}`,
-                      self: `${base}/relationships/${alias}`
+                      self: `${base}/${alias}`
                     }
                   }
                 }
