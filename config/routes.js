@@ -20,16 +20,6 @@ export const routes = {
 
   'GET /': {
     view: 'homepage'
-  },
-  'GET /foos/:id/hydrate': {
-    controller: 'FooController',
-    action: 'hydrate',
-    model: 'foo'
-  },
-  'GET /bars/:id/hydrate': {
-    controller: 'BarController',
-    action: 'hydrate',
-    model: 'bar'
   }
 
   /***************************************************************************
