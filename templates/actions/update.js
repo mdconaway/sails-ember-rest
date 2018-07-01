@@ -137,7 +137,8 @@ module.exports = function(interrupts = {}, afterUpdate) {
           );
         },
         ({ associated, matchingRecord, populatedRecord }, done) => {
-          const emberizedJSON = Ember.buildResponse(Model, populatedRecord, associations, associated);
+          // XXX const emberizedJSON = Ember.buildResponse(Model, populatedRecord, associations, associated);
+          const emberizedJSON = Ember.buildResponse(Model, populatedRecord);
           return done(null, { emberizedJSON, matchingRecord });
         }
       ],
