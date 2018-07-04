@@ -137,7 +137,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
           );
         },
         ({ associated, matchingRecord, populatedRecord }, done) => {
-          const specJSON = Ember.buildResponse(Model, populatedRecord);
+          const specJSON = JsonApi.buildResponse(Model, populatedRecord);
           return done(null, { specJSON, matchingRecord });
         }
       ],

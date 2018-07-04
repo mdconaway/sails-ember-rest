@@ -38,7 +38,7 @@ module.exports = function defineRegisterSerializersHook(sails) {
                 [alias]: {
                   type: kebabCase(type === 'model' ? pluralize(alias) : alias),
                   links(data) {
-                    const base = Ember.generateResourceLink(modelType, data.id);
+                    const base = JsonApi.generateResourceLink(modelType, data.id);
                     return {
                       related: `${base}/${alias}`,
                       self: `${base}/${alias}`
@@ -51,7 +51,7 @@ module.exports = function defineRegisterSerializersHook(sails) {
           JSONAPISerializer.register(modelType, {
             links: {
               self(data) {
-                return Ember.generateResourceLink(modelType, data.id);
+                return JsonApi.generateResourceLink(modelType, data.id);
               }
             },
             relationships,
@@ -61,8 +61,8 @@ module.exports = function defineRegisterSerializersHook(sails) {
             topLevelLinks(data, extraData) {
               return {
                 self: Array.isArray(data)
-                  ? Ember.generateResourceLink(modelType) 
-                  : Ember.generateResourceLink(modelType, data.id) 
+                  ? JsonApi.generateResourceLink(modelType) 
+                  : JsonApi.generateResourceLink(modelType, data.id) 
               }
             }
           });

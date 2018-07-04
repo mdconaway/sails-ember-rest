@@ -63,7 +63,7 @@ module.exports = function(interrupts = {}) {
 
     parallel(
       {
-        count: Ember.countRelationship(Model, association, parentPk),
+        count: JsonApi.countRelationship(Model, association, parentPk),
         records: done => {
           Model.findOne(parentPk)
             .populate(relation, populateOptions)
@@ -101,9 +101,9 @@ module.exports = function(interrupts = {}) {
             const documentIdentifier = pluralize(camelCase(RelatedModel.globalId));
             const json = {};
 
-            json[documentIdentifier] = Ember.linkAssociations(RelatedModel, children);
+            json[documentIdentifier] = JsonApi.linkAssociations(RelatedModel, children);
             //BOOM! counted relationships!
-            res.ok(Ember.buildResponse(RelatedModel, Ember.linkAssociations(RelatedModel, children), { total: results.count }), actionUtil.parseLocals(req));
+            res.ok(JsonApi.buildResponse(RelatedModel, JsonApi.linkAssociations(RelatedModel, children), { total: results.count }), actionUtil.parseLocals(req));
           },
           Model,
           children

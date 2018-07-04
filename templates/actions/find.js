@@ -76,7 +76,7 @@ module.exports = function(interrupts = {}) {
                   actionUtil.subscribeDeep(req, record);
                 });
               }
-              const specJSON = Ember.buildResponse(Model, matchingRecords, { total: results.count });
+              const specJSON = JsonApi.buildResponse(Model, matchingRecords, { total: results.count });
               res.ok(specJSON, actionUtil.parseLocals(req));
             },
             Model,
