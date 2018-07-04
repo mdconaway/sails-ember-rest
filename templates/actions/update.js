@@ -137,8 +137,8 @@ module.exports = function(interrupts = {}, afterUpdate) {
           );
         },
         ({ associated, matchingRecord, populatedRecord }, done) => {
-          const emberizedJSON = Ember.buildResponse(Model, populatedRecord);
-          return done(null, { emberizedJSON, matchingRecord });
+          const specJSON = Ember.buildResponse(Model, populatedRecord);
+          return done(null, { specJSON, matchingRecord });
         }
       ],
       (err, results) => {
@@ -148,7 +148,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
           }
           return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
         }
-        const { emberizedJSON, matchingRecord } = results;
+        const { specJSON, matchingRecord } = results;
         if (req._sails.hooks.pubsub) {
           if (req.isSocket) {
             Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
@@ -157,7 +157,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
             previous: toJSON.call(matchingRecord)
           });
         }
-        res.ok(emberizedJSON, actionUtil.parseLocals(req));
+        res.ok(specJSON, actionUtil.parseLocals(req));
       }
     );
   };

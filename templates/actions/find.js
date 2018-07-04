@@ -76,8 +76,8 @@ module.exports = function(interrupts = {}) {
                   actionUtil.subscribeDeep(req, record);
                 });
               }
-              const emberizedJSON = Ember.buildResponse(Model, matchingRecords, { total: results.count });
-              res.ok(emberizedJSON, actionUtil.parseLocals(req));
+              const specJSON = Ember.buildResponse(Model, matchingRecords, { total: results.count });
+              res.ok(specJSON, actionUtil.parseLocals(req));
             },
             Model,
             matchingRecords

@@ -90,7 +90,7 @@ module.exports = function(interrupts = {}) {
         },
         ({ associated, newInstance, populatedRecord }, done) => {
           return done(null, {
-            emberizedJSON: Ember.buildResponse(Model, populatedRecord),
+            specJSON: Ember.buildResponse(Model, populatedRecord),
             newInstance
           });
         }
@@ -99,7 +99,7 @@ module.exports = function(interrupts = {}) {
         if (err) {
           return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
         }
-        const { emberizedJSON, newInstance } = results;
+        const { specJSON, newInstance } = results;
         if (req._sails.hooks.pubsub) {
           if (req.isSocket) {
             Model.subscribe(req, [newInstance[Model.primaryKey]]);
@@ -107,7 +107,7 @@ module.exports = function(interrupts = {}) {
           }
           Model._publishCreate(newInstance, !req.options.mirror && req);
         }
-        res.created(emberizedJSON, actionUtil.parseLocals(req));
+        res.created(specJSON, actionUtil.parseLocals(req));
       }
     );
   };
