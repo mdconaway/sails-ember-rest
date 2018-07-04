@@ -13,10 +13,10 @@ const path = require('path');
 
 const args = Array.prototype.slice.call(process.argv, 2);
 const scope = {
-  generatorType: 'ember-jsonapi',
+  generatorType: 'jsonapi',
   rootPath: process.cwd(),
   modules: {
-    'ember-jsonapi': path.resolve(__dirname, '../')
+    'jsonapi': path.resolve(__dirname, '../')
   },
   args
 };

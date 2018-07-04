@@ -269,8 +269,8 @@ module.exports = {
   // XXX buildResponse(model, records, associations, associatedRecords, include) {
   buildResponse(model, records, meta) {
     const primaryKey = model.primaryKey;
-    const emberModelIdentity = model.globalId;
-    const modelPlural = pluralize(emberModelIdentity);
+    const modelIdentity = model.globalId;
+    const modelPlural = pluralize(modelIdentity);
     /* XXX
     const documentIdentifier = camelCase(modelPlural);
     const isCollection = Array.isArray(records);

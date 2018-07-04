@@ -20,8 +20,8 @@ module.exports = function(interrupts = {}) {
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
     const query = Model.findOne(pk);
-    const emberModelIdentity = Model.globalId;
-    const modelPlural = pluralize(emberModelIdentity);
+    const modelIdentity = Model.globalId;
+    const modelPlural = pluralize(modelIdentity);
     const documentIdentifier = camelCase(modelPlural);
     const response = {};
     const toJSON = Model.customToJSON
