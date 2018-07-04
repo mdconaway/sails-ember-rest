@@ -1,7 +1,7 @@
 module.exports = () =>
   function(req, res, next) {
-    if (!req.headers.ember) {
-      req.headers.ember = true;
+    if (!req.headers.jsonApi) {
+      req.headers.jsonApi = true;
     }
     next();
   };
