@@ -1,137 +1,147 @@
 import supertest from 'supertest';
+
 const ids = [];
-const newFoo = {
-    foo: {
-        name: 'Kung Fooooooo!',
-        myBar: 1,
-        bars: [1, 2, 3, 4]
+const newArticle = {
+  data: {
+    type: 'articles',
+    attributes: {
+      title: 'I Woke Up in a Car'
+    },
+    relationships: {
+      author: {
+        data: {
+          type: 'authors',
+          id: '2'
+        }
+      }
     }
+  }
 };
-const newAssessmentQuestion = {
-    assessmentQuestion: {
-        name: 'Question 3',
-        identiField: 'XX'
+const newMediaOutlet = {
+  data: {
+    type: 'media-outlets',
+    attributes: {
+      name: "Nate's Newz",
+      type: 'newspaper'
     }
+  }
 };
-const badAssessmentQuestion = {
-    'assessment-question': {
-        name: 'Question 4',
-        identiField: 'YY'
+const badMediaOutlet = {
+  data: {
+    type: 'mediaOutlets',
+    attributes: {
+      name: "Ralph's Radio 93.7",
+      type: 'radio'
     }
+  }
 };
 
 describe('Integration | Action | create', function() {
-    after(function(done) {
-        Foo.destroy({ id: ids }).exec(done);
+  after(function(done) {
+    Article.destroy({ id: ids }).exec(done);
+  });
+
+  describe(':: response format', function() {
+    it('should respond with status code 201', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(201)
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+    it('should respond with Content-Type application/vnd.api+json', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.headers['content-type']).to.contain('application/vnd.api+json');
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+    it('should return an object as root response value', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.body).to.be.an.instanceof(Object);
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+    it('should return a links object containing a self reference', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.body.data.links.self).to.equal(`http://localhost:1337/articles/${res.body.data.id}`);
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+    it('should return a data object containing the newly created record info', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.body.data).to.be.an.instanceof(Object);
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+  });
+
+  describe(':: data integrity', function() {
+    it('should return 1 article', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(res => {
+          expect(res.body.data.type).to.equal('articles');
+          expect(res.body.data.id).to.not.be.undefined;
+          expect(res.body.data.attributes.title).to.equal('I Woke Up in a Car');
+        })
+        .expect(res => {
+          ids.push(res.body.data.id);
+        })
+        .end(done);
+    });
+  });
+
+  describe(':: multi-word model name', function() {
+    it('should receive and return a kabab-case type in the data object', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/mediaoutlets')
+        .send(newMediaOutlet)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.data.type).to.equal('media-outlets');
+        })
+        .expect(res => {
+          expect(res.body.data.attributes.name).to.equal("Nate's Newz");
+        })
+        .end(done);
     });
 
-    describe(':: response format', function() {
-        it('should respond with status code 201', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(201)
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(done);
-        });
-        it('should return an object as root response value', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(res => {
-                    expect(res.body).to.be.an.instanceof(Object);
-                })
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(done);
-        });
-        it('should return a pluralized payload envelope', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(res => {
-                    expect(res.body.foos).to.be.an.instanceof(Array);
-                })
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(done);
-        });
-        it('should not return a meta object', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(res => {
-                    expect(res.body.meta).to.be.undefined;
-                })
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(done);
-        });
+    /* TODO: Should this be tested / implemented ?
+    it('should fail if sent as a non-kebab-case type', function(done) {
+      supertest(sails.hooks.http.app)
+        .post('/mediaoutlets')
+        .send(badMediaOutlet)
+        .expect(400)
+        .end(done);
     });
-
-    describe(':: data integrity', function() {
-        it('should return 1 foo', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(res => {
-                    expect(res.body.foos).to.have.lengthOf(1);
-                    expect(res.body.foos[0].name).to.equal('Kung Fooooooo!');
-                })
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(done);
-        });
-        it('should create 4 many<->many bar relations', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/foos')
-                .send(newFoo)
-                .expect(res => {
-                    expect(res.body.foos).to.have.lengthOf(1);
-                    expect(res.body.foos[0].name).to.equal('Kung Fooooooo!');
-                })
-                .expect(res => {
-                    ids.push(res.body.foos[0].id);
-                })
-                .end(() => {
-                    supertest(sails.hooks.http.app)
-                        .get(`/foos/${ids[ids.length - 1]}/bars`)
-                        .expect(res => {
-                            expect(res.body.bars).to.have.lengthOf(4);
-                            expect(res.body.meta.total).to.equal(4);
-                        })
-                        .end(done);
-                });
-        });
-    });
-
-    describe(':: multi-word model name', function() {
-        it('should receive and return a camelCase payload envelope', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/assessmentquestions')
-                .send(newAssessmentQuestion)
-                .expect(201)
-                .expect(res => {
-                    expect(res.body.assessmentQuestions).to.be.an.instanceof(Array);
-                })
-                .expect(res => {
-                    expect(res.body.assessmentQuestions[0].name).to.equal('Question 3');
-                })
-                .end(done);
-        });
-
-        it('should fail if sent a kebab-case payload envelope', function(done) {
-            supertest(sails.hooks.http.app)
-                .post('/assessmentquestions')
-                .send(badAssessmentQuestion)
-                .expect(400)
-                .end(done);
-        });
-    });
+    */
+  });
 });
