@@ -184,7 +184,7 @@ module.exports.Actions = module.exports.actions = {
   Populate: require('./templates/actions/populate'),
   Update: require('./templates/actions/update')
 };
-module.exports.Controller = module.exports.controller = require('./templates/controllers/EmberController');
+module.exports.Controller = module.exports.controller = require('./templates/controllers/JsonApiController');
 module.exports.Hooks = module.exports.hooks = {
   registerSerializers: require('./templates/hooks/register-serializers')
 };
