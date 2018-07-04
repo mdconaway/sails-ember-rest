@@ -1,18 +1,15 @@
 {
     "name": "sails-json-api",
     "version": "0.0.1",
-    "description": "Ember Data JSONAPI-Adapter compatible controllers, policies, services and generators for Sails v1.0+",
-    "main": "index.js",
+    "description": "JSON API compatible controllers, policies, services and generators for Sails v1.0+", "main": "index.js",
     "scripts": {
         "start": "node app.js",
         "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
         "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 2 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\""
     },
     "keywords": [
-        "ember",
         "json-api",
         "jsonapi",
-        "ember-jsonapi",
         "generator",
         "controller",
         "virtual",
@@ -61,7 +58,7 @@
         "sails": "1.0.2"
     },
     "sailsGenerator": {
-        "type": "ember-jsonapi",
+        "type": "jsonapi",
         "behavior": "adds `sails generate json-api`",
         "sailsVersion": "^1.0.0"
     }
