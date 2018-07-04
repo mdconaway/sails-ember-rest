@@ -20,8 +20,8 @@ module.exports = function(interrupts = {}) {
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
     const query = Model.findOne(pk);
-    const emberModelIdentity = Model.globalId;
-    const modelPlural = pluralize(emberModelIdentity);
+    const modelIdentity = Model.globalId;
+    const modelPlural = pluralize(modelIdentity);
     const documentIdentifier = camelCase(modelPlural);
     const response = {};
     const toJSON = Model.customToJSON
@@ -59,12 +59,12 @@ module.exports = function(interrupts = {}) {
                 assocModel = req._sails.models[assoc.collection];
                 if (record[assoc.alias] && record[assoc.alias].length > 0) {
                   // sideload association records with links for 3rd level associations
-                  record[assoc.alias] = Ember.linkAssociations(assocModel, record[assoc.alias]);
+                  record[assoc.alias] = JsonApi.linkAssociations(assocModel, record[assoc.alias]);
                 }
               }
               if (assoc.type === 'model' && record[assoc.alias]) {
                 assocModel = req._sails.models[assoc.model];
-                let linkedRecords = Ember.linkAssociations(assocModel, record[assoc.alias]);
+                let linkedRecords = JsonApi.linkAssociations(assocModel, record[assoc.alias]);
                 record[assoc.alias] = linkedRecords[0];
               }
             });

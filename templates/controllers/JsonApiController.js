@@ -1,5 +1,5 @@
 /**
- * EmberController
+ * JsonApiController
  *
  * @description :: Server-side logic for a generic crud controller that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers

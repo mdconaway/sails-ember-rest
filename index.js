@@ -23,7 +23,7 @@ const defaults = require('merge-defaults');
 
 function INVALID_SCOPE_VARIABLE(varname, details, message) {
   let DEFAULT_MESSAGE =
-    'Issue encountered in generator "ember-jsonapi":\n' +
+    'Issue encountered in generator "jsonapi":\n' +
     'Missing required scope variable: `%s`"\n' +
     'If you are the author of `sails-json-api`, please resolve this ' +
     'issue and publish a new patch release.';
@@ -37,9 +37,9 @@ function INVALID_SCOPE_VARIABLE(varname, details, message) {
  * sails-json-api
  *
  * Usage:
- * `sails generate ember-jsonapi`
+ * `sails generate jsonapi`
  *
- * @description Generates an ember-jsonapi entity
+ * @description Generates an jsonapi entity
  * @help See http://links.sailsjs.org/docs/generators
  */
 
@@ -57,7 +57,7 @@ module.exports = {
 
   before(scope, cb) {
     if (!scope.args[0]) {
-      return cb(new Error('Please provide a type for ember-jsonapi to generate.'));
+      return cb(new Error('Please provide a type for jsonapi to generate.'));
     } else if (acceptedCommands.indexOf(scope.args[0]) === -1) {
       return cb(new Error('Please enter a valid command. Supported commands: ' + acceptedCommands.join()));
     }
@@ -141,16 +141,16 @@ module.exports = {
           ['Create', 'Destroy', 'Find', 'FindOne', 'Hydrate', 'Populate', 'SetHeader', 'Update'].forEach(function(
             file
           ) {
-            if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/ember' + file + '.js')) {
-              console.info('Policy ember' + file + ' detected, skipping. To overwrite use --force.');
+            if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/jsonApi' + file + '.js')) {
+              console.info('Policy jsonApi' + file + ' detected, skipping. To overwrite use --force.');
             } else {
               fs.writeFileSync(
-                scope.rootPath + '/api/policies/ember' + file + '.js',
-                "const SailsEmber = require('sails-json-api');\nmodule.exports = new SailsEmber.policies.ember" +
+                scope.rootPath + '/api/policies/jsonApi' + file + '.js',
+                "const SailsEmber = require('sails-json-api');\nmodule.exports = new SailsEmber.policies.jsonApi" +
                   file +
                   '();\n'
               );
-              console.info('Created policy: ' + scope.rootPath + '/api/policies/ember' + file + '.js');
+              console.info('Created policy: ' + scope.rootPath + '/api/policies/jsonApi' + file + '.js');
             }
           });
         }
@@ -184,28 +184,20 @@ module.exports.Actions = module.exports.actions = {
   Populate: require('./templates/actions/populate'),
   Update: require('./templates/actions/update')
 };
-module.exports.Controller = module.exports.controller = require('./templates/controllers/EmberController');
+module.exports.Controller = module.exports.controller = require('./templates/controllers/JsonApiController');
 module.exports.Hooks = module.exports.hooks = {
   registerSerializers: require('./templates/hooks/register-serializers')
 };
-module.exports.Service = module.exports.service = require('./templates/services/Ember');
+module.exports.Service = module.exports.service = require('./templates/services/JsonApi');
 module.exports.Policies = module.exports.policies = {
-  emberCreate: require('./templates/policies/emberCreate'),
-  emberDestroy: require('./templates/policies/emberDestroy'),
-  emberFind: require('./templates/policies/emberFind'),
-  emberFindOne: require('./templates/policies/emberFindOne'),
-  emberHydrate: require('./templates/policies/emberHydrate'),
-  emberPopulate: require('./templates/policies/emberPopulate'),
-  emberSetHeader: require('./templates/policies/emberSetHeader'),
-  emberUpdate: require('./templates/policies/emberUpdate'),
-  EmberCreate: require('./templates/policies/emberCreate'),
-  EmberDestroy: require('./templates/policies/emberDestroy'),
-  EmberFind: require('./templates/policies/emberFind'),
-  EmberFindOne: require('./templates/policies/emberFindOne'),
-  EmberHydrate: require('./templates/policies/emberHydrate'),
-  EmberPopulate: require('./templates/policies/emberPopulate'),
-  EmberSetHeader: require('./templates/policies/emberSetHeader'),
-  EmberUpdate: require('./templates/policies/emberUpdate')
+  jsonApiCreate: require('./templates/policies/jsonApiCreate'),
+  jsonApiDestroy: require('./templates/policies/jsonApiDestroy'),
+  jsonApiFind: require('./templates/policies/jsonApiFind'),
+  jsonApiFindOne: require('./templates/policies/jsonApiFindOne'),
+  jsonApiHydrate: require('./templates/policies/jsonApiHydrate'),
+  jsonApiPopulate: require('./templates/policies/jsonApiPopulate'),
+  jsonApiSetHeader: require('./templates/policies/jsonApiSetHeader'),
+  jsonApiUpdate: require('./templates/policies/jsonApiUpdate')
 };
 module.exports.Responses = module.exports.responses = {
   created: require('./templates/responses/created'),

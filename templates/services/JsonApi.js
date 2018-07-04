@@ -1,7 +1,7 @@
 /**
- * Ember service
+ * JsonApi service
  *
- * @module Ember
+ * @module JsonApi
  */
 const { camelCase, kebabCase, omit, pick, reduce, uniqBy } = require('lodash');
 const pluralize = require('pluralize');
@@ -63,7 +63,7 @@ module.exports = {
         ) {
           /* XXX
                     json.data.relationships[assocModelIdentifier] = uniqBy(
-                        json.data.relationships[assocModelIdentifier].concat(Ember.linkAssociations(assocModel, record[association.alias])),
+                        json.data.relationships[assocModelIdentifier].concat(JsonApi.linkAssociations(assocModel, record[association.alias])),
                         assocPK
                     );
                     // reduce association on primary record to an array of IDs
@@ -104,9 +104,9 @@ module.exports = {
         // Side-load any requested relationships
         const assocAssociations = actionUtil.getAssociationConfiguration(assocModel, 'detail');
         const serializedResources = record[alias].map(r => {
-          return Ember.serializeResource(r, assocType, assocAssociations);
+          return JsonApi.serializeResource(r, assocType, assocAssociations);
         });
-        const linkedRecords = Ember.linkAssociations(assocModel, serializedResources);
+        const linkedRecords = JsonApi.linkAssociations(assocModel, serializedResources);
         if (include && alias === include) {
           included = uniqBy(included.concat(linkedRecords), assocPK);
         }
@@ -118,8 +118,8 @@ module.exports = {
         assocType = pluralize(assocModel.globalId.toLowerCase());
 
         // Side-load any requested relationships
-        const serializedResource = Ember.serializeResource(record[alias], assocType);
-        const linkedRecords = Ember.linkAssociations(assocModel, serializedResource);
+        const serializedResource = JsonApi.serializeResource(record[alias], assocType);
+        const linkedRecords = JsonApi.linkAssociations(assocModel, serializedResource);
         if (include && alias === include) {
           included = uniqBy(included.concat(linkedRecords), assocPK);
         }
@@ -161,7 +161,7 @@ module.exports = {
       {}
     );
     const links = {
-      self: Ember.generateResourceLink(type.toLowerCase(), linkSuffix)
+      self: JsonApi.generateResourceLink(type.toLowerCase(), linkSuffix)
     };
     const relationships = associations.reduce((acc, assoc) => {
       const { alias } = assoc;
@@ -208,7 +208,7 @@ module.exports = {
   },
 
   /**
-   * Prepare records and populated associations to be consumed by Ember's DS.RESTAdapter in link mode
+   * Prepare records and populated associations to be consumed by JsonApi's DS.RESTAdapter in link mode
    *
    * @param {Collection} model Waterline collection object (returned from parseModel)
    * @param {Array|Object} records A record or an array of records returned from a Waterline query
@@ -234,7 +234,7 @@ module.exports = {
   },
 
   /**
-   * Prepare sideloaded records for final return to Ember's DS.RESTAdapter
+   * Prepare sideloaded records for final return to JsonApi's DS.RESTAdapter
    *
    * @param {Object} json A sideloaded record hash
    * @param {String} documentIdentifier A string that identifies the primary object queried by the user
@@ -252,14 +252,14 @@ module.exports = {
         return;
       }
       let model = sails.models[pluralize(camelCase(key).toLowerCase(), 1)];
-      Ember.linkAssociations(model, array);
+      JsonApi.linkAssociations(model, array);
     });
 
     return json;
   },
 
   /**
-   * Prepare records and populated associations to be consumed by Ember's DS.JSONAPIAdapter
+   * Prepare records and populated associations to be consumed by JsonApi's DS.JSONAPIAdapter
    *
    * @param {Collection} model Waterline collection object (returned from parseModel)
    * @param {Array|Object} records A record or an array of records returned from a Waterline query
@@ -269,8 +269,8 @@ module.exports = {
   // XXX buildResponse(model, records, associations, associatedRecords, include) {
   buildResponse(model, records, meta) {
     const primaryKey = model.primaryKey;
-    const emberModelIdentity = model.globalId;
-    const modelPlural = pluralize(emberModelIdentity);
+    const modelIdentity = model.globalId;
+    const modelPlural = pluralize(modelIdentity);
     /* XXX
     const documentIdentifier = camelCase(modelPlural);
     const isCollection = Array.isArray(records);
@@ -284,20 +284,20 @@ module.exports = {
 
     if (isCollection) {
       records.forEach(record =>
-        Ember.prepareResourceAssociations(record, associations, primaryKey, json, toJSON, associatedRecords, include)
+        JsonApi.prepareResourceAssociations(record, associations, primaryKey, json, toJSON, associatedRecords, include)
       );
     } else {
-      Ember.prepareResourceAssociations(records, associations, primaryKey, json, toJSON, associatedRecords, include);
+      JsonApi.prepareResourceAssociations(records, associations, primaryKey, json, toJSON, associatedRecords, include);
     }
-    // json = Ember.finalizeSideloads(json, documentIdentifier);
+    // json = JsonApi.finalizeSideloads(json, documentIdentifier);
 
     return json;
     */
-    return Ember.serializeResource(records, modelPlural, meta);
+    return JsonApi.serializeResource(records, modelPlural, meta);
   },
 
   /**
-   * Build a 'Not Found' response body to be consumed by Ember's DS.JSONAPIAdapter
+   * Build a 'Not Found' response body to be consumed by JsonApi's DS.JSONAPIAdapter
    *
    * @param {Collection} model Waterline collection object (returned from parseModel)
    * @return {Object} The returned structure can be consumed by DS.JSONAPIAdapter when passed to res.json()
