@@ -59,12 +59,12 @@ module.exports = function(interrupts = {}) {
                 assocModel = req._sails.models[assoc.collection];
                 if (record[assoc.alias] && record[assoc.alias].length > 0) {
                   // sideload association records with links for 3rd level associations
-                  record[assoc.alias] = JsonApi.linkAssociations(assocModel, record[assoc.alias]);
+                  record[assoc.alias] = sails.helpers.linkAssociations(assocModel, record[assoc.alias]);
                 }
               }
               if (assoc.type === 'model' && record[assoc.alias]) {
                 assocModel = req._sails.models[assoc.model];
-                let linkedRecords = JsonApi.linkAssociations(assocModel, record[assoc.alias]);
+                let linkedRecords = sails.helpers.linkAssociations(assocModel, record[assoc.alias]);
                 record[assoc.alias] = linkedRecords[0];
               }
             });

@@ -90,7 +90,7 @@ module.exports = function(interrupts = {}) {
         },
         ({ associated, newInstance, populatedRecord }, done) => {
           return done(null, {
-            specJSON: JsonApi.buildResponse(Model, populatedRecord),
+            specJSON: sails.helpers.buildJsonApiResponse.with({ model: Model, records: populatedRecord }),
             newInstance
           });
         }

@@ -185,10 +185,15 @@ module.exports.Actions = module.exports.actions = {
   Update: require('./templates/actions/update')
 };
 module.exports.Controller = module.exports.controller = require('./templates/controllers/JsonApiController');
+module.exports.helpers = {
+  buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
+  countRelationship: require('./templates/helpers/count-relationship'),
+  generateResourceLink: require('./templates/helpers/generate-resource-link'),
+  linkAssociations: require('./templates/helpers/link-associations')
+};
 module.exports.Hooks = module.exports.hooks = {
   registerSerializers: require('./templates/hooks/register-serializers')
 };
-module.exports.Service = module.exports.service = require('./templates/services/JsonApi');
 module.exports.Policies = module.exports.policies = {
   jsonApiCreate: require('./templates/policies/jsonApiCreate'),
   jsonApiDestroy: require('./templates/policies/jsonApiDestroy'),

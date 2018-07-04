@@ -137,7 +137,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
           );
         },
         ({ associated, matchingRecord, populatedRecord }, done) => {
-          const specJSON = JsonApi.buildResponse(Model, populatedRecord);
+          const specJSON = sails.helpers.buildJsonApiResponse.with({ model: Model, records: populatedRecord });
           return done(null, { specJSON, matchingRecord });
         }
       ],

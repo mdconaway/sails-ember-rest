@@ -55,7 +55,7 @@ module.exports = function(interrupts = {}) {
               Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
               actionUtil.subscribeDeep(req, matchingRecord);
             }
-            res.ok(JsonApi.buildResponse(Model, matchingRecord), actionUtil.parseLocals(req));
+            res.ok(sails.helpers.buildJsonApiResponse.with({ model: Model, records: matchingRecord }), actionUtil.parseLocals(req));
           },
           Model,
           matchingRecord
