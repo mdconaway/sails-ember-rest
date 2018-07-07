@@ -1,5 +1,5 @@
-import { Controller } from './../../index';
+import { controllers } from './../../index';
 
-const AuthorController = new Controller({});
+const AuthorController = new controllers.JsonApiController({});
 
 export default AuthorController;

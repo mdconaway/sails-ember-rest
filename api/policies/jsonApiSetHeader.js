@@ -1,4 +1,4 @@
-import { Policies } from '../../index';
-const { jsonApiSetHeader } = Policies;
+import { policies } from '../../index';
+const { jsonApiSetHeader } = policies;
 
 export default new jsonApiSetHeader();

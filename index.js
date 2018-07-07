@@ -175,26 +175,21 @@ module.exports.Actions = module.exports.actions = {
   findone: require('./templates/actions/findone'),
   hydrate: require('./templates/actions/hydrate'),
   populate: require('./templates/actions/populate'),
-  update: require('./templates/actions/update'),
-  Create: require('./templates/actions/create'),
-  Destroy: require('./templates/actions/destroy'),
-  Find: require('./templates/actions/find'),
-  FindOne: require('./templates/actions/findone'),
-  Hydrate: require('./templates/actions/hydrate'),
-  Populate: require('./templates/actions/populate'),
-  Update: require('./templates/actions/update')
+  update: require('./templates/actions/update')
 };
-module.exports.Controller = module.exports.controller = require('./templates/controllers/JsonApiController');
+module.exports.controllers = {
+  JsonApiController: require('./templates/controllers/JsonApiController')
+},
 module.exports.helpers = {
   buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
   countRelationship: require('./templates/helpers/count-relationship'),
   generateResourceLink: require('./templates/helpers/generate-resource-link'),
   linkAssociations: require('./templates/helpers/link-associations')
 };
-module.exports.Hooks = module.exports.hooks = {
+module.exports.hooks = {
   registerSerializers: require('./templates/hooks/register-serializers')
 };
-module.exports.Policies = module.exports.policies = {
+module.exports.policies = {
   jsonApiCreate: require('./templates/policies/jsonApiCreate'),
   jsonApiDestroy: require('./templates/policies/jsonApiDestroy'),
   jsonApiFind: require('./templates/policies/jsonApiFind'),
@@ -202,10 +197,13 @@ module.exports.Policies = module.exports.policies = {
   jsonApiHydrate: require('./templates/policies/jsonApiHydrate'),
   jsonApiPopulate: require('./templates/policies/jsonApiPopulate'),
   jsonApiSetHeader: require('./templates/policies/jsonApiSetHeader'),
-  jsonApiUpdate: require('./templates/policies/jsonApiUpdate')
+  jsonApiUpdate: require('./templates/policies/jsonApiUpdate'),
+  jsonApiValidateHeaders: require('./templates/policies/jsonApiValidateHeaders')
 };
-module.exports.Responses = module.exports.responses = {
+module.exports.responses = {
   created: require('./templates/responses/created'),
-  noContent: require('./templates/responses/noContent')
+  noContent: require('./templates/responses/noContent'),
+  notAcceptable: require('./templates/responses/notAcceptable'),
+  unsupportedMediaType: require('./templates/responses/unsupportedMediaType')
 };
-module.exports.Util = module.exports.util = require('./templates/util/actionUtil');
+module.exports.util = require('./templates/util/actionUtil');

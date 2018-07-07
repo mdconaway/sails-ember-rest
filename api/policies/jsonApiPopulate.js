@@ -1,4 +1,4 @@
-import { Policies } from '../../index';
-const { jsonApiPopulate } = Policies;
+import { policies } from '../../index';
+const { jsonApiPopulate } = policies;
 
 export default new jsonApiPopulate();

@@ -1,4 +1,4 @@
-import { Policies } from '../../index';
-const { jsonApiFindOne } = Policies;
+import { policies } from '../../index';
+const { jsonApiFindOne } = policies;
 
 export default new jsonApiFindOne();

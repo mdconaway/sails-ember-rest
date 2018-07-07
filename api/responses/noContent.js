@@ -1,4 +1,4 @@
-import { Responses } from './../../index';
-const { noContent } = Responses;
+import { responses } from './../../index';
+const { noContent } = responses;
 
 export default noContent;

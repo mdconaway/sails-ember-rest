@@ -1,4 +1,4 @@
-import { Policies } from '../../index';
-const { jsonApiCreate } = Policies;
+import { policies } from '../../index';
+const { jsonApiCreate } = policies;
 
 export default new jsonApiCreate();

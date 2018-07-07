@@ -1,5 +1,5 @@
-import { Controller } from './../../index';
+import { controllers } from './../../index';
 
-const MediaOutletController = new Controller({});
+const MediaOutletController = new controllers.JsonApiController({});
 
 export default MediaOutletController;

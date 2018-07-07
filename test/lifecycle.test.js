@@ -16,7 +16,18 @@ before(function(done) {
   sails.lift(
     {
       hooks: { grunt: false },
-      log: { level: 'silent' }
+      log: { level: 'warn' },
+      policies: {
+        DummyController: {
+          hello: ['jsonApiValidateHeaders']
+        }
+      },
+      routes: {
+        'GET /dummy': {
+          controller: 'DummyController',
+          action: 'hello'
+        }
+      }
     },
     err => {
       if (err) {

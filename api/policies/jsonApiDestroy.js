@@ -1,4 +1,4 @@
-import { Policies } from '../../index';
-const { jsonApiDestroy } = Policies;
+import { policies } from '../../index';
+const { jsonApiDestroy } = policies;
 
 export default new jsonApiDestroy();

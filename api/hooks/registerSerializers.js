@@ -1,4 +1,4 @@
-import { Hooks } from './../../index';
-const { registerSerializers } = Hooks;
+import { hooks } from './../../index';
+const { registerSerializers } = hooks;
 
 export default registerSerializers;
