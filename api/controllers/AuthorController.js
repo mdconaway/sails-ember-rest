@@ -1,5 +1,3 @@
-import { controllers } from './../../index';
+const Controller = new sails.hooks['sails-json-api'].controller({});
 
-const AuthorController = new controllers.JsonApiController({});
-
-export default AuthorController;
+export default Controller;

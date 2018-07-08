@@ -1,4 +1,3 @@
-import { responses } from './../../index';
-const { noContent } = responses;
+const { noContent } = sails.hooks['sails-json-api'].responses;
 
 export default noContent;

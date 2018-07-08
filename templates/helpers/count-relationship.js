@@ -28,7 +28,7 @@ module.exports = {
 
   exits: {},
 
-  fn: function ({ association, model, pk }, exits) {
+  fn: function({ association, model, pk }, exits) {
     if (!mapGen) {
       aliasMap = generateManyMap(sails.models);
       mapGen = true;

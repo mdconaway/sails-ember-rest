@@ -1,4 +1,3 @@
-import { responses } from './../../index';
-const { notAcceptable } = responses;
+const { notAcceptable } = sails.hooks['sails-json-api'].responses;
 
 export default notAcceptable;

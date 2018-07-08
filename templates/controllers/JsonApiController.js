@@ -4,16 +4,18 @@
  * @description :: Server-side logic for a generic crud controller that can be used to represent all models
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-const create = require('./../actions/create');
-const destroy = require('./../actions/destroy');
-const find = require('./../actions/find');
-const findone = require('./../actions/findone');
-const hydrate = require('./../actions/hydrate');
-const populate = require('./../actions/populate');
-const update = require('./../actions/update');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 
 function baseController(interrupts) {
+  const actions = sails.getActions();
+  const create = actions['sailsjsonapi/create'];
+  const destroy = actions['sailsjsonapi/destroy'];
+  const find = actions['sailsjsonapi/find'];
+  const findone = actions['sailsjsonapi/findone'];
+  const hydrate = actions['sailsjsonapi/hydrate'];
+  const populate = actions['sailsjsonapi/populate'];
+  const update = actions['sailsjsonapi/update'];
+
   return {
     create: create(interrupts),
     destroy: destroy(interrupts),

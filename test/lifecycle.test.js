@@ -15,12 +15,13 @@ before(function(done) {
 
   sails.lift(
     {
-      hooks: { grunt: false },
+      hooks: {
+        grunt: false,
+        'sails-json-api': require('../index')
+      },
       log: { level: 'warn' },
       policies: {
-        DummyController: {
-          hello: ['jsonApiValidateHeaders']
-        }
+        'dummy/hello': ['jsonApiValidateHeaders']
       },
       routes: {
         'GET /dummy': {

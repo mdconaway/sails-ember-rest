@@ -254,11 +254,14 @@ describe('Integration | Action | find', function() {
           const { included } = res.body;
 
           expect(included).to.have.length(5);
-          const types = included.reduce((acc, item) => {
-            return item.type === 'author'
-              ? Object.assign({}, acc, { author: acc.author + 1 })
-              : Object.assign({}, acc, { comment: acc.comment + 1 });
-          }, { author: 0, comment: 0 });
+          const types = included.reduce(
+            (acc, item) => {
+              return item.type === 'author'
+                ? Object.assign({}, acc, { author: acc.author + 1 })
+                : Object.assign({}, acc, { comment: acc.comment + 1 });
+            },
+            { author: 0, comment: 0 }
+          );
           expect(types.author).to.equal(2);
           expect(types.comment).to.equal(3);
         })

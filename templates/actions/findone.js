@@ -24,9 +24,8 @@ module.exports = function(interrupts = {}) {
     const query = Model.findOne(pk);
 
     // Look up the association configuration based on the reserved 'include' keyword
-    const { include='' } = req.query;
-    const associations = sails.helpers.getAssociationConfig
-      .with({ model: Model, include: include.split(',') })
+    const { include = '' } = req.query;
+    const associations = sails.helpers.getAssociationConfig.with({ model: Model, include: include.split(',') });
     delete req.query.include; // Include is no longer required
 
     parallel(
@@ -60,7 +59,10 @@ module.exports = function(interrupts = {}) {
               actionUtil.subscribeDeep(req, matchingRecord);
             }
 
-            res.ok(sails.helpers.buildJsonApiResponse.with({ model: Model, records: matchingRecord }), actionUtil.parseLocals(req));
+            res.ok(
+              sails.helpers.buildJsonApiResponse.with({ model: Model, records: matchingRecord }),
+              actionUtil.parseLocals(req)
+            );
           },
           Model,
           matchingRecord

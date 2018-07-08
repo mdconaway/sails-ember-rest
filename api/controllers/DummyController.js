@@ -1,9 +1,7 @@
-import { controllers } from './../../index';
-
-const DummyController = new controllers.JsonApiController({
+const Controller = new sails.hooks['sails-json-api'].controller({
   hello(req, res) {
     return res.ok('Hello.');
   }
 });
 
-export default DummyController;
+export default Controller;

@@ -27,9 +27,8 @@ module.exports = function(interrupts = {}) {
     const limit = actionUtil.parseLimit(req);
 
     // Look up the association configuration based on the reserved 'include' keyword
-    const { include='' } = criteria;
-    const associations = sails.helpers.getAssociationConfig
-      .with({ model: Model, include: include.split(',') });
+    const { include = '' } = criteria;
+    const associations = sails.helpers.getAssociationConfig.with({ model: Model, include: include.split(',') });
     delete criteria.include; // Include is no longer required
 
     parallel(
@@ -79,7 +78,11 @@ module.exports = function(interrupts = {}) {
                   actionUtil.subscribeDeep(req, record);
                 });
               }
-              const specJSON = sails.helpers.buildJsonApiResponse.with({ model: Model, records: matchingRecords, meta: { total: results.count }});
+              const specJSON = sails.helpers.buildJsonApiResponse.with({
+                model: Model,
+                records: matchingRecords,
+                meta: { total: results.count }
+              });
               res.ok(specJSON, actionUtil.parseLocals(req));
             },
             Model,

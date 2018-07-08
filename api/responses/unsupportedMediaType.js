@@ -1,4 +1,3 @@
-import { responses } from './../../index';
-const { unsupportedMediaType } = responses;
+const { unsupportedMediaType } = sails.hooks['sails-json-api'].responses;
 
 export default unsupportedMediaType;

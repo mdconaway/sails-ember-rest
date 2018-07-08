@@ -20,7 +20,7 @@ module.exports = {
 
   exits: {},
 
-  fn: function ({ model, records }, exits) {
+  fn: function({ model, records }, exits) {
     const modelPlural = pluralize(model.identity);
     records = Array.isArray(records) ? records : [records];
 
@@ -28,7 +28,10 @@ module.exports = {
       let links = {};
       model.associations.forEach(assoc => {
         if (assoc.type === 'collection') {
-          links[assoc.alias] = sails.helpers.generateResourceLink.with({ modelPlural, linkSuffix: `${record[model.primaryKey]}/${assoc.alias}` });
+          links[assoc.alias] = sails.helpers.generateResourceLink.with({
+            modelPlural,
+            linkSuffix: `${record[model.primaryKey]}/${assoc.alias}`
+          });
         }
       });
       if (Object.keys(links).length > 0) {
@@ -40,4 +43,3 @@ module.exports = {
     return exits.success(linkedRecords);
   }
 };
-

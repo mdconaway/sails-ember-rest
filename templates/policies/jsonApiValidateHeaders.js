@@ -6,7 +6,7 @@ module.exports = function(req, res, next) {
   // the header Content-Type: application/vnd.api+json with any media type parameters
   if (!contentType || contentType !== 'application/vnd.api+json') {
     return res.unsupportedMediaType(
-      'The Content-Type should be \'application/vnd.api+json\' and may not contain media type parameters'
+      "The Content-Type should be 'application/vnd.api+json' and may not contain media type parameters"
     );
   }
 
@@ -15,9 +15,9 @@ module.exports = function(req, res, next) {
   // media type parameters
   if (accept !== 'application/vnd.api+json') {
     return res.notAcceptable(
-      'The Accept header should be \'application/vnd.api+json\' and may not contain media type parameters'
+      "The Accept header should be 'application/vnd.api+json' and may not contain media type parameters"
     );
   }
 
   return next();
-}
+};

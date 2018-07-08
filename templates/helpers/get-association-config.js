@@ -1,6 +1,7 @@
 module.exports = {
   friendlyName: 'Get association config',
-  description: 'Extend the model\'s `associations` property with the presentation configuration (taken from the Model\'s attributes `meta` option or from Sails configuration)',
+  description:
+    "Extend the model's `associations` property with the presentation configuration (taken from the Model's attributes `meta` option or from Sails configuration)",
   sync: true,
 
   inputs: {
@@ -23,18 +24,14 @@ module.exports = {
     }
   },
 
-  fn: function ({ model, include }, exits) {
+  fn: function({ model, include }, exits) {
     const associations = model.associations;
     const attributes = model.attributes;
-    const decoratedAssocs = associations.map((assoc) => {
-      const attrMeta = attributes[assoc.alias].meta
-        ? attributes[assoc.alias].meta
-        : {};
+    const decoratedAssocs = associations.map(assoc => {
+      const attrMeta = attributes[assoc.alias].meta ? attributes[assoc.alias].meta : {};
       const dAssoc = Object.assign({}, assoc, attrMeta);
 
-      dAssoc.include = include.includes(dAssoc.alias)
-        ? 'record'
-        : 'link';
+      dAssoc.include = include.includes(dAssoc.alias) ? 'record' : 'link';
       if (attributes[dAssoc.alias].through) {
         dAssoc.through = attributes[dAssoc.alias].through;
       }
@@ -45,4 +42,3 @@ module.exports = {
     return exits.success(decoratedAssocs);
   }
 };
-

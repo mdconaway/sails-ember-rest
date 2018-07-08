@@ -1,210 +1,137 @@
 /**
- * Module dependencies
+ * sails-json-api hook
+ *
+ * @description :: A hook definition.  Extends Sails by adding shadow routes, implicit actions, and/or initialization logic.
+ * @docs        :: https://sailsjs.com/docs/concepts/extending-sails/hooks
  */
 
-const fs = require('fs');
-const util = require('util');
-const acceptedCommands = ['controller', 'responses', 'policies'];
-const defaults = require('merge-defaults');
+const { kebabCase } = require('lodash');
+const pluralize = require('pluralize');
+const Serializer = require('json-api-serializer');
 
-/**
- * INVALID_SCOPE_VARIABLE()
- *
- * Helper method to put together a nice error about a missing or invalid
- * scope variable. We should always validate any required scope variables
- * to avoid inadvertently smashing someone's filesystem.
- *
- * @param {String} varname [the name of the missing/invalid scope variable]
- * @param {String} details [optional - additional details to display on the console]
- * @param {String} message [optional - override for the default message]
- * @return {Error}
- * @api private
- */
+// Link the JSONAPISerializer to the global namespace
+global.JSONAPISerializer = new Serializer({
+  convertCase: 'kebab-case',
+  unconvertCase: 'camelCase'
+});
 
-function INVALID_SCOPE_VARIABLE(varname, details, message) {
-  let DEFAULT_MESSAGE =
-    'Issue encountered in generator "jsonapi":\n' +
-    'Missing required scope variable: `%s`"\n' +
-    'If you are the author of `sails-json-api`, please resolve this ' +
-    'issue and publish a new patch release.';
+// Imported Actions
+const create = require('./templates/actions/create');
+const destroy = require('./templates/actions/destroy');
+const find = require('./templates/actions/find');
+const findone = require('./templates/actions/findone');
+const hydrate = require('./templates/actions/hydrate');
+const populate = require('./templates/actions/populate');
+const update = require('./templates/actions/update');
 
-  message = (message || DEFAULT_MESSAGE) + (details ? '\n' + details : '');
-  message = util.inspect(message, varname);
+module.exports = function defineSailsJsonApiHook(sails) {
+  return {
+    /**
+     * Custom Controller
+     */
+    controller: require('./templates/controllers/JsonApiController'),
 
-  return new Error(message);
-}
-/**
- * sails-json-api
- *
- * Usage:
- * `sails generate jsonapi`
- *
- * @description Generates an jsonapi entity
- * @help See http://links.sailsjs.org/docs/generators
- */
+    /**
+     * Custom Responses
+     * There is not currently a binding into registering custom responses via a hook
+     */
+    responses: {
+      created: require('./templates/responses/created'),
+      noContent: require('./templates/responses/noContent'),
+      notAcceptable: require('./templates/responses/notAcceptable'),
+      unsupportedMediaType: require('./templates/responses/unsupportedMediaType')
+    },
 
-module.exports = {
-  /**
-   * `before()` is run before executing any of the `targets`
-   * defined below.
-   *
-   * This is where we can validate user input, configure default
-   * scope variables, get extra dependencies, and so on.
-   *
-   * @param  {Object} scope
-   * @param  {Function} cb    [callback]
-   */
+    /**
+     * Runs when a Sails app loads/lifts.
+     *
+     * @param {Function} done
+     */
+    initialize(done) {
+      sails.log.info('Initializing custom hook (`sails-json-api`)');
 
-  before(scope, cb) {
-    if (!scope.args[0]) {
-      return cb(new Error('Please provide a type for jsonapi to generate.'));
-    } else if (acceptedCommands.indexOf(scope.args[0]) === -1) {
-      return cb(new Error('Please enter a valid command. Supported commands: ' + acceptedCommands.join()));
-    }
-    scope.generatorName = scope.args[0];
+      // Once the ORM has loaded, dynamically register all models in the JSON API Serializer
+      sails.on('hook:orm:loaded', function() {
+        Object.keys(sails.models).forEach(modelName => {
+          const Model = sails.models[modelName];
+          const modelType = kebabCase(Model.globalId);
+          const modelPlural = pluralize(modelType);
+          const relationships = Model.associations.reduce((acc, { alias, collection, model, type }) => {
+            return Object.assign({}, acc, {
+              [alias]: {
+                type: kebabCase(type === 'model' ? model : collection),
+                links(data) {
+                  const base = sails.helpers.generateResourceLink(modelPlural, data.id);
+                  return {
+                    related: `${base}/${alias}`,
+                    self: `${base}/${alias}`
+                  };
+                }
+              }
+            });
+          }, {});
 
-    if (!scope.rootPath) {
-      return cb(INVALID_SCOPE_VARIABLE('rootPath'));
-    }
-
-    defaults(scope, {
-      createdAt: new Date()
-    });
-
-    if (scope.args[0] === 'controller') {
-      if (typeof scope.args[1] === 'string' && scope.args[1].trim().length > 0) {
-        scope.filename = scope.args[1].trim().replace(/(^| )(\w)/g, x => x.toUpperCase()) + 'Controller';
-      } else {
-        return cb(new Error('Please enter a valid name for your new controller'));
-      }
-    } else {
-      scope.filename = scope.args[0];
-    }
-
-    cb();
-  },
-
-  /**
-   * The files/folders to generate.
-   * @type {Object}
-   */
-  targets: {
-    './': {
-      exec: function(scope, cb) {
-        if (!fs.existsSync(scope.rootPath + '/api')) {
-          fs.mkdirSync(scope.rootPath + '/api');
-        }
-        if (!scope.force && fs.existsSync(scope.rootPath + '/api/responses/created.js')) {
-          console.info('Create response detected, not overwriting. To overwrite use --force.');
-        } else {
-          if (!fs.existsSync(scope.rootPath + '/api/responses')) {
-            fs.mkdirSync(scope.rootPath + '/api/responses');
-          }
-          fs.writeFileSync(
-            scope.rootPath + '/api/responses/created.js',
-            "const SailsEmber = require('sails-json-api');\nmodule.exports = SailsEmber.responses.created;\n"
-          );
-        }
-        if (scope.generatorName === 'controller' || scope.generatorName === 'policies') {
-          // check for previous installation
-          if (!scope.force && fs.existsSync(scope.rootPath + '/api/services/Ember.js')) {
-            console.info('Ember service detected, not overwriting. To overwrite use --force.');
-          } else {
-            if (!fs.existsSync(scope.rootPath + '/api/services')) {
-              fs.mkdirSync(scope.rootPath + '/api/services');
-            }
-            fs.writeFileSync(
-              scope.rootPath + '/api/services/Ember.js',
-              "const SailsEmber = require('sails-json-api');\nmodule.exports = SailsEmber.service;\n"
-            );
-          }
-        }
-        if (scope.generatorName === 'controller') {
-          if (!scope.force && fs.existsSync(scope.rootPath + '/api/controllers/' + scope.filename + '.js')) {
-            return cb(
-              new Error('Ember controller detected at specified path, not overwriting. To overwrite use --force.')
-            );
-          } else {
-            if (!fs.existsSync(scope.rootPath + '/api/controllers')) {
-              fs.mkdirSync(scope.rootPath + '/api/controllers');
-            }
-            fs.writeFileSync(
-              scope.rootPath + '/api/controllers/' + scope.filename + '.js',
-              "const SailsEmber = require('sails-json-api');\nconst controller = new SailsEmber.controller({\n});\n\nmodule.exports = controller;\n"
-            );
-            console.info('Created controller: ' + scope.rootPath + '/api/controllers/' + scope.filename + '.js');
-          }
-        } else {
-          if (!fs.existsSync(scope.rootPath + '/api/policies')) {
-            fs.mkdirSync(scope.rootPath + '/api/policies');
-          }
-          ['Create', 'Destroy', 'Find', 'FindOne', 'Hydrate', 'Populate', 'SetHeader', 'Update'].forEach(function(
-            file
-          ) {
-            if (!scope.force && fs.existsSync(scope.rootPath + '/api/policies/jsonApi' + file + '.js')) {
-              console.info('Policy jsonApi' + file + ' detected, skipping. To overwrite use --force.');
-            } else {
-              fs.writeFileSync(
-                scope.rootPath + '/api/policies/jsonApi' + file + '.js',
-                "const SailsEmber = require('sails-json-api');\nmodule.exports = new SailsEmber.policies.jsonApi" +
-                  file +
-                  '();\n'
-              );
-              console.info('Created policy: ' + scope.rootPath + '/api/policies/jsonApi' + file + '.js');
+          JSONAPISerializer.register(modelType, {
+            links: {
+              self(data) {
+                return sails.helpers.generateResourceLink(modelPlural, data.id);
+              }
+            },
+            relationships,
+            topLevelMeta({ total }) {
+              return typeof total !== 'undefined' ? { total } : {};
+            },
+            topLevelLinks(data, extraData) {
+              return {
+                self: Array.isArray(data)
+                  ? sails.helpers.generateResourceLink(modelPlural)
+                  : sails.helpers.generateResourceLink(modelPlural, data.id)
+              };
             }
           });
-        }
-        cb();
-      }
+        });
+      });
+
+      // Manually register JSON API actions
+      return this.registerActions(done);
+    },
+    configure() {
+      // Make helpers accessible via sails.helper.*
+      sails.config.helpers.moduleDefinitions = Object.assign({}, sails.config.helpers.moduleDefinitions, {
+        buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
+        countRelationship: require('./templates/helpers/count-relationship'),
+        generateResourceLink: require('./templates/helpers/generate-resource-link'),
+        getAssociationConfig: require('./templates/helpers/get-association-config'),
+        linkAssociations: require('./templates/helpers/link-associations')
+      });
+
+      // Make policies available to the policy configuration used by the policy hook
+      // The policy map MUST be all lowercase as Sails' policy hook will make this assumption
+      sails.config.policies.moduleDefinitions = Object.assign({}, sails.config.policies.moduleDefinitions, {
+        jsonapicreate: require('./templates/policies/jsonApiCreate'),
+        jsonapidestroy: require('./templates/policies/jsonApiDestroy'),
+        jsonapifind: require('./templates/policies/jsonApiFind'),
+        jsonapifindOne: require('./templates/policies/jsonApiFindOne'),
+        jsonapihydrate: require('./templates/policies/jsonApiHydrate'),
+        jsonapipopulate: require('./templates/policies/jsonApiPopulate'),
+        jsonapisetheader: require('./templates/policies/jsonApiSetHeader'),
+        jsonapiupdate: require('./templates/policies/jsonApiUpdate'),
+        jsonapivalidateheaders: require('./templates/policies/jsonApiValidateHeaders')
+      });
+    },
+    registerActions(done) {
+      sails.registerAction(create, 'sailsJsonApi/create');
+      sails.registerAction(destroy, 'sailsJsonApi/destroy');
+      sails.registerAction(find, 'sailsJsonApi/find');
+      sails.registerAction(findone, 'sailsJsonApi/findone');
+      sails.registerAction(hydrate, 'sailsJsonApi/hydrate');
+      sails.registerAction(populate, 'sailsJsonApi/populate');
+      sails.registerAction(update, 'sailsJsonApi/update');
+
+      return done();
     }
-  },
-
-  /**
-   * The absolute path to the `templates` for this generator
-   * (for use with the `template` helper)
-   *
-   * @type {String}
-   */
-  templatesDirectory: require('path').resolve(__dirname, './templates')
+  };
 };
 
-module.exports.Actions = module.exports.actions = {
-  create: require('./templates/actions/create'),
-  destroy: require('./templates/actions/destroy'),
-  find: require('./templates/actions/find'),
-  findone: require('./templates/actions/findone'),
-  hydrate: require('./templates/actions/hydrate'),
-  populate: require('./templates/actions/populate'),
-  update: require('./templates/actions/update')
-};
-module.exports.controllers = {
-  JsonApiController: require('./templates/controllers/JsonApiController')
-},
-module.exports.helpers = {
-  buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
-  countRelationship: require('./templates/helpers/count-relationship'),
-  generateResourceLink: require('./templates/helpers/generate-resource-link'),
-  getAssociationConfig: require('./templates/helpers/get-association-config'),
-  linkAssociations: require('./templates/helpers/link-associations')
-};
-module.exports.hooks = {
-  registerSerializers: require('./templates/hooks/register-serializers')
-};
-module.exports.policies = {
-  jsonApiCreate: require('./templates/policies/jsonApiCreate'),
-  jsonApiDestroy: require('./templates/policies/jsonApiDestroy'),
-  jsonApiFind: require('./templates/policies/jsonApiFind'),
-  jsonApiFindOne: require('./templates/policies/jsonApiFindOne'),
-  jsonApiHydrate: require('./templates/policies/jsonApiHydrate'),
-  jsonApiPopulate: require('./templates/policies/jsonApiPopulate'),
-  jsonApiSetHeader: require('./templates/policies/jsonApiSetHeader'),
-  jsonApiUpdate: require('./templates/policies/jsonApiUpdate'),
-  jsonApiValidateHeaders: require('./templates/policies/jsonApiValidateHeaders')
-};
-module.exports.responses = {
-  created: require('./templates/responses/created'),
-  noContent: require('./templates/responses/noContent'),
-  notAcceptable: require('./templates/responses/notAcceptable'),
-  unsupportedMediaType: require('./templates/responses/unsupportedMediaType')
-};
+// TODO: Move all actionUtil functions to their own helpers and register in hook
 module.exports.util = require('./templates/util/actionUtil');

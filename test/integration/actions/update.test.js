@@ -26,10 +26,7 @@ const updateArticle = {
   }
 };
 const updateCommentsViaArticleRelationship = {
-  data: [
-    { type: 'comment', id: '4' },
-    { type: 'comment', id: '5' }
-  ]
+  data: [{ type: 'comment', id: '4' }, { type: 'comment', id: '5' }]
 };
 const updateMediaOutlet = {
   data: {

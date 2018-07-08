@@ -27,7 +27,6 @@
  */
 
 module.exports = function unsupportedMediaType(optionalData) {
-
   // Get access to `req` and `res`
   var req = this.req;
   var res = this.res;
@@ -53,8 +52,7 @@ module.exports = function unsupportedMediaType(optionalData) {
     if (!_.isFunction(optionalData.toJSON)) {
       if (process.env.NODE_ENV === 'production') {
         return res.sendStatus(statusCodeToSet);
-      }
-      else {
+      } else {
         return res.status(statusCodeToSet).send(optionalData.stack);
       }
     }
@@ -63,5 +61,4 @@ module.exports = function unsupportedMediaType(optionalData) {
   else {
     return res.status(statusCodeToSet).send(optionalData);
   }
-
 };

@@ -26,7 +26,7 @@ module.exports = {
 
   exits: {},
 
-  fn: function ({ meta, model, records }, exits) {
+  fn: function({ meta, model, records }, exits) {
     const modelIdentity = model.globalId;
     return exits.success(JSONAPISerializer.serialize(kebabCase(modelIdentity), records, meta));
   }

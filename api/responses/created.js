@@ -1,4 +1,3 @@
-import { responses } from './../../index';
-const { created } = responses;
+const { created } = sails.hooks['sails-json-api'].responses;
 
 export default created;
