@@ -72,28 +72,6 @@ module.exports = {
   },
 
   /**
-   * Extend the model's `associations` property with the presentation configuration (taken from the Model's attributes `meta` option or from Sails configuration)
-   * @param  {Waterline Collection}  Model
-   * @return {Array}                 Extended version of the Model.associations with `includeIn` defintions
-   */
-  getAssociationConfiguration(Model, style) {
-    // get configured defaults or always embed full records
-    let presentationDefaults = sails.config.models.associations || {
-      list: 'record',
-      detail: 'record'
-    };
-    let associations = Model.associations;
-    let attributes = Model.attributes;
-    associations.forEach(assoc => {
-      let attrMeta = attributes[assoc.alias].meta ? attributes[assoc.alias].meta : {};
-      assoc.include = extend({}, presentationDefaults, attrMeta)[style]; // extend association object with presentation configuration
-      if (attributes[assoc.alias].through) {
-        assoc.through = attributes[assoc.alias].through;
-      }
-    });
-    return associations;
-  },
-  /**
    * helper function to populate a record with an array for indexes for associated models, running various Waterline queries on the join tables if neccessary ( defined as: include -> index )
    * @param  {Waterine Collection}   parentModel  [description]
    * @param  {Array|Integer}   ids          [description]

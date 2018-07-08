@@ -2,14 +2,14 @@ import supertest from 'supertest';
 const ids = [];
 const newArticle = {
   data: {
-    type: 'articles',
+    type: 'article',
     attributes: {
       title: 'I Woke Up in a Car'
     },
     relationships: {
       author: {
         data: {
-          type: 'authors',
+          type: 'author',
           id: '2'
         }
       }
@@ -19,7 +19,7 @@ const newArticle = {
 const updateArticle = {
   data: {
     id: '2',
-    type: 'articles',
+    type: 'article',
     attributes: {
       title: 'I Slept in a Truck'
     }
@@ -27,13 +27,13 @@ const updateArticle = {
 };
 const updateCommentsViaArticleRelationship = {
   data: [
-    { type: 'comments', id: '4' },
-    { type: 'comments', id: '5' }
+    { type: 'comment', id: '4' },
+    { type: 'comment', id: '5' }
   ]
 };
 const updateMediaOutlet = {
   data: {
-    type: 'media-outlets',
+    type: 'media-outlet',
     attributes: {
       name: "Nate's Newz",
       type: 'newspaper'
@@ -42,7 +42,7 @@ const updateMediaOutlet = {
 };
 const badMediaOutlet = {
   data: {
-    type: 'mediaOutlets',
+    type: 'mediaOutlet',
     attributes: {
       name: "Ralph's Radio 93.7",
       type: 'radio'
@@ -163,7 +163,7 @@ describe('Integration | Action | update', function() {
         .send(updateMediaOutlet)
         .expect(200)
         .expect(res => {
-          expect(res.body.data.type).to.equal('media-outlets');
+          expect(res.body.data.type).to.equal('media-outlet');
         })
         .expect(res => {
           expect(res.body.data.attributes.name).to.equal("Nate's Newz");

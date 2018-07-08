@@ -16,15 +16,18 @@ module.exports = function(interrupts = {}) {
   interrupts.findone = interrupts.findone ? interrupts.findone : defaultInterrupt;
 
   return function(req, res) {
-    // Set the JSONAPI required header
+    // Set the JSON API required header
     res.set('Content-Type', 'application/vnd.api+json');
 
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
     const query = Model.findOne(pk);
-    // Look up the association configuration and determine how to populate the query
-    // @todo support request driven selection of includes/populate
-    const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
+
+    // Look up the association configuration based on the reserved 'include' keyword
+    const { include='' } = req.query;
+    const associations = sails.helpers.getAssociationConfig
+      .with({ model: Model, include: include.split(',') })
+    delete req.query.include; // Include is no longer required
 
     parallel(
       {
@@ -43,6 +46,7 @@ module.exports = function(interrupts = {}) {
           return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
         }
         const { matchingRecord, associated } = results;
+
         if (!matchingRecord) {
           return res.notFound('No record found with the specified ' + Model.primaryKey + '.');
         }
@@ -55,6 +59,7 @@ module.exports = function(interrupts = {}) {
               Model.subscribe(req, [matchingRecord[Model.primaryKey]]);
               actionUtil.subscribeDeep(req, matchingRecord);
             }
+
             res.ok(sails.helpers.buildJsonApiResponse.with({ model: Model, records: matchingRecord }), actionUtil.parseLocals(req));
           },
           Model,

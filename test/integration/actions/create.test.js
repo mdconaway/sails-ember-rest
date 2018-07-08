@@ -3,14 +3,14 @@ import supertest from 'supertest';
 const ids = [];
 const newArticle = {
   data: {
-    type: 'articles',
+    type: 'article',
     attributes: {
       title: 'I Woke Up in a Car'
     },
     relationships: {
       author: {
         data: {
-          type: 'authors',
+          type: 'author',
           id: '2'
         }
       }
@@ -19,7 +19,7 @@ const newArticle = {
 };
 const newMediaOutlet = {
   data: {
-    type: 'media-outlets',
+    type: 'media-outlet',
     attributes: {
       name: "Nate's Newz",
       type: 'newspaper'
@@ -28,7 +28,7 @@ const newMediaOutlet = {
 };
 const badMediaOutlet = {
   data: {
-    type: 'mediaOutlets',
+    type: 'mediaOutlet',
     attributes: {
       name: "Ralph's Radio 93.7",
       type: 'radio'
@@ -108,7 +108,7 @@ describe('Integration | Action | create', function() {
         .post('/articles')
         .send(newArticle)
         .expect(res => {
-          expect(res.body.data.type).to.equal('articles');
+          expect(res.body.data.type).to.equal('article');
           expect(res.body.data.id).to.not.be.undefined;
           expect(res.body.data.attributes.title).to.equal('I Woke Up in a Car');
         })
@@ -126,7 +126,7 @@ describe('Integration | Action | create', function() {
         .send(newMediaOutlet)
         .expect(201)
         .expect(res => {
-          expect(res.body.data.type).to.equal('media-outlets');
+          expect(res.body.data.type).to.equal('media-outlet');
         })
         .expect(res => {
           expect(res.body.data.attributes.name).to.equal("Nate's Newz");

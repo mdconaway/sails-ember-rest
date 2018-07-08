@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const pluralize = require('pluralize');
-const { parallel } = require('async');
+const { parallel, waterfall } = require('async');
 const { camelCase, find } = require('lodash');
 
 module.exports = function(interrupts = {}) {
@@ -30,7 +30,7 @@ module.exports = function(interrupts = {}) {
     const RelatedModel = req._sails.models[relationIdentity];
     // Allow customizable blacklist for params.
     req.options.criteria = req.options.criteria || {};
-    req.options.criteria.blacklist = req.options.criteria.blacklist || ['limit', 'skip', 'sort', 'id', 'parentid'];
+    req.options.criteria.blacklist = req.options.criteria.blacklist || ['include', 'limit', 'skip', 'sort', 'id', 'parentid'];
     // Determine whether to populate using a criteria, or the
     // specified primary key of the child record, or with no
     // filter at all.
@@ -61,58 +61,82 @@ module.exports = function(interrupts = {}) {
       populateOptions.sort = sort;
     }
 
-    parallel(
-      {
-        count: sails.helpers.countRelationship.with({ model: Model, association, pk: parentPk }),
-        records: done => {
-          Model.findOne(parentPk)
-            .populate(relation, populateOptions)
-            .exec((err, matchingRecord) => {
-              if (err) {
-                return done(err);
-              }
-              if (!matchingRecord) {
-                return done(new Error('No record found with the specified id.'));
-              }
-              if (!matchingRecord[relation]) {
-                return done(new Error(`Specified record (${parentPk}) is missing relation ${relation}`));
-              }
-              done(null, { parent: matchingRecord, children: matchingRecord[relation] });
-            });
-        }
-      },
-      (err, results) => {
-        if (err) {
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-        }
-        const { parent, children } = results.records;
-        interrupts.populate.call(
-          this,
-          req,
-          res,
-          () => {
-            // Subcribe to instance, if relevant
-            // TODO: only subscribe to populated attribute- not the entire model
-            if (sails.hooks.pubsub && req.isSocket) {
-              Model.subscribe(req, [parent[Model.primaryKey]]);
-              actionUtil.subscribeDeep(req, parent);
+    waterfall([
+      (cb) => {
+        parallel(
+          {
+            count: sails.helpers.countRelationship.with({ model: Model, association, pk: parentPk }),
+            records: done => {
+              Model.findOne(parentPk)
+                .populate(relation, populateOptions)
+                .exec((err, matchingRecord) => {
+                  if (err) {
+                    return done(err);
+                  }
+                  if (!matchingRecord) {
+                    return done(new Error('No record found with the specified id.'));
+                  }
+                  if (!matchingRecord[relation]) {
+                    return done(new Error(`Specified record (${parentPk}) is missing relation ${relation}`));
+                  }
+                  done(null, { parent: matchingRecord, children: matchingRecord[relation] });
+                });
             }
-            // find the model identity and the Collection for this relation
-            const documentIdentifier = pluralize(camelCase(RelatedModel.globalId));
-            const json = {};
-
-            json[documentIdentifier] = sails.helpers.linkAssociations(RelatedModel, children);
-            //BOOM! counted relationships!
-            res.ok(sails.helpers.buildJsonApiResponse.with({
-              model: RelatedModel,
-              records: sails.helpers.linkAssociations(RelatedModel, children),
-              meta: { total: results.count }
-            }), actionUtil.parseLocals(req));
           },
-          Model,
-          children
+          (err, results) => {
+            if (err) {
+              return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+            }
+            cb(null, results)
+          }
         );
+      },
+      (results, cb) => {
+        const { parent, children } = results.records;
+        const include = req.param('include') || '';
+        const associations = sails.helpers.getAssociationConfig
+          .with({ model: RelatedModel, include: include.split(',') })
+
+        // Sort needs to be reapplied but skip and limit do not
+        const query = RelatedModel.find()
+          .where({ [RelatedModel.primaryKey]: children.map(child => child[RelatedModel.primaryKey])})
+          .sort(sort);
+
+        actionUtil.populateRecords(query, associations).exec((err, populatedResults) => {
+          if (err) {
+            return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+          }
+          cb(null, Object.assign({}, results, {records: { parent, children: populatedResults }}));
+        });
       }
-    );
+    ], (err, results) => {
+      if (err) {
+        return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+      }
+
+      const { parent, children } = results.records;
+      interrupts.populate.call(
+        this,
+        req,
+        res,
+        () => {
+          // Subscribe to instance, if relevant
+          // TODO: only subscribe to populated attribute- not the entire model
+          if (sails.hooks.pubsub && req.isSocket) {
+            Model.subscribe(req, [parent[Model.primaryKey]]);
+            actionUtil.subscribeDeep(req, parent);
+          }
+
+          //BOOM! counted relationships!
+          res.ok(sails.helpers.buildJsonApiResponse.with({
+            model: RelatedModel,
+            records: sails.helpers.linkAssociations(RelatedModel, children),
+            meta: { total: results.count }
+          }), actionUtil.parseLocals(req));
+        },
+        Model,
+        results
+      );
+    });
   };
 };

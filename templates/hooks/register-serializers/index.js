@@ -31,14 +31,15 @@ module.exports = function defineRegisterSerializersHook(sails) {
       sails.on('hook:orm:loaded', function() {
         Object.keys(sails.models).forEach((modelName) => {
           const Model = sails.models[modelName];
-          const modelType = pluralize(kebabCase(Model.globalId));
+          const modelType = kebabCase(Model.globalId);
+          const modelPlural = pluralize(modelType);
           const relationships = Model.associations
-            .reduce((acc, { alias, type }) => {
+            .reduce((acc, { alias, collection, model, type }) => {
               return Object.assign({}, acc, {
                 [alias]: {
-                  type: kebabCase(type === 'model' ? pluralize(alias) : alias),
+                  type: kebabCase(type === 'model' ? model : collection),
                   links(data) {
-                    const base = sails.helpers.generateResourceLink(modelType, data.id);
+                    const base = sails.helpers.generateResourceLink(modelPlural, data.id);
                     return {
                       related: `${base}/${alias}`,
                       self: `${base}/${alias}`
@@ -51,7 +52,7 @@ module.exports = function defineRegisterSerializersHook(sails) {
           JSONAPISerializer.register(modelType, {
             links: {
               self(data) {
-                return sails.helpers.generateResourceLink(modelType, data.id);
+                return sails.helpers.generateResourceLink(modelPlural, data.id);
               }
             },
             relationships,
@@ -61,8 +62,8 @@ module.exports = function defineRegisterSerializersHook(sails) {
             topLevelLinks(data, extraData) {
               return {
                 self: Array.isArray(data)
-                  ? sails.helpers.generateResourceLink(modelType) 
-                  : sails.helpers.generateResourceLink(modelType, data.id) 
+                  ? sails.helpers.generateResourceLink(modelPlural)
+                  : sails.helpers.generateResourceLink(modelPlural, data.id) 
               }
             }
           });

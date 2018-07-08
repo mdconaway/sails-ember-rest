@@ -28,8 +28,6 @@ module.exports = {
 
   fn: function ({ meta, model, records }, exits) {
     const modelIdentity = model.globalId;
-    const modelPlural = pluralize(modelIdentity);
-
-    return exits.success(JSONAPISerializer.serialize(kebabCase(modelPlural), records, meta));
+    return exits.success(JSONAPISerializer.serialize(kebabCase(modelIdentity), records, meta));
   }
 };

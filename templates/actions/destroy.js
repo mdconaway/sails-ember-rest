@@ -23,7 +23,7 @@ module.exports = function(interrupts = {}) {
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
     const query = Model.findOne(pk);
-    const associations = actionUtil.getAssociationConfiguration(Model, 'list');
+    const associations = sails.helpers.getAssociationConfig.with({ model: Model });
 
     actionUtil.populateEach(query, req).exec((err, record) => {
       if (err) {

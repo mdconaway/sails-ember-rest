@@ -184,6 +184,7 @@ module.exports.helpers = {
   buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
   countRelationship: require('./templates/helpers/count-relationship'),
   generateResourceLink: require('./templates/helpers/generate-resource-link'),
+  getAssociationConfig: require('./templates/helpers/get-association-config'),
   linkAssociations: require('./templates/helpers/link-associations')
 };
 module.exports.hooks = {

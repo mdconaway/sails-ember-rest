@@ -51,7 +51,7 @@ describe('Integration | Action | populate', function() {
         .expect(res => {
           expect(res.body.data).to.have.lengthOf(3);
           expect(res.body.data[0].id).to.equal('1');
-          expect(res.body.data[0].type).to.equal('comments');
+          expect(res.body.data[0].type).to.equal('comment');
           expect(res.body.data[0].attributes.text).to.include('Nice');
           expect(res.body.data[0].attributes['created-at']).to.exist;
           expect(res.body.data[0].attributes['createdAt']).to.not.exist;

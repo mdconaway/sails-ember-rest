@@ -30,8 +30,7 @@ module.exports = function(interrupts = {}) {
           return this;
         };
     // Look up the association configuration and determine how to populate the query
-    // @todo support request driven selection of includes/populate
-    const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
+    const associations = sails.helpers.getAssociationConfig.with({ model: Model });
 
     actionUtil
       .populateRecords(query, associations, true)

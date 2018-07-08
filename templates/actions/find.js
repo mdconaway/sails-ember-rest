@@ -25,9 +25,12 @@ module.exports = function(interrupts = {}) {
     // parse criteria from request
     const criteria = actionUtil.parseCriteria(req);
     const limit = actionUtil.parseLimit(req);
-    // Look up the association configuration and determine how to populate the query
-    // @todo support request driven selection of includes/populate
-    const associations = actionUtil.getAssociationConfiguration(Model, 'list');
+
+    // Look up the association configuration based on the reserved 'include' keyword
+    const { include='' } = criteria;
+    const associations = sails.helpers.getAssociationConfig
+      .with({ model: Model, include: include.split(',') });
+    delete criteria.include; // Include is no longer required
 
     parallel(
       {

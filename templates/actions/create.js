@@ -21,7 +21,7 @@ module.exports = function(interrupts = {}) {
 
     const Model = actionUtil.parseModel(req);
     const data = actionUtil.parseValues(req, Model);
-    const associations = actionUtil.getAssociationConfiguration(Model, 'detail');
+    const associations = sails.helpers.getAssociationConfig.with({ model: Model });
     const preppedRelations = actionUtil.prepareManyRelations(associations, data);
 
     waterfall(

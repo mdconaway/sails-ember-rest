@@ -64,16 +64,14 @@ describe('Integration | Action | findone', function() {
           const { attributes, id, relationships, type } = res.body.data;
 
           expect(id).to.equal('1');
-          expect(type).to.equal('articles');
+          expect(type).to.equal('article');
           expect(attributes.title).to.include('XML');
           expect(attributes['created-at']).to.exist;
 
-          expect(relationships.author.data.type).to.equal('authors');
+          expect(relationships.author.data.type).to.equal('author');
           expect(relationships.author.links.self).to.equal('http://localhost:1337/articles/1/author');
           expect(relationships.author.links.related).to.equal('http://localhost:1337/articles/1/author');
 
-          expect(relationships.comments.data.length).to.equal(3);
-          expect(Object.keys(relationships.comments.data[0])).to.deep.equal(['type', 'id']);
           expect(relationships.comments.links.self).to.equal('http://localhost:1337/articles/1/comments');
           expect(relationships.comments.links.related).to.equal('http://localhost:1337/articles/1/comments');
 
@@ -81,41 +79,60 @@ describe('Integration | Action | findone', function() {
           expect(attributes.author).to.not.exist;
 
           expect(res.body.errors).to.not.exist;
-          // TODO: handle included documents expect(res.body.included).to.not.exist;
         })
         .end(done);
     });
   });
 
   describe(':: query functions', function() {
-    /* TODO: handle errors and the included query param
-    it('should support the "include" query param for a single one-to-many relationship', function(done) {
+    it('should only include author data', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1?include=comments')
+        .get('/articles/1?include=author')
         .expect(res => {
-          const { errors, included } = res.body;
+          const { included } = res.body;
 
-          expect(included.length).to.equal(2);
-          expect(included.map(item => item.type)).to.deep.equal(['comments', 'comments']);
-          expect(Object.keys(included[0])).to.deep.equal(['id', 'type', 'attributes', 'links', 'relationships']);
-
-          expect(included[0].id).to.equal('1');
-          expect(included[0].attributes.text).to.equal('Nice article!');
-          expect(included[0].attributes.article).to.not.exist;
-          expect(included[0].attributes.author).to.not.exist;
-
-          expect(included[0].relationships.author.data.id).to.equal('2');
-          expect(included[0].relationships.author.data.type).to.equal('author');
-          expect(included[0].relationships.article.data.id).to.equal('1');
-          expect(included[0].relationships.article.data.type).to.equal('article');
-
-          expect(included[0].links.self).to.equal('http://localhost:1337/comments/1');
-
-          expect(errors).to.not.exist;
+          expect(included).to.have.length(1);
+          expect(included[0].type).to.equal('author');
+          expect(included[0].attributes.name).to.equal('Bob');
+          expect(included[0].attributes.age).to.equal(46);
         })
         .end(done);
     });
-    */
+
+    it('should include both author and comments', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles/1?include=author,comments')
+        .expect(res => {
+          const { included } = res.body;
+
+          expect(included).to.have.length(4);
+          
+          const types = included.reduce((acc, item) => {
+            return item.type === 'author'
+              ? Object.assign({}, acc, { author: acc.author + 1 })
+              : Object.assign({}, acc, { comment: acc.comment + 1 });
+          }, { author: 0, comment: 0 });
+          expect(types.author).to.equal(1);
+          expect(types.comment).to.equal(3);
+        })
+        .end(done);
+    });
+
+    it('should include authors from relationship endpoint', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles/1/comments?include=author')
+        .expect(res => {
+          const { included } = res.body;
+
+          expect(included).to.have.length(2);
+          
+          included.forEach((item) => {
+            expect(item.type).to.equal('author');
+          });
+        })
+        .end(done);
+    });
+
     it('should not honor additional query params', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles/1?title=XML')

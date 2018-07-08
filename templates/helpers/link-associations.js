@@ -28,8 +28,6 @@ module.exports = {
       let links = {};
       model.associations.forEach(assoc => {
         if (assoc.type === 'collection') {
-          //Had to modify this code to run on app hosted at subroute
-          // XXX links[assoc.alias] = linkPrefix + '/' + modelPlural + '/' + record[model.primaryKey] + '/' + assoc.alias;
           links[assoc.alias] = sails.helpers.generateResourceLink.with({ modelPlural, linkSuffix: `${record[model.primaryKey]}/${assoc.alias}` });
         }
       });
