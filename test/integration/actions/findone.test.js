@@ -69,11 +69,17 @@ describe('Integration | Action | findone', function() {
           expect(attributes['created-at']).to.exist;
 
           expect(relationships.author.data.type).to.equal('author');
-          expect(relationships.author.links.self).to.equal('http://localhost:1337/articles/1/author');
-          expect(relationships.author.links.related).to.equal('http://localhost:1337/articles/1/author');
+          expect(relationships.author.links.self).to.not.exist;
+          expect(relationships.author.links.related).to.be.an.instanceof(Object);
+          expect(relationships.author.links.related.href).to.equal('http://localhost:1337/articles/1/author');
+          expect(relationships.author.links.related.meta).to.be.an.instanceof(Object);
+          expect(relationships.author.links.related.meta.count).to.equal(1);
 
-          expect(relationships.comments.links.self).to.equal('http://localhost:1337/articles/1/comments');
-          expect(relationships.comments.links.related).to.equal('http://localhost:1337/articles/1/comments');
+          expect(relationships.comments.links.self).to.not.exist;
+          expect(relationships.comments.links.related).to.be.an.instanceof(Object);
+          expect(relationships.comments.links.related.href).to.equal('http://localhost:1337/articles/1/comments');
+          expect(relationships.comments.links.related.meta).to.be.an.instanceof(Object);
+          expect(relationships.comments.links.related.meta.count).to.equal(3);
 
           expect(attributes.createdAt).to.not.exist;
           expect(attributes.author).to.not.exist;
@@ -90,11 +96,29 @@ describe('Integration | Action | findone', function() {
         .get('/articles/1?include=author')
         .expect(res => {
           const { included } = res.body;
+          const focusDoc = included[0];
 
           expect(included).to.have.length(1);
-          expect(included[0].type).to.equal('author');
-          expect(included[0].attributes.name).to.equal('Bob');
-          expect(included[0].attributes.age).to.equal(46);
+          expect(focusDoc.type).to.equal('author');
+          expect(focusDoc.attributes.name).to.equal('Bob');
+          expect(focusDoc.attributes.age).to.equal(46);
+
+          expect(focusDoc.relationships.articles.links.related.href).to.equal(
+            `http://localhost:1337/authors/${focusDoc.id}/articles`
+          );
+          expect(focusDoc.relationships.comments.links.related.href).to.equal(
+            `http://localhost:1337/authors/${focusDoc.id}/comments`
+          );
+
+          if (focusDoc.id === '1') {
+            expect(focusDoc.relationships.articles.links.related.meta.count).to.equal(1);
+            expect(focusDoc.relationships.comments.links.related.meta.count).to.equal(0);
+          }
+
+          if (focusDoc.id === '2') {
+            expect(focusDoc.relationships.articles.links.related.meta.count).to.equal(1);
+            expect(focusDoc.relationships.comments.links.related.meta.count).to.equal(1);
+          }
         })
         .end(done);
     });
@@ -117,6 +141,37 @@ describe('Integration | Action | findone', function() {
           );
           expect(types.author).to.equal(1);
           expect(types.comment).to.equal(3);
+
+          included.forEach(record => {
+            if (record.type === 'author') {
+              expect(record.relationships.articles.links.related.href).to.equal(
+                `http://localhost:1337/authors/${record.id}/articles`
+              );
+              expect(record.relationships.comments.links.related.href).to.equal(
+                `http://localhost:1337/authors/${record.id}/comments`
+              );
+
+              if (record.id === '1') {
+                expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+                expect(record.relationships.comments.links.related.meta.count).to.equal(0);
+              }
+
+              if (record.id === '2') {
+                expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+                expect(record.relationships.comments.links.related.meta.count).to.equal(1);
+              }
+            } else {
+              expect(record.relationships.article.links.related.href).to.equal(
+                `http://localhost:1337/comments/${record.id}/article`
+              );
+              expect(record.relationships.author.links.related.href).to.equal(
+                `http://localhost:1337/comments/${record.id}/author`
+              );
+
+              expect(record.relationships.article.links.related.meta.count).to.equal(1);
+              expect(record.relationships.author.links.related.meta.count).to.equal(1);
+            }
+          });
         })
         .end(done);
     });
@@ -129,8 +184,24 @@ describe('Integration | Action | findone', function() {
 
           expect(included).to.have.length(2);
 
-          included.forEach(item => {
-            expect(item.type).to.equal('author');
+          included.forEach(record => {
+            expect(record.type).to.equal('author');
+            expect(record.relationships.articles.links.related.href).to.equal(
+              `http://localhost:1337/authors/${record.id}/articles`
+            );
+            expect(record.relationships.comments.links.related.href).to.equal(
+              `http://localhost:1337/authors/${record.id}/comments`
+            );
+
+            if (record.id === '1') {
+              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+              expect(record.relationships.comments.links.related.meta.count).to.equal(0);
+            }
+
+            if (record.id === '2') {
+              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+              expect(record.relationships.comments.links.related.meta.count).to.equal(1);
+            }
           });
         })
         .end(done);

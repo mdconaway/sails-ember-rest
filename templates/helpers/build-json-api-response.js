@@ -1,4 +1,3 @@
-const pluralize = require('pluralize');
 const { kebabCase } = require('lodash');
 
 module.exports = {

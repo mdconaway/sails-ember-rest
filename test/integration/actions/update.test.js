@@ -133,7 +133,6 @@ describe('Integration | Action | update', function() {
         .patch(`/articles/${targetArticle.id}/comments`)
         .send(updateCommentsViaArticleRelationship)
         .expect(res => {
-          sails.log.warn(res.body.data);
           expect(res.body.data.relationships.comments).to.have.lengthOf(2);
         })
         .end(() => {

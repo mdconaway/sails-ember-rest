@@ -45,24 +45,52 @@ describe('Integration | Action | populate', function() {
   });
 
   describe(':: data integrity', function() {
-    it('should return 3 comments', function(done) {
+    it('should return 3 comments with proper metadata at all levels', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles/1/comments')
         .expect(res => {
-          expect(res.body.data).to.have.lengthOf(3);
-          expect(res.body.data[0].id).to.equal('1');
-          expect(res.body.data[0].type).to.equal('comment');
-          expect(res.body.data[0].attributes.text).to.include('Nice');
-          expect(res.body.data[0].attributes['created-at']).to.exist;
-          expect(res.body.data[0].attributes['createdAt']).to.not.exist;
+          const { data, meta } = res.body;
+          const focusDoc = data[0];
+
+          expect(data).to.have.lengthOf(3);
+          expect(meta.total).to.equal(3);
+
+          expect(focusDoc.id).to.equal('1');
+          expect(focusDoc.type).to.equal('comment');
+          expect(focusDoc.attributes.text).to.include('Nice');
+          expect(focusDoc.attributes['created-at']).to.exist;
+          expect(focusDoc.attributes.createdAt).to.not.exist;
+
+          expect(focusDoc.relationships).to.exist;
+          expect(Object.keys(focusDoc.relationships).length).to.equal(2);
+          expect(focusDoc.relationships.author.links.related.href).to.equal(
+            `http://localhost:1337/comments/${focusDoc.id}/author`
+          );
+          expect(focusDoc.relationships.author.links.related.meta.count).to.equal(1);
         })
         .end(done);
     });
-    it('should have meta total of 3', function(done) {
+    it('should return 1 author with proper metadata at all levels', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1/comments')
+        .get('/comments/2/author')
         .expect(res => {
-          expect(res.body.meta.total).to.equal(3);
+          const { data, meta } = res.body;
+          const focusDoc = data[0];
+
+          expect(data).to.have.lengthOf(1);
+          expect(meta.total).to.equal(1);
+
+          expect(focusDoc.id).to.equal('3');
+          expect(focusDoc.type).to.equal('author');
+          expect(focusDoc.attributes['created-at']).to.exist;
+          expect(focusDoc.attributes.createdAt).to.not.exist;
+
+          expect(focusDoc.relationships).to.exist;
+          expect(Object.keys(focusDoc.relationships).length).to.equal(2);
+          expect(focusDoc.relationships.comments.links.related.href).to.equal(
+            `http://localhost:1337/authors/${focusDoc.id}/comments`
+          );
+          expect(focusDoc.relationships.comments.links.related.meta.count).to.equal(2);
         })
         .end(done);
     });

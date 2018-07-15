@@ -6,7 +6,6 @@ let mapGen = false;
 module.exports = {
   friendlyName: 'Count relationship',
   description: 'Generate a COUNT query to analyze a relationship for the populate action',
-  sync: true,
 
   inputs: {
     association: {
@@ -35,7 +34,7 @@ module.exports = {
     }
 
     if (aliasMap[model.identity] && aliasMap[model.identity][association.alias]) {
-      return exits.success(aliasMap[model.identity][association.alias](pk));
+      return aliasMap[model.identity][association.alias](pk)((err, result) => exits.success(result));
     }
 
     // All done.
