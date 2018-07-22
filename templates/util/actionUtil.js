@@ -1,7 +1,7 @@
 /**
  * Module dependencies
  */
-const { camelCase, extend, kababCase, isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
+const { isPlainObject, isString, isUndefined, merge, omit } = require('lodash');
 const util = require('util');
 // Parameter used for jsonp callback is constant, as far as
 // blueprints are concerned (for now.)
@@ -40,11 +40,11 @@ module.exports = {
   negotiate(res, err, locals) {
     if (err.name === 'AdapterError') {
       if (err.code === 'E_UNIQUE') {
-        return res.badRequest(err, locals);
+        return res.unprocessableEntity(err, locals);
       }
       return res.serverError(err, locals);
     } else if (err.name === 'UsageError') {
-      return res.badRequest(err, locals);
+      return res.unprocessableEntity(err, locals);
     }
     return res.serverError(err, locals);
   },

@@ -145,7 +145,7 @@ module.exports = function(interrupts = {}, afterUpdate) {
           if (err === 404) {
             return res.notFound();
           }
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
+          return sails.helpers.negotiate.with({ res, err });
         }
         const { specJSON, matchingRecord } = results;
         if (req._sails.hooks.pubsub) {

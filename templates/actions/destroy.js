@@ -15,10 +15,10 @@ module.exports = function(interrupts = {}) {
   interrupts.destroy = interrupts.destroy ? interrupts.destroy : defaultInterrupt;
 
   return function(req, res) {
-    // Set the JSONAPI required header
+    // Set the JSON API required header
     // Technically because there is no content, no content-type header is required and in fact is being
     // actively removed when calling res.send
-    // res.set('Content-Type', 'application/vnd.api+json');
+    res.set('Content-Type', 'application/vnd.api+json');
 
     const Model = actionUtil.parseModel(req);
     const pk = actionUtil.requirePk(req);
@@ -26,16 +26,14 @@ module.exports = function(interrupts = {}) {
     const associations = sails.helpers.getAssociationConfig.with({ model: Model });
 
     actionUtil.populateEach(query, req).exec((err, record) => {
-      if (err) {
-        return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-      }
+      if (err) return sails.helpers.negotiate.with({ res, err });
+
       if (!record) {
         return res.notFound(`No record found with the specified ${Model.primaryKey}.`);
       }
       Model.destroy(pk).exec(err => {
-        if (err) {
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-        }
+        if (err) return sails.helpers.negotiate.with({ res, err });
+
         if (sails.hooks.pubsub) {
           Model._publishDestroy(pk, !sails.config.blueprints.mirror && req, {
             previous: record

@@ -103,18 +103,14 @@ module.exports = function(interrupts = {}) {
               }, {})
             ),
             (err, result) => {
-              if (err) {
-                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-              }
+              if (err) return cb(err);
               cb(null, Object.assign({}, { matchingRecord: record }, { meta: { relationships: { count: result } } }));
             }
           );
         }
       ],
       (err, results) => {
-        if (err) {
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-        }
+        if (err) return sails.helpers.negotiate.with({ res, err });
         const { matchingRecord, meta } = results;
 
         if (!matchingRecord) {

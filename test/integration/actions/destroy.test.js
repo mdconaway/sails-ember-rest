@@ -30,11 +30,29 @@ describe('Integration | Action | destroy', function() {
     });
   });
 
+  afterEach(function(done) {
+    Article.destroy({ id: targetArticle.id }).exec(done);
+  });
+
   describe(':: response format', function() {
     it('should respond with status code 204', function(done) {
       supertest(sails.hooks.http.app)
         .delete(`/articles/${targetArticle.id}`)
         .expect(204)
+        .end(done);
+    });
+    it('should respond with a JSON API body and status code 404', function(done) {
+      supertest(sails.hooks.http.app)
+        .delete(`/articles/9999`)
+        .expect(404)
+        .expect(res => {
+          const { errors } = res.body;
+
+          expect(errors).to.be.an.instanceof(Array);
+          expect(errors).to.have.length(1);
+          expect(errors[0].title).to.equal('Not Found');
+          expect(errors[0].detail).to.exist;
+        })
         .end(done);
     });
     it('should respond with Content-Type application/vnd.api+json', function(done) {
@@ -74,6 +92,14 @@ describe('Integration | Action | destroy', function() {
           supertest(sails.hooks.http.app)
             .get(`/articles/${targetArticle.id}`)
             .expect(404)
+            .expect(res => {
+              const { errors } = res.body;
+
+              expect(errors).to.be.an.instanceof(Array);
+              expect(errors).to.have.length(1);
+              expect(errors[0].title).to.equal('Not Found');
+              expect(errors[0].detail).to.exist;
+            })
             .end(done);
         });
     });

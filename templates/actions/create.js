@@ -16,7 +16,7 @@ module.exports = function(interrupts = {}) {
   interrupts.create = interrupts.create ? interrupts.create : defaultInterrupt;
 
   return function(req, res) {
-    // Set the JSONAPI required header
+    // Set the JSON API required header
     res.set('Content-Type', 'application/vnd.api+json');
 
     const Model = actionUtil.parseModel(req);
@@ -88,7 +88,7 @@ module.exports = function(interrupts = {}) {
             }
           );
         },
-        ({ associated, newInstance, populatedRecord }, done) => {
+        ({ newInstance, populatedRecord }, done) => {
           return done(null, {
             specJSON: sails.helpers.buildJsonApiResponse.with({ model: Model, records: populatedRecord }),
             newInstance
@@ -96,9 +96,9 @@ module.exports = function(interrupts = {}) {
         }
       ],
       (err, results) => {
-        if (err) {
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-        }
+        // Catch-all for errors
+        if (err) return sails.helpers.negotiate.with({ res, err });
+
         const { specJSON, newInstance } = results;
         if (req._sails.hooks.pubsub) {
           if (req.isSocket) {

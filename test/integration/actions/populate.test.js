@@ -8,6 +8,20 @@ describe('Integration | Action | populate', function() {
         .expect(200)
         .end(done);
     });
+    it('should respond with status code 400', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles/1/notarealrelationship')
+        .expect(400)
+        .expect(res => {
+          const { errors } = res.body;
+
+          expect(errors).to.be.an.instanceof(Array);
+          expect(errors).to.have.length(1);
+          expect(errors[0].title).to.equal('Bad Request');
+          expect(errors[0].detail).to.exist;
+        })
+        .end(done);
+    });
     it('should return an object as root response value', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles/1/comments')

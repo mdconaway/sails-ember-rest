@@ -100,9 +100,7 @@ module.exports = function(interrupts = {}) {
               }
             },
             (err, results) => {
-              if (err) {
-                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-              }
+              if (err) return cb(err);
               cb(null, results);
             }
           );
@@ -131,9 +129,7 @@ module.exports = function(interrupts = {}) {
             .sort(sort);
 
           actionUtil.populateRecords(query, associations).exec((err, populatedResults) => {
-            if (err) {
-              return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-            }
+            if (err) return cb(err);
             cb(
               null,
               Object.assign(
@@ -211,18 +207,14 @@ module.exports = function(interrupts = {}) {
               }, {})
             ),
             (err, result) => {
-              if (err) {
-                return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-              }
+              if (err) return cb(err);
               cb(null, Object.assign({}, results, { meta: { relationships: { count: result } } }));
             }
           );
         }
       ],
       (err, results) => {
-        if (err) {
-          return actionUtil.negotiate(res, err, actionUtil.parseLocals(req));
-        }
+        if (err) return sails.helpers.negotiate.with({ res, err });
 
         const { parent, children } = results.records;
         interrupts.populate.call(
