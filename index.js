@@ -20,7 +20,6 @@ const create = require('./templates/actions/create');
 const destroy = require('./templates/actions/destroy');
 const find = require('./templates/actions/find');
 const findone = require('./templates/actions/findone');
-const hydrate = require('./templates/actions/hydrate');
 const populate = require('./templates/actions/populate');
 const update = require('./templates/actions/update');
 
@@ -189,7 +188,6 @@ module.exports = function defineSailsJsonApiHook(sails) {
       sails.registerAction(destroy, 'sailsJsonApi/destroy');
       sails.registerAction(find, 'sailsJsonApi/find');
       sails.registerAction(findone, 'sailsJsonApi/findone');
-      sails.registerAction(hydrate, 'sailsJsonApi/hydrate');
       sails.registerAction(populate, 'sailsJsonApi/populate');
       sails.registerAction(update, 'sailsJsonApi/update');
 

@@ -12,7 +12,6 @@ function baseController(interrupts) {
   const destroy = actions['sailsjsonapi/destroy'];
   const find = actions['sailsjsonapi/find'];
   const findone = actions['sailsjsonapi/findone'];
-  const hydrate = actions['sailsjsonapi/hydrate'];
   const populate = actions['sailsjsonapi/populate'];
   const update = actions['sailsjsonapi/update'];
 
@@ -21,7 +20,6 @@ function baseController(interrupts) {
     destroy: destroy(interrupts),
     find: find(interrupts),
     findone: findone(interrupts),
-    hydrate: hydrate(interrupts),
     populate: populate(interrupts),
     update: update(interrupts)
   };
@@ -33,7 +31,6 @@ module.exports = function(instanceOverrides = {}) {
     destroy: defaultInterrupt,
     find: defaultInterrupt,
     findone: defaultInterrupt,
-    hydrate: defaultInterrupt,
     populate: defaultInterrupt,
     beforeUpdate: defaultInterrupt,
     afterUpdate: defaultInterrupt
