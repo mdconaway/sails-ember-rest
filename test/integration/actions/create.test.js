@@ -107,7 +107,7 @@ describe('Integration | Action | create', function() {
       it('should respond with status code 411', function(done) {
         supertest(sails.hooks.http.app)
           .post('/articles')
-          .send({ data: {}})
+          .send({ data: {} })
           .expect(411)
           .expect(res => {
             const { errors } = res.body;

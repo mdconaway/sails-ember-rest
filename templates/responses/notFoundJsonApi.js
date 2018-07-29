@@ -2,7 +2,7 @@
  * notFoundJsonApi.js
  *
  * 404 (Not Found) Handler for JSON API
- * 
+ *
  * Example usage:
  * ```
  *     return res.notFoundJsonApi();
@@ -34,7 +34,7 @@ module.exports = function notFoundJsonApi(optionalData) {
   // If no data was provided, use res.sendStatus().
   if (optionalData === undefined) {
     sails.log.info('Ran custom response: res.notFoundJsonApi()');
-    return res.sendStatus(statusCodeToSet).send({ errors: [{ title }]});
+    return res.status(statusCodeToSet).send({ errors: [{ title }] });
   }
   // Else if the provided data is an Error instance, if it has
   // a toJSON() function, then always run it and use it as the
@@ -54,7 +54,6 @@ module.exports = function notFoundJsonApi(optionalData) {
   }
   // Set status code and send response data.
   else {
-    return res.status(statusCodeToSet).send({ errors: [{ title, detail: optionalData }]});
+    return res.status(statusCodeToSet).send({ errors: [{ title, detail: optionalData }] });
   }
-
 };

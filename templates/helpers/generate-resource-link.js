@@ -26,9 +26,7 @@ module.exports = {
     const linkPrefix = sails.config.blueprints.linkPrefix ? sails.config.blueprints.linkPrefix : '';
 
     return exits.success(
-      `${protocol}://${host}:${port}/${linkPrefix ? '/' + linkPrefix : ''}${modelPlural}${
-        linkSuffix ? '/' + linkSuffix : ''
-      }`
+      `${protocol}://${host}:${port}${linkPrefix || ''}/${modelPlural}${linkSuffix ? '/' + linkSuffix : ''}`
     );
   }
 };

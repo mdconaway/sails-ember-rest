@@ -18,7 +18,7 @@ module.exports = {
 
   exits: {},
 
-  fn: function ({ res, err }, exits) {
+  fn: function({ res, err }, exits) {
     let errResp;
     let title = 'Server Error';
 
@@ -33,14 +33,13 @@ module.exports = {
       errResp = res.unprocessableEntity;
     } else {
       errorObj.errors.push({
-        title:  "Server Error",
+        title: 'Server Error',
         detail: err.details
       });
       errResp = res.serverError;
     }
-  
+
     // Return the correct error type with the populated body
     return exits.success(errResp(sails.helpers.jsonifyError.with({ err, title })));
   }
 };
-

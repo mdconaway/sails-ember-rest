@@ -36,7 +36,7 @@ module.exports = function unprocessableEntity(optionalData) {
   // If no data was provided, use res.sendStatus().
   if (optionalData === undefined) {
     sails.log.info('Ran custom response: res.unprocessableEntity()');
-    return res.sendStatus(statusCodeToSet);
+    return res.status(statusCodeToSet).send({ errors: [{ title }] });
   }
   // Else if the provided data is an Error instance, if it has
   // a toJSON() function, then always run it and use it as the
@@ -46,7 +46,7 @@ module.exports = function unprocessableEntity(optionalData) {
     sails.log.info('Custom response `res.unprocessableEntity()` called with an Error:', optionalData);
     optionalData.toJSON = function(data) {
       res.sendStatus(statusCodeToSet);
-    }
+    };
     // If the error doesn't have a custom .toJSON(), use its `stack` instead--
     // otherwise res.json() would turn it into an empty dictionary.
     // (If this is production, don't send a response body at all.)

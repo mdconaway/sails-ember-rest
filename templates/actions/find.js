@@ -10,7 +10,7 @@ const actionUtil = require('./../util/actionUtil');
 const shimFunction = require('./../util/shimFunction');
 const defaultInterrupt = require('./../interrupts/defaultInterrupt');
 const { parallel, waterfall } = require('async');
-const { flatten, map } = require('lodash');
+const { map } = require('lodash');
 
 module.exports = function(interrupts = {}) {
   interrupts = shimFunction(interrupts, 'find');
