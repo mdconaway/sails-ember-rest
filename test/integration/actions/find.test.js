@@ -332,5 +332,20 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
+    it('should support the fields query param to display only the fields of a resource requested', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/authors?fields[authors]=name')
+        .expect(200)
+        .expect(res => {
+          const { data } = res.body;
+          sails.log.warn(data);
+
+          data.forEach((record) => {
+            expect(record.attributes.name).to.exist;
+            expect(record.attributes.age).to.not.exist;
+          });
+        })
+        .end(done);
+    });
   });
 });
