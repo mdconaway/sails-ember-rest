@@ -156,6 +156,23 @@ The following will be available as any other helper via `sails.helpers` object
   });
   ```
 
+* populateRecords (synchronous)
+
+  ```javascript
+  const query = Model.find()
+    .where({ name: 'Bob' })
+    .skip(2)
+    .sort('age DESC');
+
+  // populate associations according to our model specific configuration...
+  sails.helpers.populateRecords.with({
+    query,
+    associations: [{ include: 'record' alias: 'articles' }],
+    force: false,
+    subCriteria: { genre: { contains: 'Fiction' }}
+  }).exec(cb);
+  ```
+
 #### Responses
 
 This hook automatically wraps the built-in responses with JSON API specific equivalents. If the Content-Type header of the res object is `application/vnd.api+json` a JSON API compliant response will be returned, otherwise the standard Sails response is used. Additionally, the following responses can be manually called via the `res` object:
@@ -294,7 +311,7 @@ npm test
     * [ ] Many to many (currently untested / partially implemented)
     * [X] One to many
     * [X] Through relationships
-  * [ ] Sparse Fields
+  * [X] Sparse Fields
   * [X] Sorting
   * [X] Pagination
   * [X] Filtering
@@ -302,6 +319,7 @@ npm test
 * Sails integration
   * [ ] Pubsub integration (Partially Implemented)
   * [X] Provide a helper to serialize as JSON API for custom endpoints
+  * [ ] Enable configuration for blacklisting / whitelisting fields for projection queries
   * [ ] Additional configuration options (to be expanded)
 
 ## Contributing

@@ -116,7 +116,8 @@ module.exports = function defineSailsJsonApiHook(sails) {
         getAssociationConfig: require('./lib/helpers/get-association-config'),
         jsonifyError: require('./lib/helpers/jsonify-error'),
         linkAssociations: require('./lib/helpers/link-associations'),
-        negotiate: require('./lib/helpers/negotiate')
+        negotiate: require('./lib/helpers/negotiate'),
+        populateRecords: require('./lib/helpers/populate-records')
       });
 
       // Make policies available to the policy configuration used by the policy hook
