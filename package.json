@@ -1,12 +1,12 @@
 {
     "name": "sails-json-api",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "JSON API compatible controllers, policies, services and generators for Sails v1.0+",
     "main": "index.js",
     "scripts": {
         "start": "node app.js",
         "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
-        "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 2 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,templates}/**/*.js,index.js,app.js}\"",
+        "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 2 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,lib}/**/*.js,index.js,app.js}\"",
         "cover": "nyc ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js"
     },
     "keywords": [

@@ -216,5 +216,104 @@ describe('Integration | Action | populate', function() {
         })
         .end(done);
     });
+    it('support the include query param', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/articles/1/comments?include=author')
+        .expect(res => {
+          const { included } = res.body;
+
+          expect(included).to.have.length(2);
+
+          included.forEach(record => {
+            expect(record.type).to.equal('author');
+            expect(record.relationships.articles.links.related.href).to.equal(
+              `http://localhost:1337/authors/${record.id}/articles`
+            );
+            expect(record.relationships.comments.links.related.href).to.equal(
+              `http://localhost:1337/authors/${record.id}/comments`
+            );
+
+            if (record.id === '1') {
+              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+              expect(record.relationships.comments.links.related.meta.count).to.equal(0);
+            }
+
+            if (record.id === '2') {
+              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
+              expect(record.relationships.comments.links.related.meta.count).to.equal(1);
+            }
+          });
+        })
+        .end(done);
+    });
+  });
+  it('should support the fields query param to display only the fields of the populated records (singular relationship)', function(done) {
+    supertest(sails.hooks.http.app)
+      .get('/articles/1/author?fields[authors]=name')
+      .expect(200)
+      .expect(res => {
+        const { data } = res.body;
+
+        data.forEach(record => {
+          expect(record.attributes.name).to.exist;
+          expect(record.attributes.age).to.not.exist;
+        });
+      })
+      .end(done);
+  });
+  it('should support the fields query param to display only the fields of the populated records (plural relationship)', function(done) {
+    supertest(sails.hooks.http.app)
+      .get('/authors/1/articles?fields[articles]=')
+      .expect(200)
+      .expect(res => {
+        const { data } = res.body;
+
+        data.forEach(record => {
+          expect(record.attributes.name).to.not.exist;
+        });
+      })
+      .end(done);
+  });
+  it('should support the fields query param in conjunction with the include query param (singluar relationship)', function(done) {
+    supertest(sails.hooks.http.app)
+      .get('/articles/1/author?include=articles&fields[authors]=name&fields[articles]=')
+      .expect(200)
+      .expect(res => {
+        const { data, included } = res.body;
+
+        data.forEach(record => {
+          expect(record.attributes.name).to.exist;
+          expect(record.attributes.age).to.not.exist;
+        });
+        included.forEach(record => {
+          expect(record.type).to.equal('article');
+          expect(record.attributes.title).to.not.exist;
+        });
+      })
+      .end(done);
+  });
+  it('should support the fields query param in conjunction with the include query param (plural relationship)', function(done) {
+    supertest(sails.hooks.http.app)
+      .get('/authors/1/articles?include=comments&fields[comments]=&fields[articles]=')
+      .expect(200)
+      .expect(res => {
+        const { data, included } = res.body;
+
+        data.forEach(record => {
+          expect(record.type).to.equal('article');
+          expect(record.attributes.title).to.not.exist;
+        });
+        included.forEach(record => {
+          expect(record.type).to.equal('comment');
+          expect(record.attributes.text).to.not.exist;
+        });
+      })
+      .end(done);
+  });
+  it('should NOT support the fields query param against singular models until the feature is enabled in Sails.js', function(done) {
+    supertest(sails.hooks.http.app)
+      .get('/authors/1/articles?include=author&fields[author]=name')
+      .expect(400)
+      .end(done);
   });
 });
