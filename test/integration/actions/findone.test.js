@@ -176,37 +176,6 @@ describe('Integration | Action | findone', function() {
         .end(done);
     });
 
-    it('should include authors from relationship endpoint', function(done) {
-      supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?include=author')
-        .expect(res => {
-          const { included } = res.body;
-
-          expect(included).to.have.length(2);
-
-          included.forEach(record => {
-            expect(record.type).to.equal('author');
-            expect(record.relationships.articles.links.related.href).to.equal(
-              `http://localhost:1337/authors/${record.id}/articles`
-            );
-            expect(record.relationships.comments.links.related.href).to.equal(
-              `http://localhost:1337/authors/${record.id}/comments`
-            );
-
-            if (record.id === '1') {
-              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
-              expect(record.relationships.comments.links.related.meta.count).to.equal(0);
-            }
-
-            if (record.id === '2') {
-              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
-              expect(record.relationships.comments.links.related.meta.count).to.equal(1);
-            }
-          });
-        })
-        .end(done);
-    });
-
     it('should support the fields query param to display only the fields of a resource requested', function(done) {
       supertest(sails.hooks.http.app)
         .get('/authors/1?fields[authors]=name')
