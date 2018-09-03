@@ -69,6 +69,15 @@ module.exports.blueprints = {
 }
 ```
 
+To support the 'fields' query param, which is implemented by the Sails.js criteria 'select', a schema at the model level must be defined. This can be done globally in config/models.js or individually in each Model file.
+
+```javascript
+// config/models.js
+module.exports.models = {
+  schema: true
+}
+```
+
 ### Implementation
 
 After installation and configuration you will immediately have access to JSON API custom actions, helpers, responses, policies, and a controller. Additionally a global 'JSONAPISerializer' will provide direct access to the underlying serializer used by the hook.
