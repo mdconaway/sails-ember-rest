@@ -339,7 +339,7 @@ describe('Integration | Action | find', function() {
         .expect(res => {
           const { data } = res.body;
 
-          data.forEach((record) => {
+          data.forEach(record => {
             expect(record.attributes.name).to.exist;
             expect(record.attributes.age).to.not.exist;
           });
@@ -347,22 +347,22 @@ describe('Integration | Action | find', function() {
         .end(done);
     });
     it('should support the fields query param in conjunction with the include query param', function(done) {
-        supertest(sails.hooks.http.app)
-          .get('/authors?include=articles&fields[authors]=name&fields[articles]=')
-          .expect(200)
-          .expect(res => {
-            const { data, included } = res.body;
+      supertest(sails.hooks.http.app)
+        .get('/authors?include=articles&fields[authors]=name&fields[articles]=')
+        .expect(200)
+        .expect(res => {
+          const { data, included } = res.body;
 
-            data.forEach((record) => {
-              expect(record.attributes.name).to.exist;
-              expect(record.attributes.age).to.not.exist;
-            });
-            included.forEach((record) => {
-              expect(record.type).to.equal('article');
-              expect(record.attributes.title).to.not.exist;
-            });
-          })
-          .end(done);
+          data.forEach(record => {
+            expect(record.attributes.name).to.exist;
+            expect(record.attributes.age).to.not.exist;
+          });
+          included.forEach(record => {
+            expect(record.type).to.equal('article');
+            expect(record.attributes.title).to.not.exist;
+          });
+        })
+        .end(done);
     });
   });
 });
