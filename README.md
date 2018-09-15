@@ -165,6 +165,25 @@ The following will be available as any other helper via `sails.helpers` object
   });
   ```
 
+* parseFields (synchronous)
+
+  ```javascript
+  sails.helpers.parseFields.with({
+    req, // Sails request object
+    model: Model, // A Waterline collection object
+    toInclude // An array of relationships to include (optional)
+  });
+  ```
+
+* parseInclude (synchronous)
+
+  ```javascript
+  sails.helpers.parseInclude.with({
+    req, // Sails request object
+    model: Model // A Waterline collection object
+  });
+  ```
+
 * populateRecords (synchronous)
 
   ```javascript

@@ -38,18 +38,18 @@
     "devDependencies": {
         "async": "2.6.1",
         "babel": "6.23.0",
-        "babel-plugin-add-module-exports": "0.2.1",
+        "babel-plugin-add-module-exports": "1.0.0",
         "babel-preset-es2015": "6.24.1",
         "babel-register": "6.26.0",
         "chai": "4.1.2",
         "mocha": "5.2.0",
-        "nyc": "12.0.2",
-        "prettier": "1.14.0",
+        "nyc": "13.0.1",
+        "prettier": "1.14.2",
         "sails": "1.0.2",
         "sails-disk": "1.0.1",
         "sails-hook-orm": "2.1.0",
         "sails-hook-sockets": "1.5.3",
-        "supertest": "3.1.0",
+        "supertest": "3.3.0",
         "waterline": "0.13.5"
     },
     "sails": {
