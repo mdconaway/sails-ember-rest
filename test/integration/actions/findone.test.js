@@ -176,32 +176,32 @@ describe('Integration | Action | findone', function() {
         .end(done);
     });
 
-    it('should include authors from relationship endpoint', function(done) {
+    it('should support the fields query param to display only the fields of a resource requested', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/articles/1/comments?include=author')
+        .get('/authors/1?fields[authors]=name')
+        .expect(200)
         .expect(res => {
-          const { included } = res.body;
+          const { data } = res.body;
 
-          expect(included).to.have.length(2);
+          expect(data.attributes.name).to.exist;
+          expect(data.attributes.age).to.not.exist;
+        })
+        .end(done);
+    });
+    it('should support the fields query param in conjunction with the include query param', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/authors?include=articles&fields[authors]=name&fields[articles]=')
+        .expect(200)
+        .expect(res => {
+          const { data, included } = res.body;
 
+          data.forEach(record => {
+            expect(record.attributes.name).to.exist;
+            expect(record.attributes.age).to.not.exist;
+          });
           included.forEach(record => {
-            expect(record.type).to.equal('author');
-            expect(record.relationships.articles.links.related.href).to.equal(
-              `http://localhost:1337/authors/${record.id}/articles`
-            );
-            expect(record.relationships.comments.links.related.href).to.equal(
-              `http://localhost:1337/authors/${record.id}/comments`
-            );
-
-            if (record.id === '1') {
-              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
-              expect(record.relationships.comments.links.related.meta.count).to.equal(0);
-            }
-
-            if (record.id === '2') {
-              expect(record.relationships.articles.links.related.meta.count).to.equal(1);
-              expect(record.relationships.comments.links.related.meta.count).to.equal(1);
-            }
+            expect(record.type).to.equal('article');
+            expect(record.attributes.title).to.not.exist;
           });
         })
         .end(done);

@@ -16,34 +16,34 @@ global.JSONAPISerializer = new Serializer({
 });
 
 // Imported Actions
-const create = require('./templates/actions/create');
-const destroy = require('./templates/actions/destroy');
-const find = require('./templates/actions/find');
-const findone = require('./templates/actions/findone');
-const populate = require('./templates/actions/populate');
-const update = require('./templates/actions/update');
+const create = require('./lib/actions/create');
+const destroy = require('./lib/actions/destroy');
+const find = require('./lib/actions/find');
+const findone = require('./lib/actions/findone');
+const populate = require('./lib/actions/populate');
+const update = require('./lib/actions/update');
 
 module.exports = function defineSailsJsonApiHook(sails) {
   return {
     /**
      * Custom Controller
      */
-    controller: require('./templates/controllers/JsonApiController'),
+    controller: require('./lib/controllers/JsonApiController'),
 
     /**
      * Custom Responses
      * There is not currently a binding into registering custom responses via a hook
      */
     responses: {
-      badRequestJsonApi: require('./templates/responses/badRequestJsonApi'),
-      created: require('./templates/responses/created'),
-      forbiddenJsonApi: require('./templates/responses/forbiddenJsonApi'),
-      noContent: require('./templates/responses/noContent'),
-      notAcceptable: require('./templates/responses/notAcceptable'),
-      notFoundJsonApi: require('./templates/responses/notFoundJsonApi'),
-      serverErrorJsonApi: require('./templates/responses/serverErrorJsonApi'),
-      unprocessableEntity: require('./templates/responses/unprocessableEntity'),
-      unsupportedMediaType: require('./templates/responses/unsupportedMediaType')
+      badRequestJsonApi: require('./lib/responses/badRequestJsonApi'),
+      created: require('./lib/responses/created'),
+      forbiddenJsonApi: require('./lib/responses/forbiddenJsonApi'),
+      noContent: require('./lib/responses/noContent'),
+      notAcceptable: require('./lib/responses/notAcceptable'),
+      notFoundJsonApi: require('./lib/responses/notFoundJsonApi'),
+      serverErrorJsonApi: require('./lib/responses/serverErrorJsonApi'),
+      unprocessableEntity: require('./lib/responses/unprocessableEntity'),
+      unsupportedMediaType: require('./lib/responses/unsupportedMediaType')
     },
 
     /**
@@ -110,19 +110,22 @@ module.exports = function defineSailsJsonApiHook(sails) {
     configure() {
       // Make helpers accessible via sails.helper.*
       sails.config.helpers.moduleDefinitions = Object.assign({}, sails.config.helpers.moduleDefinitions, {
-        buildJsonApiResponse: require('./templates/helpers/build-json-api-response'),
-        countRelationship: require('./templates/helpers/count-relationship'),
-        generateResourceLink: require('./templates/helpers/generate-resource-link'),
-        getAssociationConfig: require('./templates/helpers/get-association-config'),
-        jsonifyError: require('./templates/helpers/jsonify-error'),
-        linkAssociations: require('./templates/helpers/link-associations'),
-        negotiate: require('./templates/helpers/negotiate')
+        buildJsonApiResponse: require('./lib/helpers/build-json-api-response'),
+        countRelationship: require('./lib/helpers/count-relationship'),
+        generateResourceLink: require('./lib/helpers/generate-resource-link'),
+        getAssociationConfig: require('./lib/helpers/get-association-config'),
+        jsonifyError: require('./lib/helpers/jsonify-error'),
+        linkAssociations: require('./lib/helpers/link-associations'),
+        negotiate: require('./lib/helpers/negotiate'),
+        parseFields: require('./lib/helpers/parse-fields-param'),
+        parseInclude: require('./lib/helpers/parse-include-param'),
+        populateRecords: require('./lib/helpers/populate-records')
       });
 
       // Make policies available to the policy configuration used by the policy hook
       // The policy map MUST be all lowercase as Sails' policy hook will make this assumption
       sails.config.policies.moduleDefinitions = Object.assign({}, sails.config.policies.moduleDefinitions, {
-        jsonapivalidateheaders: require('./templates/policies/jsonApiValidateHeaders')
+        jsonapivalidateheaders: require('./lib/policies/jsonApiValidateHeaders')
       });
 
       // Add middleware for handling unmatched urls
@@ -197,4 +200,4 @@ module.exports = function defineSailsJsonApiHook(sails) {
 };
 
 // TODO: Move all actionUtil functions to their own helpers and register in hook
-module.exports.util = require('./templates/util/actionUtil');
+module.exports.util = require('./lib/util/actionUtil');

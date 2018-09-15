@@ -69,6 +69,15 @@ module.exports.blueprints = {
 }
 ```
 
+To support the 'fields' query param, which is implemented by the Sails.js criteria 'select', a schema at the model level must be defined. This can be done globally in config/models.js or individually in each Model file.
+
+```javascript
+// config/models.js
+module.exports.models = {
+  schema: true
+}
+```
+
 ### Implementation
 
 After installation and configuration you will immediately have access to JSON API custom actions, helpers, responses, policies, and a controller. Additionally a global 'JSONAPISerializer' will provide direct access to the underlying serializer used by the hook.
@@ -154,6 +163,42 @@ The following will be available as any other helper via `sails.helpers` object
     res, // Sails response object
     err // An error to identify as a either an unprocessableEntity or a serverError
   });
+  ```
+
+* parseFields (synchronous)
+
+  ```javascript
+  sails.helpers.parseFields.with({
+    req, // Sails request object
+    model: Model, // A Waterline collection object
+    toInclude // An array of relationships to include (optional)
+  });
+  ```
+
+* parseInclude (synchronous)
+
+  ```javascript
+  sails.helpers.parseInclude.with({
+    req, // Sails request object
+    model: Model // A Waterline collection object
+  });
+  ```
+
+* populateRecords (synchronous)
+
+  ```javascript
+  const query = Model.find()
+    .where({ name: 'Bob' })
+    .skip(2)
+    .sort('age DESC');
+
+  // populate associations according to our model specific configuration...
+  sails.helpers.populateRecords.with({
+    query,
+    associations: [{ include: 'record' alias: 'articles' }],
+    force: false,
+    subCriteria: { genre: { contains: 'Fiction' }}
+  }).exec(cb);
   ```
 
 #### Responses
@@ -294,7 +339,7 @@ npm test
     * [ ] Many to many (currently untested / partially implemented)
     * [X] One to many
     * [X] Through relationships
-  * [ ] Sparse Fields
+  * [X] Sparse Fields
   * [X] Sorting
   * [X] Pagination
   * [X] Filtering
@@ -302,6 +347,7 @@ npm test
 * Sails integration
   * [ ] Pubsub integration (Partially Implemented)
   * [X] Provide a helper to serialize as JSON API for custom endpoints
+  * [ ] Enable configuration for blacklisting / whitelisting fields for projection queries
   * [ ] Additional configuration options (to be expanded)
 
 ## Contributing
