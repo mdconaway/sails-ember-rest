@@ -22,10 +22,7 @@
 // no matter where we actually lift from.
 // > Note: This is not required in order to lift, but it is a convenient default.
 
-require('babel-register')({
-  presets: ['es2015'],
-  plugins: ['add-module-exports']
-});
+require('@babel/register');
 
 process.chdir(__dirname);
 

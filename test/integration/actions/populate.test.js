@@ -287,7 +287,7 @@ describe('Integration | Action | populate', function() {
         });
         included.forEach(record => {
           expect(record.type).to.equal('article');
-          expect(record.attributes.title).to.not.exist;
+          expect(record.attributes).to.not.exist;
         });
       })
       .end(done);
@@ -305,7 +305,7 @@ describe('Integration | Action | populate', function() {
         });
         included.forEach(record => {
           expect(record.type).to.equal('comment');
-          expect(record.attributes.text).to.not.exist;
+          expect(record.attributes).to.not.exist;
         });
       })
       .end(done);

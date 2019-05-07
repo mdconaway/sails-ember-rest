@@ -1,13 +1,13 @@
 {
     "name": "sails-json-api",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "JSON API compatible controllers, policies, services and generators for Sails v1.0+",
     "main": "index.js",
     "scripts": {
         "start": "node app.js",
-        "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
+        "test": "node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js --require @babel/register",
         "format": "node ./node_modules/.bin/prettier --single-quote --tab-width 2 --print-width 120 --trailing-comma none --write \"{{api,bin,config,test,lib}/**/*.js,index.js,app.js}\"",
-        "cover": "nyc ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js"
+        "cover": "nyc ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js --require @babel/register"
     },
     "keywords": [
         "json-api",
@@ -31,26 +31,26 @@
         "node": ">=6.0.0"
     },
     "dependencies": {
-        "json-api-serializer": "1.13.0",
-        "lodash": "4.17.10",
+        "json-api-serializer": "1.15.1",
+        "lodash": "4.17.11",
         "pluralize": "7.0.0"
     },
     "devDependencies": {
-        "async": "2.6.1",
-        "babel": "6.23.0",
-        "babel-plugin-add-module-exports": "1.0.0",
-        "babel-preset-es2015": "6.24.1",
-        "babel-register": "6.26.0",
-        "chai": "4.1.2",
-        "mocha": "5.2.0",
-        "nyc": "13.0.1",
-        "prettier": "1.14.2",
-        "sails": "1.0.2",
-        "sails-disk": "1.0.1",
-        "sails-hook-orm": "2.1.0",
-        "sails-hook-sockets": "1.5.3",
-        "supertest": "3.3.0",
-        "waterline": "0.13.5"
+        "@babel/core": "7.4.4",
+        "@babel/preset-env": "7.4.4",
+        "@babel/register": "7.4.4",
+        "async": "2.6.2",
+        "babel-plugin-add-module-exports": "1.0.2",
+        "chai": "4.2.0",
+        "mocha": "6.1.4",
+        "nyc": "14.1.0",
+        "prettier": "1.17.0",
+        "sails": "1.2.1",
+        "sails-disk": "1.1.2",
+        "sails-hook-orm": "2.1.1",
+        "sails-hook-sockets": "1.5.5",
+        "supertest": "4.0.2",
+        "waterline": "0.13.6"
     },
     "sails": {
         "isHook": true

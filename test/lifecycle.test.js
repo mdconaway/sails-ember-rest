@@ -1,7 +1,3 @@
-require('babel-register')({
-  presets: ['es2015'],
-  plugins: ['add-module-exports']
-});
 const loadFixtures = require('./helpers/loadFixtures');
 const sails = require('sails');
 const { expect } = require('chai');
