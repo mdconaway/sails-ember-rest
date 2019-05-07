@@ -201,7 +201,7 @@ describe('Integration | Action | findone', function() {
           });
           included.forEach(record => {
             expect(record.type).to.equal('article');
-            expect(record.attributes.title).to.not.exist;
+            expect(record.attributes).to.not.exist;
           });
         })
         .end(done);

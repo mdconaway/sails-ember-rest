@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [0.0.2] - 2018-09-15
+## [0.3.0] - 2019-05-07
+### Changed
+- Updated test environment to use Sails 1.2.1 and Babel 7
+- Updated JSON API Serializer to newest version (1.15.1)
+
+## [0.2.0] - 2018-09-15
 ### Changed
 - Added support for JSON API's 'fields' query param for sparse fields
 - Added Travis-CI configuration
