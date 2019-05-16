@@ -100,11 +100,42 @@ describe('Integration | Action | populate', function() {
           expect(focusDoc.attributes.createdAt).to.not.exist;
 
           expect(focusDoc.relationships).to.exist;
-          expect(Object.keys(focusDoc.relationships).length).to.equal(2);
+          expect(Object.keys(focusDoc.relationships).length).to.equal(3);
           expect(focusDoc.relationships.comments.links.related.href).to.equal(
             `http://localhost:1337/authors/${focusDoc.id}/comments`
           );
           expect(focusDoc.relationships.comments.links.related.meta.count).to.equal(2);
+        })
+        .end(done);
+    });
+    it('should return 2 authors with associated, 3 non-duplicated publishers', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/publishers/1/authors?include=publishers')
+        .expect(res => {
+          const { data, included, meta } = res.body;
+          const focusDoc = data[1];
+
+          expect(data).to.have.lengthOf(2);
+          expect(meta.total).to.equal(2);
+
+          expect(focusDoc.id).to.equal('3');
+          expect(focusDoc.type).to.equal('author');
+          expect(focusDoc.attributes.name).to.equal('Cob');
+          expect(focusDoc.attributes['created-at']).to.exist;
+          expect(focusDoc.attributes.createdAt).to.not.exist;
+
+          expect(focusDoc.relationships).to.exist;
+          expect(Object.keys(focusDoc.relationships).length).to.equal(3);
+          expect(focusDoc.relationships.publishers.links.related.href).to.equal(
+            `http://localhost:1337/authors/${focusDoc.id}/publishers`
+          );
+          expect(focusDoc.relationships.publishers.links.related.meta.count).to.equal(2);
+          expect(data[0].relationships.publishers.links.related.meta.count).to.equal(1);
+
+          expect(included).to.have.lengthOf(2);
+          included.forEach(record => {
+            expect(record.type).to.equal('publisher');
+          });
         })
         .end(done);
     });

@@ -65,7 +65,7 @@ describe('Integration | Action | find', function() {
       supertest(sails.hooks.http.app)
         .get('/articles')
         .expect(res => {
-          const { data, meta } = res.body;
+          const { data } = res.body;
           const focusDoc = data[0];
 
           expect(data).to.have.lengthOf(2);
@@ -257,7 +257,7 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
-    it('should support the include query param with multiple top-level relationship value', function(done) {
+    it('should support the include query param with multiple top-level relationship values', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles?include=author,comments')
         .expect(res => {
@@ -308,7 +308,7 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
-    it('should support the include query param with with additional params', function(done) {
+    it('should support the include query param with additional params', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles?include=author&title[contains]=XML')
         .expect(res => {
@@ -319,7 +319,7 @@ describe('Integration | Action | find', function() {
           expect(focusDoc.type).to.equal('author');
           expect(focusDoc.id).to.equal('1');
           expect(focusDoc.relationships).to.exist;
-          expect(Object.keys(focusDoc.relationships).length).to.equal(2);
+          expect(Object.keys(focusDoc.relationships).length).to.equal(3);
 
           expect(focusDoc.relationships.articles.links.related.href).to.equal(
             `http://localhost:1337/authors/${focusDoc.id}/articles`
@@ -348,7 +348,9 @@ describe('Integration | Action | find', function() {
     });
     it('should support the fields query param in conjunction with the include query param', function(done) {
       supertest(sails.hooks.http.app)
-        .get('/authors?include=articles&fields[authors]=name&fields[articles]=')
+        .get(
+          '/authors?include=articles,publishers&fields[authors]=name&fields[articles]=&fields[publishers]=name,updatedAt'
+        )
         .expect(200)
         .expect(res => {
           const { data, included } = res.body;
@@ -357,9 +359,18 @@ describe('Integration | Action | find', function() {
             expect(record.attributes.name).to.exist;
             expect(record.attributes.age).to.not.exist;
           });
+
+          // Expect only articles and publishers for relationships
+          expect(included.filter(record => ['article', 'publisher'].indexOf(record.type) < 0).length).to.equal(0);
+
           included.forEach(record => {
-            expect(record.type).to.equal('article');
-            expect(record.attributes).to.not.exist;
+            if (record.type === 'article') {
+              expect(record.attributes).to.not.exist;
+            } else if (record.type === 'publisher') {
+              expect(record.attributes.name).to.exist;
+              expect(record.attributes['updated-at']).to.exist;
+              expect(record.attributes['created-at']).to.not.exist;
+            }
           });
         })
         .end(done);

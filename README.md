@@ -2,7 +2,7 @@
 
 Developed with the goal of seamlessly integrating [Ember.js](https://www.emberjs.com/) front-end applications with [SailsJS](https://sailsjs.com/) back-ends, Sail-JSON-API overrides default blueprints to provide a more robust communication interface. Sails-JSON-API provides [JSON API](http://jsonapi.org/) compliant actions, controllers, helpers, policies, and responses for Sails v1.0+ which are immediately available after installation.
 
-Sails-JSON-API is in the VERY early stages and should be treated as a WIP until further notice!
+As of v0.3.0, Sails-JSON-API has now begun its stable push towards a 1.0 release. If you're using this library in your project, please provide issues and feedback!
 
 ## Getting Started
 
@@ -336,7 +336,7 @@ npm test
   * Relationships
     * [X] One to one
     * [X] One way associations
-    * [ ] Many to many (currently untested / partially implemented)
+    * [X] Many to many
     * [X] One to many
     * [X] Through relationships
   * [X] Sparse Fields
@@ -345,7 +345,7 @@ npm test
   * [X] Filtering
   * [X] Special param 'include'
 * Sails integration
-  * [ ] Pubsub integration (Partially Implemented)
+  * [X] Pubsub integration
   * [X] Provide a helper to serialize as JSON API for custom endpoints
   * [ ] Enable configuration for blacklisting / whitelisting fields for projection queries
   * [ ] Additional configuration options (to be expanded)

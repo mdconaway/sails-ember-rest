@@ -11,19 +11,15 @@ export default {
     },
     articles: {
       collection: 'article',
-      via: 'author',
-      meta: {
-        list: 'record',
-        detail: 'record'
-      }
+      via: 'author'
     },
     comments: {
       collection: 'comment',
-      via: 'author',
-      meta: {
-        list: 'record',
-        detail: 'record'
-      }
+      via: 'author'
+    },
+    publishers: {
+      collection: 'publisher',
+      via: 'authors'
     }
   }
 };
