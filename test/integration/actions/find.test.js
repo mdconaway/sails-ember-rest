@@ -257,6 +257,12 @@ describe('Integration | Action | find', function() {
         })
         .end(done);
     });
+    it('should NOT support the include query param with a nested relationship value', function(done) {
+      supertest(sails.hooks.http.app)
+        .get('/authors?include=articles.comments')
+        .expect(400)
+        .end(done);
+    });
     it('should support the include query param with multiple top-level relationship values', function(done) {
       supertest(sails.hooks.http.app)
         .get('/articles?include=author,comments')

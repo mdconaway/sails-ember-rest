@@ -329,26 +329,41 @@ npm test
 
 * JSON API implementation
   * [X] GET all resources
+  * [X] GET one resource
   * [X] POST resource
   * [X] DELETE resource
   * [X] PATCH resource
-  * [X] Return proper error if any
   * Relationships
     * [X] One to one
     * [X] One way associations
     * [X] Many to many
     * [X] One to many
     * [X] Through relationships
+  * Update relationships via [relationship links](https://jsonapi.org/format/#crud-updating-relationships)
+    * [ ] To-One Relationships
+    * [ ] To-Many Relationships
   * [X] Sparse Fields
   * [X] Sorting
   * [X] Pagination
   * [X] Filtering
-  * [X] Special param 'include'
+  * Special param 'include' [Fetching Includes](https://jsonapi.org/format/#fetching-includes)
+    * [X] Include top level relationships
+    * [ ] Include nested relationships denoted with dot-notation
+  * Return proper error if any [Server Responsibilities](https://jsonapi.org/format/#content-negotiation-servers)
+    * [X] 406 Not Acceptable
+    * [ ] 409 Conflict
+    * [X] 415 Unsupported Media Type
+  * Allow [client generated IDs](https://jsonapi.org/format/#crud-creating-client-ids)
+    * [ ] Return '204 No Content' upon a successful creation
+    * [ ] Return '409 Conflict' when attempted to create a resource with an ID that already exists
+  * [ ] Custom non-dynamic, metadata applied to each response
+  * [ ] Location header upon successful resource [creation](https://jsonapi.org/format/#crud-creating-responses)
 * Sails integration
   * [X] Pubsub integration
   * [X] Provide a helper to serialize as JSON API for custom endpoints
   * [ ] Enable configuration for blacklisting / whitelisting fields for projection queries
   * [ ] Additional configuration options (to be expanded)
+  * [ ] Support asynchronous actions that could take awhile to process (202 Accepted)
 
 ## Contributing
 
