@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.1] - 2019-05-19
+### Changed
+- Patched errors in certain scenarios which became deeply nested
+
 ## [0.3.0] - 2019-05-07
 ### Changed
 - Updated test environment to use Sails 1.2.1 and Babel 7
