@@ -1,6 +1,6 @@
 {
     "name": "sails-json-api",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "JSON API compatible controllers, policies, services and generators for Sails v1.0+",
     "main": "index.js",
     "scripts": {
@@ -31,24 +31,24 @@
         "node": ">=6.0.0"
     },
     "dependencies": {
-        "json-api-serializer": "1.15.1",
-        "lodash": "4.17.11",
-        "pluralize": "7.0.0"
+        "json-api-serializer": "2.3.0",
+        "lodash": "4.17.15",
+        "pluralize": "8.0.0"
     },
     "devDependencies": {
-        "@babel/core": "7.4.4",
-        "@babel/preset-env": "7.4.4",
-        "@babel/register": "7.4.4",
-        "async": "2.6.2",
+        "@babel/core": "7.8.4",
+        "@babel/preset-env": "7.8.4",
+        "@babel/register": "7.8.3",
+        "async": "3.1.1",
         "babel-plugin-add-module-exports": "1.0.2",
         "chai": "4.2.0",
-        "mocha": "6.1.4",
-        "nyc": "14.1.0",
-        "prettier": "1.17.0",
-        "sails": "1.2.1",
+        "mocha": "7.0.1",
+        "nyc": "15.0.0",
+        "prettier": "1.19.1",
+        "sails": "1.2.3",
         "sails-disk": "1.1.2",
         "sails-hook-orm": "2.1.1",
-        "sails-hook-sockets": "1.5.5",
+        "sails-hook-sockets": "2.0.0",
         "supertest": "4.0.2",
         "waterline": "0.13.6"
     },

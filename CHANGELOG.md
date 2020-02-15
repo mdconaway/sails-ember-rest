@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.2] - 2020-02-15
+### Changed
+- Bumped dev dependencies
+- Updated (major) json-api-serializer dependency to v2.3.0
+- Updated (major) pluralize dependency to v8.0.0
+- Patched lodash to v4.17.15
+
 ## [0.3.1] - 2019-05-19
 ### Changed
 - Patched errors in certain scenarios which became deeply nested
