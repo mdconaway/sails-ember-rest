@@ -221,7 +221,7 @@ This hook provides additional policies to implement the JSON API spec to its str
 
 * jsonApiValidateHeaders - Requires that both the request `Content-Type` and `Accept` headers are set to `application/vnd.api+json`
 
-#### Controller
+#### Controller (Mandatory)
 
 Arguably the most important component provided by sails-json-api. It exports a class constructor that will handle all blueprint actions for any model type by default; these actions are defined above.
 
@@ -229,7 +229,7 @@ To create a new sails-json-api controller instance, simply define your controlle
 ```javascript
 const Controller = new sails.hooks['sails-json-api'].controller({});
 
-export default Controller;
+module.exports= Controller;
 ```
 
 To create a new sails-json-api controller instance *when the `sails` global is not available*:
@@ -238,7 +238,7 @@ import { controller } from 'sails-json-api';
 
 const Controller = controller({});
 
-export default Controller;
+module.exports= Controller;
 ```
 
 Default actions can be overwritten and custom actions can be added:
@@ -260,7 +260,7 @@ const Controller = new sails.hooks['sails-json-api'].controller({
   }
 });
 
-export default Controller;
+module.exports= Controller;
 ```
 
 Sails-json-api controllers also offer a powerful new feature that does not exist anywhere else in the sails ecosystem: `interrupts`. This is a concept directly inherited from [Sails-Ember-Rest](https://github.com/mdconaway/sails-ember-rest).
