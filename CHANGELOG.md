@@ -6,13 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-
-## [0.3.3] - 2021-03-28
+## [0.3.2] - 2021-03-28
 ### Changed
 - Add proxyPort config support to fix links behind a PaaS
-
-## [0.3.2] - 2020-02-15
-### Changed
 - Bumped dev dependencies
 - Updated (major) json-api-serializer dependency to v2.3.0
 - Updated (major) pluralize dependency to v8.0.0
