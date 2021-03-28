@@ -28,7 +28,7 @@
     "author": "Adam Gribble",
     "license": "MIT",
     "engines": {
-        "node": ">=6.0.0"
+        "node": ">=10.0.0"
     },
     "dependencies": {
         "json-api-serializer": "2.3.0",
